@@ -70,7 +70,7 @@ const OrderForm = () => {
             <SelectContent>
               {products.map((product) => (
                 <SelectItem key={product.id} value={product.id}>
-                  {product.name} - ${product.price}
+                  {product.name} - NPR {product.price.toLocaleString()}
                 </SelectItem>
               ))}
             </SelectContent>

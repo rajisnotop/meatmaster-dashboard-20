@@ -56,7 +56,7 @@ const ProductsTable = () => {
         />
         <Input
           type="number"
-          placeholder="Price"
+          placeholder="Price (NPR)"
           value={newProduct.price}
           onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
         />
@@ -86,7 +86,7 @@ const ProductsTable = () => {
             {products.map((product) => (
               <TableRow key={product.id}>
                 <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
+                <TableCell>NPR {product.price.toLocaleString()}</TableCell>
                 <TableCell>{product.stock}</TableCell>
                 <TableCell className="text-right">
                   <Button

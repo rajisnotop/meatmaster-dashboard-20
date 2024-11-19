@@ -1,7 +1,19 @@
 import { DollarSign, ShoppingCart, Package, TrendingUp } from "lucide-react";
 import { Card } from "./ui/card";
+import { useStore } from "@/store/store";
 
 const DashboardStats = () => {
+  const { orders, products } = useStore();
+  
+  // Calculate total sales from orders
+  const todaysSales = orders
+    .filter(order => {
+      const today = new Date();
+      const orderDate = new Date(order.date);
+      return orderDate.toDateString() === today.toDateString();
+    })
+    .reduce((total, order) => total + order.total, 0);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
       <Card className="p-6 hover:shadow-lg transition-shadow">
@@ -11,7 +23,7 @@ const DashboardStats = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Today's Sales</p>
-            <h3 className="text-2xl font-bold">$1,234</h3>
+            <h3 className="text-2xl font-bold">NPR {todaysSales.toLocaleString()}</h3>
           </div>
         </div>
       </Card>
@@ -23,7 +35,7 @@ const DashboardStats = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Orders</p>
-            <h3 className="text-2xl font-bold">25</h3>
+            <h3 className="text-2xl font-bold">{orders.length}</h3>
           </div>
         </div>
       </Card>
@@ -35,7 +47,7 @@ const DashboardStats = () => {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Products</p>
-            <h3 className="text-2xl font-bold">48</h3>
+            <h3 className="text-2xl font-bold">{products.length}</h3>
           </div>
         </div>
       </Card>
@@ -46,8 +58,10 @@ const DashboardStats = () => {
             <TrendingUp className="h-6 w-6 text-secondary" />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Revenue</p>
-            <h3 className="text-2xl font-bold">$12,345</h3>
+            <p className="text-sm text-muted-foreground">Total Revenue</p>
+            <h3 className="text-2xl font-bold">
+              NPR {orders.reduce((total, order) => total + order.total, 0).toLocaleString()}
+            </h3>
           </div>
         </div>
       </Card>
