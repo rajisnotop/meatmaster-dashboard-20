@@ -1,5 +1,5 @@
 import { Card } from "./ui/card";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStore } from "@/store/store";
 
 const RevenueChart = () => {
@@ -44,17 +44,7 @@ const RevenueChart = () => {
       
       <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="earnedGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-              </linearGradient>
-              <linearGradient id="forecastedGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/>
-                <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
+          <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid 
               strokeDasharray="3 3" 
               stroke="hsl(var(--muted-foreground))" 
@@ -93,25 +83,17 @@ const RevenueChart = () => {
                 return null;
               }}
             />
-            <Area 
-              type="monotone" 
+            <Bar 
               dataKey="earned" 
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              fillOpacity={1}
-              fill="url(#earnedGradient)"
-              dot={false}
+              fill="hsl(var(--primary))"
+              radius={[4, 4, 0, 0]}
             />
-            <Area 
-              type="monotone" 
+            <Bar 
               dataKey="forecasted" 
-              stroke="#22c55e"
-              strokeWidth={2}
-              fillOpacity={1}
-              fill="url(#forecastedGradient)"
-              dot={false}
+              fill="#22c55e"
+              radius={[4, 4, 0, 0]}
             />
-          </AreaChart>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </Card>

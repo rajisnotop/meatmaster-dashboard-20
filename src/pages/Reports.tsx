@@ -52,7 +52,7 @@ const Reports = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="p-6">
+          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
             <div className="flex items-center gap-4">
               <ChartPie className="w-8 h-8 text-primary" />
               <div>
@@ -62,7 +62,7 @@ const Reports = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
             <div className="flex items-center gap-4">
               <FileText className="w-8 h-8 text-primary" />
               <div>
@@ -72,7 +72,7 @@ const Reports = () => {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
             <div className="flex items-center gap-4">
               <ShoppingBag className="w-8 h-8 text-primary" />
               <div>
@@ -84,22 +84,49 @@ const Reports = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6">
+          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
             <h3 className="text-lg font-semibold mb-4">Top Selling Products</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topProducts}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#A239CA" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.1} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="hsl(var(--muted-foreground))"
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))"
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="rounded-lg border bg-background p-2 shadow-md">
+                            <p className="text-sm font-medium">{payload[0].payload.name}</p>
+                            <p className="text-sm text-primary">
+                              Quantity: {payload[0].value}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Bar 
+                    dataKey="value" 
+                    fill="hsl(var(--primary))"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
             <h3 className="text-lg font-semibold mb-4">Loyal Customers</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
