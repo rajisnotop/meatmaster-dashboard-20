@@ -1,5 +1,6 @@
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -8,13 +9,11 @@ const Header = () => {
         <Button variant="ghost" size="icon" className="lg:hidden">
           <Menu className="h-6 w-6" />
         </Button>
-        <h1 className="text-xl font-bold">Meat Shop Manager</h1>
+        <Link to="/" className="text-xl font-bold">Meat Shop Manager</Link>
       </div>
       <nav className="hidden lg:flex items-center space-x-6">
-        <a href="#dashboard" className="hover:text-secondary transition-colors">Dashboard</a>
-        <a href="#products" className="hover:text-secondary transition-colors">Products</a>
-        <a href="#orders" className="hover:text-secondary transition-colors">Orders</a>
-        <a href="#reports" className="hover:text-secondary transition-colors">Reports</a>
+        <Link to="/" className="hover:text-secondary transition-colors">Dashboard</Link>
+        <Link to="/orders" className="hover:text-secondary transition-colors">Orders</Link>
       </nav>
     </header>
   );
