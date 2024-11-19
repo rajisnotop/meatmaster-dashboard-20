@@ -5,23 +5,29 @@ import { useStore } from "@/store/store";
 const RevenueChart = () => {
   const { orders } = useStore();
 
-  // Process orders to get daily revenue
-  const dailyRevenue = orders.reduce((acc: { [key: string]: number }, order) => {
-    const date = new Date(order.date).toLocaleDateString('en-US', { month: 'short' });
-    acc[date] = (acc[date] || 0) + order.total;
+  // Process orders to get weekly revenue
+  const weeklyRevenue = orders.reduce((acc: { [key: string]: number }, order) => {
+    const date = new Date(order.date);
+    const weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - date.getDay()); // Get Sunday of the week
+    const weekKey = weekStart.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric'
+    });
+    acc[weekKey] = (acc[weekKey] || 0) + order.total;
     return acc;
   }, {});
 
-  const data = Object.entries(dailyRevenue).map(([name, revenue]) => ({
+  const data = Object.entries(weeklyRevenue).map(([name, revenue]) => ({
     name,
     earned: revenue,
   }));
 
   return (
     <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-2xl font-bold text-foreground">
+          <h3 className="text-xl font-bold text-foreground">
             NPR {orders.reduce((total, order) => total + order.total, 0).toLocaleString()}
           </h3>
           <p className="text-sm text-muted-foreground">Total Revenue</p>
@@ -34,7 +40,7 @@ const RevenueChart = () => {
         </div>
       </div>
       
-      <div className="h-[300px] w-full">
+      <div className="h-[200px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid 
@@ -62,7 +68,7 @@ const RevenueChart = () => {
                 if (active && payload && payload.length) {
                   return (
                     <div className="rounded-lg border bg-background p-2 shadow-md">
-                      <p className="text-sm font-medium">{payload[0].payload.name}</p>
+                      <p className="text-sm font-medium">Week of {payload[0].payload.name}</p>
                       <p className="text-sm text-primary">
                         Revenue: NPR {payload[0].value?.toLocaleString()}
                       </p>
