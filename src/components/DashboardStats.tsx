@@ -5,7 +5,6 @@ import { useStore } from "@/store/store";
 const DashboardStats = () => {
   const { orders, products } = useStore();
   
-  // Calculate total sales from orders
   const todaysSales = orders
     .filter(order => {
       const today = new Date();
@@ -16,10 +15,10 @@ const DashboardStats = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-      <Card className="p-6 hover:shadow-lg transition-shadow">
+      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-secondary/10 rounded-full">
-            <DollarSign className="h-6 w-6 text-secondary" />
+          <div className="p-3 bg-primary/10 rounded-full">
+            <DollarSign className="h-6 w-6 text-primary" />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Today's Sales</p>
@@ -28,10 +27,10 @@ const DashboardStats = () => {
         </div>
       </Card>
       
-      <Card className="p-6 hover:shadow-lg transition-shadow">
+      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-secondary/10 rounded-full">
-            <ShoppingCart className="h-6 w-6 text-secondary" />
+          <div className="p-3 bg-primary/10 rounded-full">
+            <ShoppingCart className="h-6 w-6 text-primary" />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Orders</p>
@@ -40,10 +39,10 @@ const DashboardStats = () => {
         </div>
       </Card>
       
-      <Card className="p-6 hover:shadow-lg transition-shadow">
+      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-secondary/10 rounded-full">
-            <Package className="h-6 w-6 text-secondary" />
+          <div className="p-3 bg-primary/10 rounded-full">
+            <Package className="h-6 w-6 text-primary" />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Products</p>
@@ -52,10 +51,10 @@ const DashboardStats = () => {
         </div>
       </Card>
       
-      <Card className="p-6 hover:shadow-lg transition-shadow">
+      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-secondary/10 rounded-full">
-            <TrendingUp className="h-6 w-6 text-secondary" />
+          <div className="p-3 bg-primary/10 rounded-full">
+            <TrendingUp className="h-6 w-6 text-primary" />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Total Revenue</p>

@@ -48,7 +48,7 @@ const OrderForm = () => {
   };
 
   return (
-    <Card className="p-6 animate-scale-in">
+    <Card className="p-6 card-glow animate-scale-in">
       <h3 className="text-lg font-semibold mb-4">New Order</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
@@ -58,13 +58,14 @@ const OrderForm = () => {
             placeholder="Enter customer name"
             value={order.customerName}
             onChange={(e) => setOrder({ ...order, customerName: e.target.value })}
+            className="bg-secondary/50 border-primary/20"
           />
         </div>
         
         <div className="space-y-2">
           <Label htmlFor="product">Product</Label>
           <Select value={order.productId} onValueChange={(value) => setOrder({ ...order, productId: value })}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-secondary/50 border-primary/20">
               <SelectValue placeholder="Select a product" />
             </SelectTrigger>
             <SelectContent>
@@ -86,10 +87,11 @@ const OrderForm = () => {
             step="0.1"
             value={order.quantity}
             onChange={(e) => setOrder({ ...order, quantity: e.target.value })}
+            className="bg-secondary/50 border-primary/20"
           />
         </div>
         
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full bg-primary/20 hover:bg-primary/30 text-primary">
           Create Order
         </Button>
       </form>
