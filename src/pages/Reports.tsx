@@ -5,6 +5,7 @@ import { useStore } from "@/store/store";
 import { FileText, Printer, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { toast } from "@/components/ui/use-toast";
 
 const Reports = () => {
   const { orders, products } = useStore();
@@ -39,13 +40,79 @@ const Reports = () => {
 
   const COLORS = ['#A239CA', '#4717F6', '#F64C72', '#6B7280', '#9CA3AF'];
 
+  const handlePrintReport = () => {
+    try {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast({
+          title: "Error",
+          description: "Please allow pop-ups to print the report",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Meat Shop Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              .header { text-align: center; margin-bottom: 30px; }
+              .section { margin-bottom: 20px; }
+              .metric { margin: 10px 0; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Meat Shop Report</h1>
+              <p>Generated on ${new Date().toLocaleDateString()}</p>
+            </div>
+            <div class="section">
+              <h2>Key Metrics</h2>
+              <div class="metric">Total Revenue: NPR ${totalRevenue.toLocaleString()}</div>
+              <div class="metric">Average Order Value: NPR ${averageOrderValue.toLocaleString()}</div>
+              <div class="metric">Total Products: ${products.length}</div>
+            </div>
+            <div class="section">
+              <h2>Top Selling Products</h2>
+              ${Object.entries(productSales)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([name, value]) => `<div class="metric">${name}: ${value} units</div>`)
+                .join('')}
+            </div>
+          </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+      printWindow.print();
+      
+      toast({
+        title: "Success",
+        description: "Report sent to printer",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate report",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container py-8 space-y-8">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-foreground">Reports</h1>
-          <Button variant="outline" className="hover:bg-primary/20">
+          <Button 
+            variant="outline" 
+            className="hover:bg-primary/20"
+            onClick={handlePrintReport}
+          >
             <Printer className="w-4 h-4 mr-2" />
             Print Report
           </Button>
