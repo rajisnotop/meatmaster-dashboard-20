@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import RevenueChart from "@/components/RevenueChart";
 import { useStore } from "@/store/store";
-import { ChartPie, FileText, Printer, Users, ShoppingBag } from "lucide-react";
+import { FileText, Printer, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -54,7 +54,7 @@ const Reports = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
             <div className="flex items-center gap-4">
-              <ChartPie className="w-8 h-8 text-primary" />
+              <FileText className="w-8 h-8 text-primary" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Revenue</p>
                 <h3 className="text-2xl font-bold">NPR {totalRevenue.toLocaleString()}</h3>

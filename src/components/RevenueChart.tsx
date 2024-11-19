@@ -5,20 +5,16 @@ import { useStore } from "@/store/store";
 const RevenueChart = () => {
   const { orders } = useStore();
 
-  // Process orders to get daily revenue and forecast
+  // Process orders to get daily revenue
   const dailyRevenue = orders.reduce((acc: { [key: string]: number }, order) => {
     const date = new Date(order.date).toLocaleDateString('en-US', { month: 'short' });
     acc[date] = (acc[date] || 0) + order.total;
     return acc;
   }, {});
 
-  // Generate forecast data (simple example - you can replace with actual forecast logic)
-  const generateForecast = (value: number) => value * (0.8 + Math.random() * 0.4);
-
   const data = Object.entries(dailyRevenue).map(([name, revenue]) => ({
     name,
     earned: revenue,
-    forecasted: generateForecast(revenue),
   }));
 
   return (
@@ -33,11 +29,7 @@ const RevenueChart = () => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-primary/80"></div>
-            <span className="text-sm text-muted-foreground">Earned</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-[#22c55e]/80"></div>
-            <span className="text-sm text-muted-foreground">Forecasted</span>
+            <span className="text-sm text-muted-foreground">Revenue</span>
           </div>
         </div>
       </div>
@@ -59,7 +51,7 @@ const RevenueChart = () => {
               dy={10}
             />
             <YAxis 
-              tickFormatter={(value) => `NPR ${(value/1000).toFixed(0)}K`}
+              tickFormatter={(value) => `NPR ${value.toLocaleString()}`}
               stroke="hsl(var(--muted-foreground))"
               tickLine={false}
               axisLine={false}
@@ -72,10 +64,7 @@ const RevenueChart = () => {
                     <div className="rounded-lg border bg-background p-2 shadow-md">
                       <p className="text-sm font-medium">{payload[0].payload.name}</p>
                       <p className="text-sm text-primary">
-                        Earned: NPR {payload[0].value?.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-[#22c55e]">
-                        Forecasted: NPR {payload[1].value?.toLocaleString()}
+                        Revenue: NPR {payload[0].value?.toLocaleString()}
                       </p>
                     </div>
                   );
@@ -86,11 +75,6 @@ const RevenueChart = () => {
             <Bar 
               dataKey="earned" 
               fill="hsl(var(--primary))"
-              radius={[4, 4, 0, 0]}
-            />
-            <Bar 
-              dataKey="forecasted" 
-              fill="#22c55e"
               radius={[4, 4, 0, 0]}
             />
           </BarChart>
