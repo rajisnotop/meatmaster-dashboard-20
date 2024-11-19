@@ -64,6 +64,7 @@ const RevenueChart = () => {
               dx={-10}
             />
             <Tooltip 
+              cursor={false}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
