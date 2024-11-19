@@ -40,9 +40,9 @@ const RevenueChart = () => {
         </div>
       </div>
       
-      <div className="h-[200px] w-full">
+      <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} barSize={20}>
             <CartesianGrid 
               strokeDasharray="3 3" 
               stroke="hsl(var(--muted-foreground))" 
