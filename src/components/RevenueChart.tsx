@@ -1,5 +1,5 @@
 import { Card } from "./ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStore } from "@/store/store";
 
 const RevenueChart = () => {
@@ -22,23 +22,39 @@ const RevenueChart = () => {
       <h3 className="text-lg font-semibold mb-4">Weekly Revenue</h3>
       <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/>
+                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.01}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.2} />
+            <XAxis 
+              dataKey="name" 
+              stroke="hsl(var(--muted-foreground))"
+            />
             <YAxis 
               tickFormatter={(value) => `NPR ${value.toLocaleString()}`}
+              stroke="hsl(var(--muted-foreground))"
             />
             <Tooltip 
               formatter={(value: number) => [`NPR ${value.toLocaleString()}`, "Revenue"]}
+              contentStyle={{
+                backgroundColor: 'hsl(var(--background))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '8px',
+              }}
             />
-            <Line 
+            <Area 
               type="monotone" 
               dataKey="revenue" 
-              stroke="#F97316" 
+              stroke="hsl(var(--primary))"
+              fillOpacity={1}
+              fill="url(#revenueGradient)"
               strokeWidth={2}
-              dot={{ fill: '#F97316' }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </Card>
