@@ -1,11 +1,13 @@
 import Header from "@/components/Header";
-import { Card } from "@/components/ui/card";
-import RevenueChart from "@/components/RevenueChart";
 import { useStore } from "@/store/store";
 import { FileText, Printer, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { toast } from "@/components/ui/use-toast";
+import MetricCard from "@/components/reports/MetricCard";
+import TopProducts from "@/components/reports/TopProducts";
+import LoyalCustomers from "@/components/reports/LoyalCustomers";
+import RecentCustomers from "@/components/reports/RecentCustomers";
+import RevenueChart from "@/components/RevenueChart";
 
 const Reports = () => {
   const { orders, products } = useStore();
@@ -13,7 +15,7 @@ const Reports = () => {
   const totalRevenue = orders.reduce((total, order) => total + order.total, 0);
   const averageOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
 
-  // Calculate top selling products
+  // Process orders to get product sales data
   const productSales = orders.reduce((acc: { [key: string]: number }, order) => {
     const product = products.find(p => p.id === order.productId);
     if (product) {
@@ -37,6 +39,11 @@ const Reports = () => {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
     .map(([name, value]) => ({ name, value }));
+
+  // Get recent customers
+  const recentCustomers = [...orders]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 10);
 
   const COLORS = ['#A239CA', '#4717F6', '#F64C72', '#6B7280', '#9CA3AF'];
 
@@ -119,107 +126,32 @@ const Reports = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
-            <div className="flex items-center gap-4">
-              <FileText className="w-8 h-8 text-primary" />
-              <div>
-                <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <h3 className="text-2xl font-bold">NPR {totalRevenue.toLocaleString()}</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
-            <div className="flex items-center gap-4">
-              <FileText className="w-8 h-8 text-primary" />
-              <div>
-                <p className="text-sm text-muted-foreground">Average Order Value</p>
-                <h3 className="text-2xl font-bold">NPR {averageOrderValue.toLocaleString()}</h3>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
-            <div className="flex items-center gap-4">
-              <ShoppingBag className="w-8 h-8 text-primary" />
-              <div>
-                <p className="text-sm text-muted-foreground">Total Products</p>
-                <h3 className="text-2xl font-bold">{products.length}</h3>
-              </div>
-            </div>
-          </Card>
+          <MetricCard
+            icon={FileText}
+            title="Total Revenue"
+            value={`NPR ${totalRevenue.toLocaleString()}`}
+          />
+          <MetricCard
+            icon={FileText}
+            title="Average Order Value"
+            value={`NPR ${averageOrderValue.toLocaleString()}`}
+          />
+          <MetricCard
+            icon={ShoppingBag}
+            title="Total Products"
+            value={products.length.toString()}
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
-            <h3 className="text-lg font-semibold mb-4">Top Selling Products</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={topProducts}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted-foreground))" opacity={0.1} />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="hsl(var(--muted-foreground))"
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis 
-                    stroke="hsl(var(--muted-foreground))"
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="rounded-lg border bg-background p-2 shadow-md">
-                            <p className="text-sm font-medium">{payload[0].payload.name}</p>
-                            <p className="text-sm text-primary">
-                              Quantity: {payload[0].value}
-                            </p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Bar 
-                    dataKey="value" 
-                    fill="hsl(var(--primary))"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm">
-            <h3 className="text-lg font-semibold mb-4">Loyal Customers</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={loyalCustomers}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {loyalCustomers.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+          <TopProducts data={topProducts} />
+          <LoyalCustomers data={loyalCustomers} colors={COLORS} />
         </div>
 
-        <RevenueChart />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <RevenueChart />
+          <RecentCustomers customers={recentCustomers} />
+        </div>
       </main>
     </div>
   );
