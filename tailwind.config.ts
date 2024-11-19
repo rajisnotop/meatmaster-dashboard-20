@@ -22,22 +22,22 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: "#0D0D0D",
+        foreground: "#FFFFFF",
         primary: {
-          DEFAULT: "#1A1F2C",
+          DEFAULT: "#A239CA",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#F97316",
+          DEFAULT: "#4717F6",
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#F8FAFC",
-          foreground: "#64748B",
+          DEFAULT: "#0D0D0D",
+          foreground: "#E0E0E0",
         },
         destructive: {
-          DEFAULT: "#EF4444",
+          DEFAULT: "#F64C72",
           foreground: "#FFFFFF",
         },
       },
@@ -49,11 +49,17 @@ export default {
         "scale-in": {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" }
+        },
+        "glow-pulse": {
+          "0%": { boxShadow: "0 0 10px #A239CA, 0 0 20px #A239CA" },
+          "50%": { boxShadow: "0 0 20px #A239CA, 0 0 30px #A239CA" },
+          "100%": { boxShadow: "0 0 10px #A239CA, 0 0 20px #A239CA" }
         }
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-out",
-        "scale-in": "scale-in 0.2s ease-out"
+        "scale-in": "scale-in 0.2s ease-out",
+        "glow-pulse": "glow-pulse 2s infinite"
       }
     },
   },

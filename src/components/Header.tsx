@@ -4,16 +4,18 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <header className="bg-primary text-primary-foreground py-4 px-6 flex items-center justify-between">
+    <header className="bg-background border-b border-primary/20 py-4 px-6 flex items-center justify-between backdrop-blur-sm">
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" className="lg:hidden">
+        <Button variant="ghost" size="icon" className="lg:hidden hover:bg-primary/20 hover:text-primary">
           <Menu className="h-6 w-6" />
         </Button>
-        <Link to="/" className="text-xl font-bold">Meat Shop Manager</Link>
+        <Link to="/" className="text-xl font-bold text-foreground hover:text-primary transition-colors">
+          Meat Shop Manager
+        </Link>
       </div>
       <nav className="hidden lg:flex items-center space-x-6">
-        <Link to="/" className="hover:text-secondary transition-colors">Dashboard</Link>
-        <Link to="/orders" className="hover:text-secondary transition-colors">Orders</Link>
+        <Link to="/" className="text-foreground hover:text-primary transition-colors">Dashboard</Link>
+        <Link to="/orders" className="text-foreground hover:text-primary transition-colors">Orders</Link>
       </nav>
     </header>
   );
