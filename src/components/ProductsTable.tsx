@@ -1,46 +1,108 @@
+import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Button } from "./ui/button";
-import { Edit2, Trash2 } from "lucide-react";
-
-const products = [
-  { id: 1, name: 'Beef Sirloin', price: 15.99, stock: 50 },
-  { id: 2, name: 'Chicken Breast', price: 8.99, stock: 75 },
-  { id: 3, name: 'Pork Chops', price: 12.99, stock: 30 },
-  { id: 4, name: 'Lamb Leg', price: 19.99, stock: 25 },
-];
+import { Plus, Trash2 } from "lucide-react";
+import { Input } from "./ui/input";
+import { useStore } from "@/store/store";
+import { useToast } from "./ui/use-toast";
 
 const ProductsTable = () => {
+  const { products, addProduct, deleteProduct } = useStore();
+  const { toast } = useToast();
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    price: "",
+    stock: "",
+  });
+
+  const handleAddProduct = () => {
+    if (!newProduct.name || !newProduct.price || !newProduct.stock) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    addProduct({
+      name: newProduct.name,
+      price: Number(newProduct.price),
+      stock: Number(newProduct.stock),
+    });
+
+    setNewProduct({ name: "", price: "", stock: "" });
+    toast({
+      title: "Success",
+      description: "Product added successfully",
+    });
+  };
+
+  const handleDeleteProduct = (id: string) => {
+    deleteProduct(id);
+    toast({
+      title: "Success",
+      description: "Product deleted successfully",
+    });
+  };
+
   return (
-    <div className="rounded-md border animate-fade-in">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Product Name</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {products.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell className="font-medium">{product.name}</TableCell>
-              <TableCell>${product.price.toFixed(2)}</TableCell>
-              <TableCell>{product.stock}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-2">
-                  <Button variant="ghost" size="icon">
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="text-destructive">
+    <div className="space-y-4 animate-fade-in">
+      <div className="flex gap-4">
+        <Input
+          placeholder="Product Name"
+          value={newProduct.name}
+          onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+        />
+        <Input
+          type="number"
+          placeholder="Price"
+          value={newProduct.price}
+          onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+        />
+        <Input
+          type="number"
+          placeholder="Stock"
+          value={newProduct.stock}
+          onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
+        />
+        <Button onClick={handleAddProduct}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Product
+        </Button>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Product Name</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell className="font-medium">{product.name}</TableCell>
+                <TableCell>${product.price.toFixed(2)}</TableCell>
+                <TableCell>{product.stock}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="text-destructive"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
