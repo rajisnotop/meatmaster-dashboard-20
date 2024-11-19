@@ -7,7 +7,9 @@ const Products = () => {
       <Header />
       <main className="container py-8 space-y-8">
         <h1 className="text-3xl font-bold text-foreground">Products</h1>
-        <ProductsTable />
+        <div className="p-6 rounded-lg card-glow">
+          <ProductsTable />
+        </div>
       </main>
     </div>
   );
