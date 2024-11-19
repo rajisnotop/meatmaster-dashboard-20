@@ -15,9 +15,9 @@ const DashboardStats = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
+      <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm hover:scale-105 transition-all duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-primary/10 rounded-full">
+          <div className="p-3 bg-primary/10 rounded-full border border-primary/20">
             <DollarSign className="h-6 w-6 text-primary" />
           </div>
           <div>
@@ -27,9 +27,9 @@ const DashboardStats = () => {
         </div>
       </Card>
       
-      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
+      <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm hover:scale-105 transition-all duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-primary/10 rounded-full">
+          <div className="p-3 bg-primary/10 rounded-full border border-primary/20">
             <ShoppingCart className="h-6 w-6 text-primary" />
           </div>
           <div>
@@ -39,9 +39,9 @@ const DashboardStats = () => {
         </div>
       </Card>
       
-      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
+      <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm hover:scale-105 transition-all duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-primary/10 rounded-full">
+          <div className="p-3 bg-primary/10 rounded-full border border-primary/20">
             <Package className="h-6 w-6 text-primary" />
           </div>
           <div>
@@ -51,9 +51,9 @@ const DashboardStats = () => {
         </div>
       </Card>
       
-      <Card className="p-6 card-glow hover:scale-105 transition-transform duration-300">
+      <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm hover:scale-105 transition-all duration-300">
         <div className="flex items-center space-x-4">
-          <div className="p-3 bg-primary/10 rounded-full">
+          <div className="p-3 bg-primary/10 rounded-full border border-primary/20">
             <TrendingUp className="h-6 w-6 text-primary" />
           </div>
           <div>
