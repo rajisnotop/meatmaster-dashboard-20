@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Printer } from "lucide-react";
 import { toast } from "sonner";
-import { startOfDay, startOfWeek, startOfMonth, startOfYear, isAfter, parseISO } from "date-fns";
+import { startOfDay, startOfWeek, startOfMonth, startOfYear, isAfter, isBefore, endOfDay, endOfWeek, endOfMonth, endOfYear } from "date-fns";
 import BillingTable from "@/components/billing/BillingTable";
 import Header from "@/components/Header";
 
@@ -22,7 +22,7 @@ const Billing = () => {
 
   // Filter data based on selected time period
   const filterData = (date: Date) => {
-    let startDate;
+    let startDate, endDate;
     const now = new Date();
 
     if (timeFilter === "all") return true;
@@ -30,21 +30,25 @@ const Billing = () => {
     switch (timeFilter) {
       case "daily":
         startDate = startOfDay(now);
+        endDate = endOfDay(now);
         break;
       case "weekly":
         startDate = startOfWeek(now);
+        endDate = endOfWeek(now);
         break;
       case "monthly":
         startDate = startOfMonth(now);
+        endDate = endOfMonth(now);
         break;
       case "yearly":
         startDate = startOfYear(now);
+        endDate = endOfYear(now);
         break;
       default:
         return true;
     }
 
-    return isAfter(date, startDate);
+    return isAfter(date, startDate) && isBefore(date, endDate);
   };
 
   // Calculate totals for each product
@@ -70,8 +74,10 @@ const Billing = () => {
   });
 
   // Calculate overall totals
-  const totalExpenses = expenses
-    .filter((expense) => filterData(new Date(expense.date)))
+  const filteredExpenses = expenses
+    .filter((expense) => filterData(new Date(expense.date)));
+
+  const totalExpenses = filteredExpenses
     .reduce((sum, expense) => sum + expense.amount, 0);
 
   const overallTotals = {
@@ -194,7 +200,7 @@ const Billing = () => {
                 <SelectTrigger className="w-[180px] bg-background">
                   <SelectValue placeholder="Select time period" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background border border-border">
                   <SelectItem value="all">All Time</SelectItem>
                   <SelectItem value="daily">Daily</SelectItem>
                   <SelectItem value="weekly">Weekly</SelectItem>

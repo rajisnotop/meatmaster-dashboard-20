@@ -57,7 +57,7 @@ const BillingTable = ({
               />
             </TableCell>
             <TableCell className="font-medium">{product.name}</TableCell>
-            <TableCell>{product.quantity}</TableCell>
+            <TableCell>{product.quantity.toFixed(2)}</TableCell>
             <TableCell>{product.amount.toLocaleString()}</TableCell>
             <TableCell>{product.unpaid.toLocaleString()}</TableCell>
           </TableRow>
@@ -65,7 +65,7 @@ const BillingTable = ({
         <TableRow className="bg-muted/50 font-bold">
           <TableCell></TableCell>
           <TableCell>Total</TableCell>
-          <TableCell>{overallTotals.quantity}</TableCell>
+          <TableCell>{overallTotals.quantity.toFixed(2)}</TableCell>
           <TableCell>NPR {overallTotals.sales.toLocaleString()}</TableCell>
           <TableCell>NPR {overallTotals.unpaid.toLocaleString()}</TableCell>
         </TableRow>
