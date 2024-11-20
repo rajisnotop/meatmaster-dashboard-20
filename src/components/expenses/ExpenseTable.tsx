@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useStore } from "@/store/store";
-import Header from "@/components/Header";
 import {
   Table,
   TableBody,
@@ -50,9 +49,8 @@ const ExpenseTable = () => {
   };
 
   return (
-    <div className="container py-8 space-y-8">
-      <Header />
-      <div className="space-y-6">
+    <div className="container mx-auto py-12">
+      <div className="space-y-8">
         <Card className="p-6">
           <h2 className="text-2xl font-bold mb-4">Expense Summary</h2>
           <div className="space-y-2">
