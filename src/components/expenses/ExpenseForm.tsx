@@ -36,6 +36,8 @@ const ExpenseForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log("Submitting expense:", values); // Debug log
+    
     addExpense({
       amount: Number(values.amount),
       description: values.description || "",
@@ -48,6 +50,7 @@ const ExpenseForm = () => {
       description: "Your expense has been successfully recorded.",
     });
 
+    // Reset form with default values
     form.reset({
       amount: "",
       description: "",
