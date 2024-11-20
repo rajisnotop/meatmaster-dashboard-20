@@ -59,15 +59,49 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
     updateOrderStatus(orderId, true);
   };
 
+  const handleMarkAllAsPaid = (customerOrders: any[]) => {
+    console.log("Marking all orders as paid for customer");
+    customerOrders.forEach(order => {
+      updateOrderStatus(order.id, true);
+    });
+  };
+
   return (
     <div className="space-y-6">
       {Object.entries(groupedUnpaidOrders).map(([customerName, { orders: customerOrders, totalAmount }]) => (
         <Card key={customerName} className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">{customerName}</h3>
-            <p className="text-red-600 font-bold">
-              Total Unpaid: NPR {totalAmount.toLocaleString()}
-            </p>
+            <div>
+              <h3 className="text-lg font-semibold">{customerName}</h3>
+              <p className="text-red-600 font-bold">
+                Total Unpaid: NPR {totalAmount.toLocaleString()}
+              </p>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="bg-green-500/20 hover:bg-green-500/30 text-green-500"
+                >
+                  Pay All Orders
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Mark All Orders as Paid?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action will mark all unpaid orders for {customerName} as paid, totaling NPR {totalAmount.toLocaleString()}.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleMarkAllAsPaid(customerOrders)}>
+                    Confirm
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
           <div className="rounded-md border">
             <Table>
