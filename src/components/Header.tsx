@@ -19,6 +19,7 @@ const Header = () => {
         <Link to="/products" className="text-foreground hover:text-primary transition-colors">Products</Link>
         <Link to="/reports" className="text-foreground hover:text-primary transition-colors">Reports</Link>
         <Link to="/expenditure" className="text-foreground hover:text-primary transition-colors">Expenditure</Link>
+        <Link to="/credit" className="text-foreground hover:text-primary transition-colors">Credit</Link>
         <Link to="/settings" className="text-foreground hover:text-primary transition-colors">Settings</Link>
       </nav>
     </header>
