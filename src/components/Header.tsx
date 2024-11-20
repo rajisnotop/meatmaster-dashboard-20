@@ -16,7 +16,6 @@ const Header = () => {
       <nav className="hidden lg:flex items-center space-x-6">
         <Link to="/" className="text-foreground hover:text-primary transition-colors">Dashboard</Link>
         <Link to="/orders" className="text-foreground hover:text-primary transition-colors">Orders</Link>
-        <Link to="/products" className="text-foreground hover:text-primary transition-colors">Products</Link>
         <Link to="/reports" className="text-foreground hover:text-primary transition-colors">Reports</Link>
         <Link to="/expenditure" className="text-foreground hover:text-primary transition-colors">Expenditure</Link>
         <Link to="/billing" className="text-foreground hover:text-primary transition-colors">Billing</Link>
