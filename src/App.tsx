@@ -9,6 +9,7 @@ import Orders from "./pages/Orders";
 import Products from "./pages/Products";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Expenditure from "./pages/Expenditure";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => {
               <Route path="/products" element={<Products />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/expenditure" element={<Expenditure />} />
             </Routes>
           </TooltipProvider>
         </BrowserRouter>

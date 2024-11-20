@@ -17,12 +17,22 @@ interface Order {
   date: Date;
 }
 
+interface Expense {
+  id: string;
+  category: string;
+  amount: number;
+  description: string;
+  date: Date;
+}
+
 interface StoreState {
   products: Product[];
   orders: Order[];
+  expenses: Expense[];
   addProduct: (product: Omit<Product, 'id'>) => void;
   deleteProduct: (id: string) => void;
   addOrder: (order: Omit<Order, 'id' | 'date'>) => void;
+  addExpense: (expense: Omit<Expense, 'id'>) => void;
 }
 
 export const useStore = create<StoreState>()(
@@ -31,6 +41,7 @@ export const useStore = create<StoreState>()(
       (set) => ({
         products: [],
         orders: [],
+        expenses: [],
         addProduct: (product) =>
           set((state) => ({
             products: [...state.products, { ...product, id: crypto.randomUUID() }],
@@ -44,6 +55,13 @@ export const useStore = create<StoreState>()(
             orders: [
               ...state.orders,
               { ...order, id: crypto.randomUUID(), date: new Date() },
+            ],
+          })),
+        addExpense: (expense) =>
+          set((state) => ({
+            expenses: [
+              ...state.expenses,
+              { ...expense, id: crypto.randomUUID() },
             ],
           })),
       }),
