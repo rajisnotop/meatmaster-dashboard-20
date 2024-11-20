@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
@@ -14,15 +14,32 @@ const OrderForm = () => {
     customerName: "",
     productId: "",
     quantity: "",
+    price: "",
   });
+
+  const selectedProduct = products.find((p) => p.id === order.productId);
+
+  useEffect(() => {
+    if (selectedProduct && order.price) {
+      const quantity = Number(order.price) / selectedProduct.price;
+      setOrder(prev => ({ ...prev, quantity: quantity.toFixed(2) }));
+    }
+  }, [order.price, selectedProduct]);
+
+  useEffect(() => {
+    if (selectedProduct && order.quantity) {
+      const price = selectedProduct.price * Number(order.quantity);
+      setOrder(prev => ({ ...prev, price: price.toFixed(2) }));
+    }
+  }, [order.quantity, selectedProduct]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!order.customerName || !order.productId || !order.quantity) {
+    if (!order.productId || (!order.quantity && !order.price)) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Please fill in required fields",
         variant: "destructive",
       });
       return;
@@ -34,13 +51,14 @@ const OrderForm = () => {
     const total = product.price * Number(order.quantity);
 
     addOrder({
-      customerName: order.customerName,
+      customerName: order.customerName || undefined,
       productId: order.productId,
       quantity: Number(order.quantity),
       total,
+      isPaid: false,
     });
 
-    setOrder({ customerName: "", productId: "", quantity: "" });
+    setOrder({ customerName: "", productId: "", quantity: "", price: "" });
     toast({
       title: "Success",
       description: "Order created successfully",
@@ -52,7 +70,7 @@ const OrderForm = () => {
       <h3 className="text-lg font-semibold mb-4">New Order</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="customer">Customer Name</Label>
+          <Label htmlFor="customer">Customer Name (Optional)</Label>
           <Input
             id="customer"
             placeholder="Enter customer name"
@@ -77,18 +95,32 @@ const OrderForm = () => {
             </SelectContent>
           </Select>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="quantity">Quantity (kg)</Label>
-          <Input
-            id="quantity"
-            type="number"
-            min="0"
-            step="0.1"
-            value={order.quantity}
-            onChange={(e) => setOrder({ ...order, quantity: e.target.value })}
-            className="bg-background border-border/50 focus:border-primary/50"
-          />
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="quantity">Quantity (kg)</Label>
+            <Input
+              id="quantity"
+              type="number"
+              min="0"
+              step="0.1"
+              value={order.quantity}
+              onChange={(e) => setOrder({ ...order, quantity: e.target.value, price: "" })}
+              className="bg-background border-border/50 focus:border-primary/50"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="price">Price (NPR)</Label>
+            <Input
+              id="price"
+              type="number"
+              min="0"
+              value={order.price}
+              onChange={(e) => setOrder({ ...order, price: e.target.value, quantity: "" })}
+              className="bg-background border-border/50 focus:border-primary/50"
+            />
+          </div>
         </div>
         
         <Button type="submit" className="w-full bg-primary/20 hover:bg-primary/30 text-primary border border-primary/20">
