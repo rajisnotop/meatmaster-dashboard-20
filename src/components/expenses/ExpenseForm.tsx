@@ -20,6 +20,7 @@ const formSchema = z.object({
   }),
   description: z.string().optional(),
   date: z.string().min(1, "Date is required"),
+  category: z.string().min(1, "Category is required"),
 });
 
 const ExpenseForm = () => {
@@ -32,6 +33,7 @@ const ExpenseForm = () => {
       amount: "",
       description: "",
       date: new Date().toISOString().split("T")[0],
+      category: "",
     },
   });
 
@@ -40,6 +42,7 @@ const ExpenseForm = () => {
       amount: Number(values.amount),
       description: values.description || "",
       date: new Date(values.date),
+      category: values.category,
     });
 
     toast({
@@ -58,7 +61,7 @@ const ExpenseForm = () => {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Amount (NPR)</FormLabel>
               <FormControl>
                 <Input type="number" step="0.01" placeholder="0.00" {...field} />
               </FormControl>

@@ -10,10 +10,11 @@ import RecentCustomers from "@/components/reports/RecentCustomers";
 import RevenueChart from "@/components/RevenueChart";
 
 const Reports = () => {
-  const { orders, products } = useStore();
+  const { orders, products, expenses } = useStore();
 
   const totalRevenue = orders.reduce((total, order) => total + order.total, 0);
-  const averageOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+  const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
+  const netProfit = totalRevenue - totalExpenses;
 
   // Process orders to get product sales data
   const productSales = orders.reduce((acc: { [key: string]: number }, order) => {
@@ -78,7 +79,8 @@ const Reports = () => {
             <div class="section">
               <h2>Key Metrics</h2>
               <div class="metric">Total Revenue: NPR ${totalRevenue.toLocaleString()}</div>
-              <div class="metric">Average Order Value: NPR ${averageOrderValue.toLocaleString()}</div>
+              <div class="metric">Total Expenses: NPR ${totalExpenses.toLocaleString()}</div>
+              <div class="metric">Net Profit: NPR ${netProfit.toLocaleString()}</div>
               <div class="metric">Total Products: ${products.length}</div>
             </div>
             <div class="section">
@@ -125,25 +127,25 @@ const Reports = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <MetricCard
-            icon={FileText}
-            title="Total Revenue"
-            value={`NPR ${totalRevenue.toLocaleString()}`}
-          />
-          <MetricCard
-            icon={FileText}
-            title="Average Order Value"
-            value={`NPR ${averageOrderValue.toLocaleString()}`}
-          />
-          <MetricCard
-            icon={ShoppingBag}
-            title="Total Products"
-            value={products.length.toString()}
-          />
-        </div>
+        <Card className="p-6">
+          <h2 className="text-xl font-bold mb-4">Financial Summary</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-2xl font-bold text-green-600">NPR {totalRevenue.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Total Expenses</p>
+              <p className="text-2xl font-bold text-red-600">NPR {totalExpenses.toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Net Profit</p>
+              <p className="text-2xl font-bold text-primary">NPR {netProfit.toLocaleString()}</p>
+            </div>
+          </div>
+        </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <TopProducts data={topProducts} />
           <LoyalCustomers data={loyalCustomers} colors={COLORS} />
         </div>
