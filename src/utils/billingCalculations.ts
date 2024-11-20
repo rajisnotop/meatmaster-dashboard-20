@@ -11,12 +11,18 @@ export const calculateProductTotals = (
       return order.productId === product.id && filterDateFn(orderDate);
     });
 
-    const totalQuantity = productOrders.reduce((sum, order) => sum + order.quantity, 0);
-    const totalAmount = productOrders.reduce((sum, order) => sum + order.total, 0);
+    // Calculate total quantity and amount only for paid orders that were not previously unpaid
+    const totalQuantity = productOrders
+      .filter(order => order.isPaid && !order.wasUnpaid)
+      .reduce((sum, order) => sum + order.quantity, 0);
     
-    // Calculate unpaid to paid amount by only including orders that are currently paid
+    const totalAmount = productOrders
+      .filter(order => order.isPaid && !order.wasUnpaid)
+      .reduce((sum, order) => sum + order.total, 0);
+    
+    // Calculate unpaid to paid amount only for orders that were previously unpaid
     const unpaidToPaidAmount = productOrders
-      .filter((order) => order.isPaid)  // Only include paid orders
+      .filter(order => order.isPaid && order.wasUnpaid)
       .reduce((sum, order) => sum + order.total, 0);
 
     return {
