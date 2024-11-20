@@ -16,6 +16,7 @@ interface Order {
   total: number;
   date: Date;
   isPaid: boolean;
+  wasUnpaid?: boolean;
   description?: string;
 }
 
@@ -59,7 +60,7 @@ export const useStore = create<StoreState>()(
           set((state) => ({
             orders: [
               ...state.orders,
-              { ...order, id: crypto.randomUUID() },
+              { ...order, id: crypto.randomUUID(), wasUnpaid: !order.isPaid },
             ],
           }));
         },
@@ -74,7 +75,7 @@ export const useStore = create<StoreState>()(
         updateOrderStatus: (id, isPaid) =>
           set((state) => ({
             orders: state.orders.map((order) =>
-              order.id === id ? { ...order, isPaid } : order
+              order.id === id ? { ...order, isPaid, wasUnpaid: !order.isPaid } : order
             ),
           })),
         addExpense: (expense) =>

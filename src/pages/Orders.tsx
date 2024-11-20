@@ -31,10 +31,23 @@ const Orders = () => {
   const totalPaidAmount = orders
     .filter(order => order.isPaid)
     .reduce((sum, order) => sum + order.total, 0);
+  
+  // Calculate total unpaid to paid amount
+  const unpaidToPaidOrders = orders.filter(order => order.isPaid && order.wasUnpaid);
+  const totalUnpaidToPaidAmount = unpaidToPaidOrders
+    .reduce((sum, order) => sum + order.total, 0);
 
   // Filter paid orders based on search criteria
   const filteredPaidOrders = orders.filter(order => {
     if (!order.isPaid) return false;
+    const product = products.find(p => p.id === order.productId);
+    const searchString = `${order.customerName} ${product?.name} ${order.total}`.toLowerCase();
+    const dateMatch = searchDate ? new Date(order.date).toLocaleDateString().includes(searchDate) : true;
+    return searchString.includes(searchTerm.toLowerCase()) && dateMatch;
+  });
+
+  // Filter unpaid to paid orders
+  const filteredUnpaidToPaidOrders = unpaidToPaidOrders.filter(order => {
     const product = products.find(p => p.id === order.productId);
     const searchString = `${order.customerName} ${product?.name} ${order.total}`.toLowerCase();
     const dateMatch = searchDate ? new Date(order.date).toLocaleDateString().includes(searchDate) : true;
@@ -52,7 +65,7 @@ const Orders = () => {
         <div className="grid gap-6">
           <Card className="p-8">
             <h2 className="text-xl font-bold mb-6">Orders Summary</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
                 <p className="text-sm text-muted-foreground">Total Unpaid Amount</p>
                 <p className="text-2xl font-bold text-red-600">
@@ -63,6 +76,12 @@ const Orders = () => {
                 <p className="text-sm text-muted-foreground">Total Paid Amount</p>
                 <p className="text-2xl font-bold text-green-600">
                   NPR {totalPaidAmount.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Unpaid to Paid Amount</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  NPR {totalUnpaidToPaidAmount.toLocaleString()}
                 </p>
               </div>
               <div>
@@ -99,6 +118,37 @@ const Orders = () => {
                 <OrderForm editingOrder={editingOrder} />
               </DialogContent>
             </Dialog>
+
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold">Unpaid to Paid Orders</h2>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredUnpaidToPaidOrders.map((order) => {
+                      const product = products.find(p => p.id === order.productId);
+                      return (
+                        <TableRow key={order.id}>
+                          <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                          <TableCell>{order.customerName || "Anonymous"}</TableCell>
+                          <TableCell>{product?.name}</TableCell>
+                          <TableCell>{order.quantity} kg</TableCell>
+                          <TableCell>NPR {order.total.toLocaleString()}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
 
             <div className="space-y-6">
               <h2 className="text-2xl font-bold">Paid Orders</h2>
