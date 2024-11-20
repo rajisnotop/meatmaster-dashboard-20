@@ -1,54 +1,56 @@
-import { useStore } from "@/store/store";
 import { Card } from "@/components/ui/card";
+import { useStore } from "@/store/store";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
-const COLORS = ["#8B5CF6", "#D946EF", "#F97316", "#0EA5E9", "#10B981", "#6366F1"];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#FF6B6B"];
 
 const ExpenseSummary = () => {
-  const { expenses } = useStore();
+  const expenses = useStore((state) => state.expenses);
 
-  const categoryTotals = expenses.reduce((acc, expense) => {
-    acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+  const expensesByCategory = expenses.reduce((acc, expense) => {
+    const category = expense.category;
+    if (!acc[category]) {
+      acc[category] = 0;
+    }
+    acc[category] += expense.amount;
     return acc;
   }, {} as Record<string, number>);
 
-  const data = Object.entries(categoryTotals).map(([name, value]) => ({
+  const pieData = Object.entries(expensesByCategory).map(([name, value]) => ({
     name: name.charAt(0).toUpperCase() + name.slice(1),
     value,
   }));
 
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">Total Expenses</h3>
-        <p className="text-3xl font-bold">NPR {totalExpenses.toLocaleString()}</p>
+        <h2 className="text-xl font-semibold mb-2">Total Expenses</h2>
+        <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
       </div>
 
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Expense Distribution</h3>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                fill="#8884d8"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {data.map((entry, index) => (
-                  <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="h-[300px]">
+        <h2 className="text-xl font-semibold mb-4">Expenses by Category</h2>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              fill="#8884d8"
+              label={(entry) => `${entry.name}: $${entry.value.toFixed(2)}`}
+            >
+              {pieData.map((_, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

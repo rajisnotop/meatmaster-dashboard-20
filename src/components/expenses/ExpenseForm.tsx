@@ -1,131 +1,139 @@
-import { useState } from "react";
-import { useStore } from "@/store/store";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useStore } from "@/store/store";
 import { useToast } from "@/components/ui/use-toast";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+
+const formSchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+    message: "Amount must be a positive number",
+  }),
+  description: z.string().optional(),
+  date: z.string().min(1, "Date is required"),
+});
 
 const ExpenseForm = () => {
-  const { addExpense } = useStore();
   const { toast } = useToast();
-  const [expense, setExpense] = useState({
-    category: "",
-    amount: "",
-    description: "",
-    date: new Date(),
-  });
+  const addExpense = useStore((state) => state.addExpense);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!expense.category || !expense.amount) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const amount = parseFloat(expense.amount);
-    if (isNaN(amount) || amount <= 0) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid positive amount",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    addExpense({
-      category: expense.category,
-      amount,
-      description: expense.description,
-      date: expense.date,
-    });
-
-    setExpense({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
       category: "",
       amount: "",
       description: "",
-      date: new Date(),
+      date: new Date().toISOString().split("T")[0],
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    addExpense({
+      category: values.category,
+      amount: Number(values.amount),
+      description: values.description || "",
+      date: new Date(values.date),
     });
 
     toast({
-      title: "Success",
-      description: "Expense added successfully",
+      title: "Expense Added",
+      description: "Your expense has been successfully recorded.",
     });
+
+    form.reset();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
-        <Select value={expense.category} onValueChange={(value) => setExpense({ ...expense, category: value })}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="rent">Rent</SelectItem>
-            <SelectItem value="utilities">Utilities</SelectItem>
-            <SelectItem value="salaries">Salaries</SelectItem>
-            <SelectItem value="supplies">Supplies</SelectItem>
-            <SelectItem value="maintenance">Maintenance</SelectItem>
-            <SelectItem value="miscellaneous">Miscellaneous</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="amount">Amount (NPR)</Label>
-        <Input
-          id="amount"
-          type="number"
-          min="0"
-          step="0.01"
-          value={expense.amount}
-          onChange={(e) => setExpense({ ...expense, amount: e.target.value })}
-          placeholder="Enter amount"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="rent">Rent</SelectItem>
+                  <SelectItem value="utilities">Utilities</SelectItem>
+                  <SelectItem value="salaries">Salaries</SelectItem>
+                  <SelectItem value="supplies">Supplies</SelectItem>
+                  <SelectItem value="maintenance">Maintenance</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Input
-          id="description"
-          value={expense.description}
-          onChange={(e) => setExpense({ ...expense, description: e.target.value })}
-          placeholder="Enter description"
+        <FormField
+          control={form.control}
+          name="amount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Amount</FormLabel>
+              <FormControl>
+                <Input type="number" step="0.01" placeholder="0.00" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="space-y-2">
-        <Label>Date</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {format(expense.date, "PPP")}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={expense.date}
-              onSelect={(date) => date && setExpense({ ...expense, date })}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <Button type="submit" className="w-full">Add Expense</Button>
-    </form>
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="w-full">Add Expense</Button>
+      </form>
+    </Form>
   );
 };
 
