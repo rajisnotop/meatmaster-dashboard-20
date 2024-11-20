@@ -1,6 +1,8 @@
 import Header from "@/components/Header";
 import { useStore } from "@/store/store";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -11,19 +13,36 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 const Credit = () => {
   const { orders, products, updateOrderStatus } = useStore();
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // Filter orders based on payment status
   const unpaidOrders = orders.filter(order => !order.isPaid);
   const paidOrders = orders.filter(order => order.isPaid);
 
+  // Calculate totals correctly based on payment status
   const totalUnpaidAmount = unpaidOrders.reduce((sum, order) => sum + order.total, 0);
   const totalPaidAmount = paidOrders.reduce((sum, order) => sum + order.total, 0);
   
   const handleMarkAsPaid = (orderId: string) => {
     updateOrderStatus(orderId, true);
   };
+
+  // Filter orders based on search term
+  const filteredUnpaidOrders = unpaidOrders.filter(order => {
+    const product = products.find(p => p.id === order.productId);
+    const searchString = `${order.customerName} ${product?.name}`.toLowerCase();
+    return searchString.includes(searchTerm.toLowerCase());
+  });
+
+  const filteredPaidOrders = paidOrders.filter(order => {
+    const product = products.find(p => p.id === order.productId);
+    const searchString = `${order.customerName} ${product?.name}`.toLowerCase();
+    return searchString.includes(searchTerm.toLowerCase());
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,7 +68,19 @@ const Credit = () => {
           </Card>
 
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Unpaid Orders</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Unpaid Orders</h2>
+              <div className="relative w-64">
+                <Input
+                  type="text"
+                  placeholder="Search orders..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+                <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+              </div>
+            </div>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -63,7 +94,7 @@ const Credit = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {unpaidOrders.map((order) => {
+                  {filteredUnpaidOrders.map((order) => {
                     const product = products.find(p => p.id === order.productId);
                     return (
                       <TableRow key={order.id}>
@@ -115,7 +146,7 @@ const Credit = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paidOrders.map((order) => {
+                  {filteredPaidOrders.map((order) => {
                     const product = products.find(p => p.id === order.productId);
                     return (
                       <TableRow key={order.id}>
