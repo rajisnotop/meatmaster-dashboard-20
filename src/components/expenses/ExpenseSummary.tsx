@@ -30,28 +30,25 @@ const ExpenseSummary = () => {
         <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
       </div>
 
-      <div className="h-[300px]">
-        <h2 className="text-xl font-semibold mb-4">Expenses by Category</h2>
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={pieData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={80}
-              fill="#8884d8"
-              label={(entry) => `${entry.name}: $${entry.value.toFixed(2)}`}
-            >
-              {pieData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={80}
+            fill="#8884d8"
+            label={(entry) => `${entry.name}: $${entry.value.toFixed(2)}`}
+          >
+            {pieData.map((_, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
     </div>
   );
 };
