@@ -58,6 +58,7 @@ const OrderForm = () => {
       isPaid,
     };
 
+    console.log("Creating new order:", { ...newOrder, isPaid });
     addOrder(newOrder);
     setOrder({ customerName: "", productId: "", quantity: "", price: "" });
 

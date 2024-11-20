@@ -19,9 +19,14 @@ const Credit = () => {
   const { orders, products, updateOrderStatus } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
 
+  console.log("All orders:", orders);
+
   // Filter orders based on payment status
-  const unpaidOrders = orders.filter(order => !order.isPaid);
-  const paidOrders = orders.filter(order => order.isPaid);
+  const unpaidOrders = orders.filter(order => order.isPaid === false);
+  const paidOrders = orders.filter(order => order.isPaid === true);
+
+  console.log("Unpaid orders:", unpaidOrders);
+  console.log("Paid orders:", paidOrders);
 
   // Calculate totals correctly based on payment status
   const totalUnpaidAmount = unpaidOrders.reduce((sum, order) => sum + order.total, 0);
