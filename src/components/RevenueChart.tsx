@@ -1,24 +1,20 @@
 import { Card } from "./ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useStore } from "@/store/store";
+import { format } from "date-fns";
 
 const RevenueChart = () => {
   const { orders } = useStore();
 
-  // Process orders to get weekly revenue
-  const weeklyRevenue = orders.reduce((acc: { [key: string]: number }, order) => {
+  // Process orders to get daily revenue
+  const dailyRevenue = orders.reduce((acc: { [key: string]: number }, order) => {
     const date = new Date(order.date);
-    const weekStart = new Date(date);
-    weekStart.setDate(date.getDate() - date.getDay()); // Get Sunday of the week
-    const weekKey = weekStart.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric'
-    });
-    acc[weekKey] = (acc[weekKey] || 0) + order.total;
+    const dayKey = format(date, 'MMM d'); // Format as "Jan 1"
+    acc[dayKey] = (acc[dayKey] || 0) + order.total;
     return acc;
   }, {});
 
-  const data = Object.entries(weeklyRevenue).map(([name, revenue]) => ({
+  const data = Object.entries(dailyRevenue).map(([name, revenue]) => ({
     name,
     earned: revenue,
   }));
@@ -69,7 +65,7 @@ const RevenueChart = () => {
                 if (active && payload && payload.length) {
                   return (
                     <div className="rounded-lg border bg-background p-2 shadow-md">
-                      <p className="text-sm font-medium">Week of {payload[0].payload.name}</p>
+                      <p className="text-sm font-medium">{payload[0].payload.name}</p>
                       <p className="text-sm text-primary">
                         Revenue: NPR {payload[0].value?.toLocaleString()}
                       </p>
