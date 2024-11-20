@@ -8,15 +8,16 @@ import { useStore } from "@/store/store";
 import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
 
-const OrderForm = () => {
-  const { products, addOrder } = useStore();
+const OrderForm = ({ editingOrder = null }) => {
+  const { products, addOrder, updateOrder } = useStore();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
   const [order, setOrder] = useState({
-    customerName: "",
-    productId: "",
-    quantity: "",
-    price: "",
+    customerName: editingOrder?.customerName || "",
+    productId: editingOrder?.productId || "",
+    quantity: editingOrder?.quantity?.toString() || "",
+    price: editingOrder?.total?.toString() || "",
   });
 
   const selectedProduct = products.find((p) => p.id === order.productId);
@@ -51,36 +52,45 @@ const OrderForm = () => {
     const total = product.price * Number(order.quantity);
 
     const newOrder = {
+      id: editingOrder?.id || crypto.randomUUID(),
       customerName: order.customerName || undefined,
       productId: order.productId,
       quantity: Number(order.quantity),
       total,
       isPaid,
-      date: new Date(),
+      date: editingOrder?.date || new Date(),
     };
 
-    console.log("Creating new order:", newOrder);
-    addOrder(newOrder);
+    console.log("Creating/Updating order:", newOrder);
+    
+    if (editingOrder) {
+      updateOrder(newOrder);
+      toast({
+        title: "Success",
+        description: "Order updated successfully",
+      });
+    } else {
+      addOrder(newOrder);
+      toast({
+        title: "Success",
+        description: `Order ${isPaid ? 'created and marked as paid' : 'created as unpaid'} successfully`,
+      });
+    }
+
     setOrder({ customerName: "", productId: "", quantity: "", price: "" });
-
-    toast({
-      title: "Success",
-      description: `Order ${isPaid ? 'created and marked as paid' : 'created as unpaid'} successfully`,
-    });
-
     navigate("/orders");
   };
 
   return (
     <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm animate-scale-in">
-      <h3 className="text-lg font-semibold mb-4">New Order</h3>
+      <h3 className="text-lg font-semibold mb-4">{editingOrder ? "Edit Order" : "New Order"}</h3>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="customer">Customer Name (Optional)</Label>
           <Input
             id="customer"
             placeholder="Enter customer name"
-            value={order.customerName}
+            value={order.customerName || ""}
             onChange={(e) => setOrder({ ...order, customerName: e.target.value })}
             className="bg-background border-border/50 focus:border-primary/50"
           />
@@ -135,7 +145,7 @@ const OrderForm = () => {
             onClick={() => handleSubmit(true)}
             className="w-full bg-green-500/20 hover:bg-green-500/30 text-green-500 border border-green-500/20"
           >
-            Create Paid Order
+            {editingOrder ? "Update as Paid" : "Create Paid Order"}
           </Button>
           
           <Button 
@@ -143,7 +153,7 @@ const OrderForm = () => {
             onClick={() => handleSubmit(false)}
             className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border border-yellow-500/20"
           >
-            Create Unpaid Order
+            {editingOrder ? "Update as Unpaid" : "Create Unpaid Order"}
           </Button>
         </div>
       </form>

@@ -63,12 +63,14 @@ export const useStore = create<StoreState>()(
             ],
           }));
         },
-        updateOrder: (updatedOrder) =>
+        updateOrder: (updatedOrder) => {
+          console.log("Updating order:", updatedOrder);
           set((state) => ({
             orders: state.orders.map((order) =>
               order.id === updatedOrder.id ? updatedOrder : order
             ),
-          })),
+          }));
+        },
         updateOrderStatus: (id, isPaid) =>
           set((state) => ({
             orders: state.orders.map((order) =>
