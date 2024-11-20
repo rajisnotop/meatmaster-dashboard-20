@@ -10,13 +10,13 @@ interface Product {
 
 interface Order {
   id: string;
-  customerName?: string;  // Made optional
+  customerName?: string;
   productId: string;
   quantity: number;
   total: number;
   date: Date;
-  isPaid: boolean;  // New field
-  description?: string;  // New field
+  isPaid: boolean;
+  description?: string;
 }
 
 interface Expense {
@@ -33,7 +33,7 @@ interface StoreState {
   expenses: Expense[];
   addProduct: (product: Omit<Product, 'id'>) => void;
   deleteProduct: (id: string) => void;
-  addOrder: (order: Omit<Order, 'id' | 'date'>) => void;
+  addOrder: (order: Omit<Order, 'id'>) => void;
   updateOrderStatus: (id: string, isPaid: boolean) => void;
   addExpense: (expense: Omit<Expense, 'id'>) => void;
 }
@@ -53,13 +53,15 @@ export const useStore = create<StoreState>()(
           set((state) => ({
             products: state.products.filter((product) => product.id !== id),
           })),
-        addOrder: (order) =>
+        addOrder: (order) => {
+          console.log("Adding order with isPaid:", order.isPaid);
           set((state) => ({
             orders: [
               ...state.orders,
-              { ...order, id: crypto.randomUUID(), date: new Date(), isPaid: false },
+              { ...order, id: crypto.randomUUID() },
             ],
-          })),
+          }));
+        },
         updateOrderStatus: (id, isPaid) =>
           set((state) => ({
             orders: state.orders.map((order) =>

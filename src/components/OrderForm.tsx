@@ -56,9 +56,10 @@ const OrderForm = () => {
       quantity: Number(order.quantity),
       total,
       isPaid,
+      date: new Date(),
     };
 
-    console.log("Creating new order:", { ...newOrder, isPaid });
+    console.log("Creating new order:", newOrder);
     addOrder(newOrder);
     setOrder({ customerName: "", productId: "", quantity: "", price: "" });
 
