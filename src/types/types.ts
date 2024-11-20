@@ -13,6 +13,7 @@ export interface Order {
   total: number;
   date: Date;
   isPaid: boolean;
+  wasUnpaid: boolean;
   description?: string;
 }
 

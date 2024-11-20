@@ -6,23 +6,26 @@ export const calculateProductTotals = (
   filterDateFn: (date: Date) => boolean
 ) => {
   return products.map((product) => {
+    // Only include paid orders in calculations
     const productOrders = orders.filter((order) => {
       const orderDate = new Date(order.date);
-      return order.productId === product.id && filterDateFn(orderDate);
+      return order.productId === product.id && 
+             filterDateFn(orderDate) && 
+             order.isPaid; // Only include paid orders
     });
 
-    // Calculate total quantity and amount only for paid orders that were not previously unpaid
+    // Calculate total quantity and amount only for orders that were never unpaid
     const totalQuantity = productOrders
-      .filter(order => order.isPaid && !order.wasUnpaid)
+      .filter(order => !order.wasUnpaid)
       .reduce((sum, order) => sum + order.quantity, 0);
     
     const totalAmount = productOrders
-      .filter(order => order.isPaid && !order.wasUnpaid)
+      .filter(order => !order.wasUnpaid)
       .reduce((sum, order) => sum + order.total, 0);
     
     // Calculate unpaid to paid amount only for orders that were previously unpaid
     const unpaidToPaidAmount = productOrders
-      .filter(order => order.isPaid && order.wasUnpaid)
+      .filter(order => order.wasUnpaid)
       .reduce((sum, order) => sum + order.total, 0);
 
     return {
