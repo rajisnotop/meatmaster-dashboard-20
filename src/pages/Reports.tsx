@@ -1,12 +1,9 @@
 import Header from "@/components/Header";
 import { useStore } from "@/store/store";
-import { FileText, Printer, ShoppingBag } from "lucide-react";
+import { FileText, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import MetricCard from "@/components/reports/MetricCard";
-import TopProducts from "@/components/reports/TopProducts";
-import LoyalCustomers from "@/components/reports/LoyalCustomers";
-import RecentCustomers from "@/components/reports/RecentCustomers";
+import { Card } from "@/components/ui/card";
 import RevenueChart from "@/components/RevenueChart";
 
 const Reports = () => {
@@ -15,38 +12,6 @@ const Reports = () => {
   const totalRevenue = orders.reduce((total, order) => total + order.total, 0);
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
   const netProfit = totalRevenue - totalExpenses;
-
-  // Process orders to get product sales data
-  const productSales = orders.reduce((acc: { [key: string]: number }, order) => {
-    const product = products.find(p => p.id === order.productId);
-    if (product) {
-      acc[product.name] = (acc[product.name] || 0) + order.quantity;
-    }
-    return acc;
-  }, {});
-
-  const topProducts = Object.entries(productSales)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-    .map(([name, value]) => ({ name, value }));
-
-  // Calculate loyal customers
-  const customerOrders = orders.reduce((acc: { [key: string]: number }, order) => {
-    acc[order.customerName] = (acc[order.customerName] || 0) + 1;
-    return acc;
-  }, {});
-
-  const loyalCustomers = Object.entries(customerOrders)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-    .map(([name, value]) => ({ name, value }));
-
-  // Get recent customers
-  const recentCustomers = [...orders]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 10);
-
-  const COLORS = ['#A239CA', '#4717F6', '#F64C72', '#6B7280', '#9CA3AF'];
 
   const handlePrintReport = () => {
     try {
@@ -63,7 +28,7 @@ const Reports = () => {
       printWindow.document.write(`
         <html>
           <head>
-            <title>Meat Shop Report</title>
+            <title>Financial Report</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
               .header { text-align: center; margin-bottom: 30px; }
@@ -73,23 +38,14 @@ const Reports = () => {
           </head>
           <body>
             <div class="header">
-              <h1>Meat Shop Report</h1>
+              <h1>Financial Report</h1>
               <p>Generated on ${new Date().toLocaleDateString()}</p>
             </div>
             <div class="section">
-              <h2>Key Metrics</h2>
+              <h2>Financial Summary</h2>
               <div class="metric">Total Revenue: NPR ${totalRevenue.toLocaleString()}</div>
               <div class="metric">Total Expenses: NPR ${totalExpenses.toLocaleString()}</div>
               <div class="metric">Net Profit: NPR ${netProfit.toLocaleString()}</div>
-              <div class="metric">Total Products: ${products.length}</div>
-            </div>
-            <div class="section">
-              <h2>Top Selling Products</h2>
-              ${Object.entries(productSales)
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, 5)
-                .map(([name, value]) => `<div class="metric">${name}: ${value} units</div>`)
-                .join('')}
             </div>
           </body>
         </html>
@@ -116,7 +72,7 @@ const Reports = () => {
       <Header />
       <main className="container py-8 space-y-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-foreground">Reports</h1>
+          <h1 className="text-3xl font-bold text-foreground">Financial Reports</h1>
           <Button 
             variant="outline" 
             className="hover:bg-primary/20"
@@ -127,32 +83,46 @@ const Reports = () => {
           </Button>
         </div>
 
-        <Card className="p-6">
-          <h2 className="text-xl font-bold mb-4">Financial Summary</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Revenue</p>
-              <p className="text-2xl font-bold text-green-600">NPR {totalRevenue.toLocaleString()}</p>
+        <div className="grid gap-6">
+          <Card className="p-8">
+            <h2 className="text-xl font-bold mb-6">Financial Summary</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Revenue</p>
+                <p className="text-2xl font-bold text-green-600">NPR {totalRevenue.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Expenses</p>
+                <p className="text-2xl font-bold text-red-600">NPR {totalExpenses.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Net Profit</p>
+                <p className="text-2xl font-bold text-primary">NPR {netProfit.toLocaleString()}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Total Expenses</p>
-              <p className="text-2xl font-bold text-red-600">NPR {totalExpenses.toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Net Profit</p>
-              <p className="text-2xl font-bold text-primary">NPR {netProfit.toLocaleString()}</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <TopProducts data={topProducts} />
-          <LoyalCustomers data={loyalCustomers} colors={COLORS} />
-        </div>
+          <Card className="p-8">
+            <h2 className="text-xl font-bold mb-6">Revenue Trend</h2>
+            <RevenueChart />
+          </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RevenueChart />
-          <RecentCustomers customers={recentCustomers} />
+          <Card className="p-8">
+            <h2 className="text-xl font-bold mb-6">Expense Breakdown</h2>
+            <div className="space-y-4">
+              {Object.entries(
+                expenses.reduce((acc, expense) => {
+                  acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+                  return acc;
+                }, {} as Record<string, number>)
+              ).map(([category, amount]) => (
+                <div key={category} className="flex justify-between items-center">
+                  <span className="capitalize">{category}</span>
+                  <span className="font-semibold">NPR {amount.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
       </main>
     </div>
