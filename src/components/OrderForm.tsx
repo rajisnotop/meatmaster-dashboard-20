@@ -63,14 +63,12 @@ const OrderForm = () => {
     addOrder(newOrder);
     setOrder({ customerName: "", productId: "", quantity: "", price: "" });
 
-    if (!isPaid) {
-      navigate("/credit");
-    } else {
-      toast({
-        title: "Success",
-        description: "Order created successfully",
-      });
-    }
+    toast({
+      title: "Success",
+      description: `Order ${isPaid ? 'created and marked as paid' : 'created as unpaid'} successfully`,
+    });
+
+    navigate("/orders");
   };
 
   return (

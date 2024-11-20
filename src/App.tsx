@@ -5,12 +5,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Orders from "./pages/Orders";
 import Products from "./pages/Products";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Expenditure from "./pages/Expenditure";
-import Credit from "./pages/Credit";
+import Orders from "./pages/Orders"; // Renamed from Credit
 
 const queryClient = new QueryClient();
 
@@ -29,7 +28,6 @@ const App = () => {
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/expenditure" element={<Expenditure />} />
-              <Route path="/credit" element={<Credit />} />
             </Routes>
           </TooltipProvider>
         </BrowserRouter>

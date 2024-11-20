@@ -34,6 +34,7 @@ interface StoreState {
   addProduct: (product: Omit<Product, 'id'>) => void;
   deleteProduct: (id: string) => void;
   addOrder: (order: Omit<Order, 'id'>) => void;
+  updateOrder: (order: Order) => void;
   updateOrderStatus: (id: string, isPaid: boolean) => void;
   addExpense: (expense: Omit<Expense, 'id'>) => void;
 }
@@ -62,6 +63,12 @@ export const useStore = create<StoreState>()(
             ],
           }));
         },
+        updateOrder: (updatedOrder) =>
+          set((state) => ({
+            orders: state.orders.map((order) =>
+              order.id === updatedOrder.id ? updatedOrder : order
+            ),
+          })),
         updateOrderStatus: (id, isPaid) =>
           set((state) => ({
             orders: state.orders.map((order) =>
