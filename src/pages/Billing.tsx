@@ -62,7 +62,8 @@ const Billing = () => {
   // Calculate filtered expenses and net profit
   const filteredExpenses = expenses.filter((expense) => filterData(new Date(expense.date)));
   const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const netProfit = overallTotals.sales - totalExpenses - overallTotals.unpaid;
+  // Updated net profit calculation to add unpaid to paid amount instead of subtracting it
+  const netProfit = overallTotals.sales + overallTotals.unpaid - totalExpenses;
 
   const handlePrint = (type: "all" | "selected") => {
     const printWindow = window.open("", "_blank");
