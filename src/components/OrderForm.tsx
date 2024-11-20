@@ -6,10 +6,12 @@ import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useStore } from "@/store/store";
 import { useToast } from "./ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const OrderForm = () => {
   const { products, addOrder } = useStore();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [order, setOrder] = useState({
     customerName: "",
     productId: "",
@@ -20,22 +22,20 @@ const OrderForm = () => {
   const selectedProduct = products.find((p) => p.id === order.productId);
 
   useEffect(() => {
-    if (selectedProduct && order.price) {
+    if (selectedProduct && order.price && !order.quantity) {
       const quantity = Number(order.price) / selectedProduct.price;
       setOrder(prev => ({ ...prev, quantity: quantity.toFixed(2) }));
     }
   }, [order.price, selectedProduct]);
 
   useEffect(() => {
-    if (selectedProduct && order.quantity) {
+    if (selectedProduct && order.quantity && !order.price) {
       const price = selectedProduct.price * Number(order.quantity);
       setOrder(prev => ({ ...prev, price: price.toFixed(2) }));
     }
   }, [order.quantity, selectedProduct]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = (isPaid: boolean) => {
     if (!order.productId || (!order.quantity && !order.price)) {
       toast({
         title: "Error",
@@ -50,25 +50,31 @@ const OrderForm = () => {
 
     const total = product.price * Number(order.quantity);
 
-    addOrder({
+    const newOrder = {
       customerName: order.customerName || undefined,
       productId: order.productId,
       quantity: Number(order.quantity),
       total,
-      isPaid: false,
-    });
+      isPaid,
+    };
 
+    addOrder(newOrder);
     setOrder({ customerName: "", productId: "", quantity: "", price: "" });
-    toast({
-      title: "Success",
-      description: "Order created successfully",
-    });
+
+    if (!isPaid) {
+      navigate("/credit");
+    } else {
+      toast({
+        title: "Success",
+        description: "Order created successfully",
+      });
+    }
   };
 
   return (
     <Card className="p-6 bg-background/80 border border-border/50 backdrop-blur-sm animate-scale-in">
       <h3 className="text-lg font-semibold mb-4">New Order</h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="customer">Customer Name (Optional)</Label>
           <Input
@@ -123,9 +129,23 @@ const OrderForm = () => {
           </div>
         </div>
         
-        <Button type="submit" className="w-full bg-primary/20 hover:bg-primary/30 text-primary border border-primary/20">
-          Create Order
-        </Button>
+        <div className="grid grid-cols-2 gap-4">
+          <Button 
+            type="button"
+            onClick={() => handleSubmit(true)}
+            className="w-full bg-green-500/20 hover:bg-green-500/30 text-green-500 border border-green-500/20"
+          >
+            Create Paid Order
+          </Button>
+          
+          <Button 
+            type="button"
+            onClick={() => handleSubmit(false)}
+            className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border border-yellow-500/20"
+          >
+            Create Unpaid Order
+          </Button>
+        </div>
       </form>
     </Card>
   );
