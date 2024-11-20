@@ -15,9 +15,11 @@ import {
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import OrderForm from "@/components/OrderForm";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const Orders = () => {
-  const { orders, products } = useStore();
+  const { orders, products, updateOrderStatus } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [editingOrder, setEditingOrder] = useState(null);
@@ -38,6 +40,10 @@ const Orders = () => {
     const dateMatch = searchDate ? new Date(order.date).toLocaleDateString().includes(searchDate) : true;
     return searchString.includes(searchTerm.toLowerCase()) && dateMatch;
   });
+
+  const handleMarkAsPaid = (orderId: string) => {
+    updateOrderStatus(orderId, true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
