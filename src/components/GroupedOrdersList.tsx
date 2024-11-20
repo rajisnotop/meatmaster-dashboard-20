@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "./ui/card";
 import {
   Table,
@@ -9,6 +9,10 @@ import {
   TableRow,
 } from "./ui/table";
 import { useStore } from "@/store/store";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent } from "./ui/dialog";
+import OrderForm from "./OrderForm";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 
 interface GroupedOrders {
   [key: string]: {
@@ -18,7 +22,8 @@ interface GroupedOrders {
 }
 
 const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
-  const { orders, products } = useStore();
+  const { orders, products, updateOrderStatus } = useStore();
+  const [editingOrder, setEditingOrder] = useState(null);
 
   // Group unpaid orders by customer
   const groupedUnpaidOrders = orders
@@ -49,6 +54,11 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
       return acc;
     }, {} as GroupedOrders);
 
+  const handleMarkAsPaid = (orderId: string) => {
+    console.log("Marking order as paid:", orderId);
+    updateOrderStatus(orderId, true);
+  };
+
   return (
     <div className="space-y-6">
       {Object.entries(groupedUnpaidOrders).map(([customerName, { orders: customerOrders, totalAmount }]) => (
@@ -67,6 +77,7 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
                   <TableHead>Product</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Amount</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -80,6 +91,40 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
                       <TableCell>{product?.name}</TableCell>
                       <TableCell>{order.quantity} kg</TableCell>
                       <TableCell>NPR {order.total.toLocaleString()}</TableCell>
+                      <TableCell className="space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setEditingOrder(order)}
+                        >
+                          Edit
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              className="bg-green-500/20 hover:bg-green-500/30 text-green-500"
+                            >
+                              Mark as Paid
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Mark Order as Paid?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action will move the order to the paid section and update the financial reports.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleMarkAsPaid(order.id)}>
+                                Confirm
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -88,6 +133,12 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
           </div>
         </Card>
       ))}
+
+      <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
+        <DialogContent>
+          <OrderForm editingOrder={editingOrder} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
