@@ -62,4 +62,10 @@
   .card-glow {
     @apply border border-primary/20 bg-accent/50 backdrop-blur-sm;
   }
+
+  /* Fix for transparent dropdowns */
+  [role="listbox"],
+  [role="dialog"] {
+    @apply bg-background border border-border;
+  }
 }
