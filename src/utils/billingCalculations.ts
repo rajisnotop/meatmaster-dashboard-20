@@ -15,7 +15,7 @@ export const calculateProductTotals = (
     const totalAmount = productOrders.reduce((sum, order) => sum + order.total, 0);
     
     // Only include amounts from orders that are now paid but were previously unpaid
-    const previouslyUnpaidAmount = productOrders
+    const unpaidToPaidAmount = productOrders
       .filter((order) => order.isPaid)  // Only paid orders
       .reduce((sum, order) => sum + order.total, 0);
 
@@ -24,7 +24,7 @@ export const calculateProductTotals = (
       name: product.name,
       quantity: totalQuantity,
       amount: totalAmount,
-      unpaid: previouslyUnpaidAmount, // Only show amounts that were previously unpaid but are now paid
+      unpaid: unpaidToPaidAmount, // Renamed to reflect that this shows amounts that moved from unpaid to paid
     };
   });
 };

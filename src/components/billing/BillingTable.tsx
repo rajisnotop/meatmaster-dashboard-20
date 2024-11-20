@@ -38,7 +38,7 @@ const BillingTable = ({
           <TableHead>Product</TableHead>
           <TableHead>Quantity Sold</TableHead>
           <TableHead>Total Sales (NPR)</TableHead>
-          <TableHead>Unpaid Amount (NPR)</TableHead>
+          <TableHead>Unpaid to Paid Amount (NPR)</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
