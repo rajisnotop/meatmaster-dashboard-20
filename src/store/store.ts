@@ -1,32 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-}
-
-interface Order {
-  id: string;
-  customerName?: string;
-  productId: string;
-  quantity: number;
-  total: number;
-  date: Date;
-  isPaid: boolean;
-  wasUnpaid?: boolean;
-  description?: string;
-}
-
-interface Expense {
-  id: string;
-  category: string;
-  amount: number;
-  description: string;
-  date: Date;
-}
+import { Product, Order, Expense } from '@/types/types';
 
 interface StoreState {
   products: Product[];
@@ -34,7 +8,7 @@ interface StoreState {
   expenses: Expense[];
   addProduct: (product: Omit<Product, 'id'>) => void;
   deleteProduct: (id: string) => void;
-  addOrder: (order: Omit<Order, 'id'>) => void;
+  addOrder: (order: Omit<Order, 'id' | 'wasUnpaid'>) => void;
   updateOrder: (order: Order) => void;
   updateOrderStatus: (id: string, isPaid: boolean) => void;
   addExpense: (expense: Omit<Expense, 'id'>) => void;
