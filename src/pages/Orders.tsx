@@ -110,11 +110,11 @@ const Orders = () => {
 
             <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
 
-          <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
-            <DialogContent className="sm:max-w-[425px]">
-              <OrderForm editingOrder={editingOrder} />
-            </DialogContent>
-          </Dialog>
+            <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
+              <DialogContent className="sm:max-w-[425px]">
+                <OrderForm editingOrder={editingOrder} />
+              </DialogContent>
+            </Dialog>
 
             <div className="space-y-6">
               <h2 className="text-2xl font-bold">Unpaid to Paid Orders</h2>
@@ -130,7 +130,7 @@ const Orders = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUnpaidToPaidOrders.map((order) => {
+                    {unpaidToPaidOrders.map((order) => {
                       const product = products.find(p => p.id === order.productId);
                       return (
                         <TableRow key={order.id}>
@@ -177,6 +177,7 @@ const Orders = () => {
                 </Table>
               </div>
             </div>
+          </div>
         </div>
       </main>
     </div>
