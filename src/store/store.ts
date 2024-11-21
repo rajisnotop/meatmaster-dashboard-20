@@ -10,7 +10,7 @@ interface StoreState {
   deleteProduct: (id: string) => void;
   addOrder: (order: Omit<Order, 'id' | 'wasUnpaid'>) => void;
   updateOrder: (order: Order) => void;
-  updateOrderStatus: (id: string, isPaid: boolean) => void;
+  updateOrderStatus: (id: string, isPaid: boolean, paidWithQR?: boolean) => void;
   addExpense: (expense: Omit<Expense, 'id'>) => void;
 }
 
@@ -30,26 +30,36 @@ export const useStore = create<StoreState>()(
             products: state.products.filter((product) => product.id !== id),
           })),
         addOrder: (order) => {
-          console.log("Adding order with isPaid:", order.isPaid);
           set((state) => ({
             orders: [
               ...state.orders,
-              { ...order, id: crypto.randomUUID(), wasUnpaid: !order.isPaid },
+              { 
+                ...order, 
+                id: crypto.randomUUID(), 
+                wasUnpaid: !order.isPaid,
+                paidWithQR: order.paidWithQR || false
+              },
             ],
           }));
         },
         updateOrder: (updatedOrder) => {
-          console.log("Updating order:", updatedOrder);
           set((state) => ({
             orders: state.orders.map((order) =>
               order.id === updatedOrder.id ? updatedOrder : order
             ),
           }));
         },
-        updateOrderStatus: (id, isPaid) =>
+        updateOrderStatus: (id, isPaid, paidWithQR = false) =>
           set((state) => ({
             orders: state.orders.map((order) =>
-              order.id === id ? { ...order, isPaid, wasUnpaid: !order.isPaid } : order
+              order.id === id 
+                ? { 
+                    ...order, 
+                    isPaid, 
+                    wasUnpaid: !order.isPaid,
+                    paidWithQR: paidWithQR 
+                  } 
+                : order
             ),
           })),
         addExpense: (expense) =>

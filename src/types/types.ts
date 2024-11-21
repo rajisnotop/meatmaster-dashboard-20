@@ -14,6 +14,7 @@ export interface Order {
   date: Date;
   isPaid: boolean;
   wasUnpaid: boolean;
+  paidWithQR: boolean;
   description?: string;
 }
 

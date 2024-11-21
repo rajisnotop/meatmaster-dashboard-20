@@ -36,7 +36,7 @@ const OrderForm = ({ editingOrder = null }) => {
     }
   }, [order.quantity, selectedProduct]);
 
-  const handleSubmit = (isPaid: boolean) => {
+  const handleSubmit = (isPaid: boolean, paidWithQR: boolean = false) => {
     if (!order.productId || (!order.quantity && !order.price)) {
       toast({
         title: "Error",
@@ -58,12 +58,11 @@ const OrderForm = ({ editingOrder = null }) => {
       quantity: Number(order.quantity),
       total,
       isPaid,
+      paidWithQR,
       wasUnpaid: editingOrder ? editingOrder.wasUnpaid : !isPaid,
       date: editingOrder?.date || new Date(),
     };
 
-    console.log("Creating/Updating order:", newOrder);
-    
     if (editingOrder) {
       updateOrder(newOrder);
       toast({
@@ -74,7 +73,7 @@ const OrderForm = ({ editingOrder = null }) => {
       addOrder(newOrder);
       toast({
         title: "Success",
-        description: `Order ${isPaid ? 'created and marked as paid' : 'created as unpaid'} successfully`,
+        description: `Order ${isPaid ? (paidWithQR ? 'created and marked as paid with QR' : 'created and marked as paid') : 'created as unpaid'} successfully`,
       });
     }
 
@@ -140,13 +139,21 @@ const OrderForm = ({ editingOrder = null }) => {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <Button 
             type="button"
             onClick={() => handleSubmit(true)}
             className="w-full bg-green-500/20 hover:bg-green-500/30 text-green-500 border border-green-500/20"
           >
             {editingOrder ? "Update as Paid" : "Create Paid Order"}
+          </Button>
+          
+          <Button 
+            type="button"
+            onClick={() => handleSubmit(true, true)}
+            className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-500 border border-blue-500/20"
+          >
+            {editingOrder ? "Update as Paid with QR" : "Create Paid with QR"}
           </Button>
           
           <Button 
