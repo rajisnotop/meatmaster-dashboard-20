@@ -139,11 +139,11 @@ const OrderForm = ({ editingOrder = null }) => {
           </div>
         </div>
         
-        <div className="grid grid-cols-3 gap-4">
+        <div className="flex flex-col space-y-2">
           <Button 
             type="button"
             onClick={() => handleSubmit(true)}
-            className="w-full bg-green-500/20 hover:bg-green-500/30 text-green-500 border border-green-500/20"
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
             {editingOrder ? "Update as Paid" : "Create Paid Order"}
           </Button>
@@ -151,7 +151,7 @@ const OrderForm = ({ editingOrder = null }) => {
           <Button 
             type="button"
             onClick={() => handleSubmit(true, true)}
-            className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-500 border border-blue-500/20"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
           >
             {editingOrder ? "Update as Paid with QR" : "Create Paid with QR"}
           </Button>
@@ -159,7 +159,7 @@ const OrderForm = ({ editingOrder = null }) => {
           <Button 
             type="button"
             onClick={() => handleSubmit(false)}
-            className="w-full bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-500 border border-yellow-500/20"
+            className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
           >
             {editingOrder ? "Update as Unpaid" : "Create Unpaid Order"}
           </Button>
