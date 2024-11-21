@@ -59,26 +59,26 @@ const BillingTable = ({
               />
             </TableCell>
             <TableCell className="font-medium">{product.name}</TableCell>
-            <TableCell>{product.quantity.toFixed(2)}</TableCell>
-            <TableCell>{product.amount.toLocaleString()}</TableCell>
-            <TableCell>{product.unpaid.toLocaleString()}</TableCell>
-            <TableCell>{product.unpaidToPaidQR.toLocaleString()}</TableCell>
+            <TableCell>{(product.quantity || 0).toFixed(2)}</TableCell>
+            <TableCell>{(product.amount || 0).toLocaleString()}</TableCell>
+            <TableCell>{(product.unpaid || 0).toLocaleString()}</TableCell>
+            <TableCell>{(product.unpaidToPaidQR || 0).toLocaleString()}</TableCell>
           </TableRow>
         ))}
         <TableRow className="bg-muted/50 font-bold">
           <TableCell></TableCell>
           <TableCell>Total</TableCell>
-          <TableCell>{overallTotals.quantity.toFixed(2)}</TableCell>
-          <TableCell>NPR {overallTotals.sales.toLocaleString()}</TableCell>
-          <TableCell>NPR {overallTotals.unpaid.toLocaleString()}</TableCell>
-          <TableCell>NPR {overallTotals.unpaidToPaidQR.toLocaleString()}</TableCell>
+          <TableCell>{(overallTotals.quantity || 0).toFixed(2)}</TableCell>
+          <TableCell>NPR {(overallTotals.sales || 0).toLocaleString()}</TableCell>
+          <TableCell>NPR {(overallTotals.unpaid || 0).toLocaleString()}</TableCell>
+          <TableCell>NPR {(overallTotals.unpaidToPaidQR || 0).toLocaleString()}</TableCell>
         </TableRow>
         <TableRow className="bg-muted/50">
           <TableCell></TableCell>
           <TableCell className="font-bold">Total Expenses</TableCell>
           <TableCell></TableCell>
           <TableCell colSpan={3} className="font-bold text-destructive">
-            NPR {totalExpenses.toLocaleString()}
+            NPR {(totalExpenses || 0).toLocaleString()}
           </TableCell>
         </TableRow>
         <TableRow className="bg-muted/50">
@@ -91,7 +91,7 @@ const BillingTable = ({
               netProfit >= 0 ? "text-green-500" : "text-destructive"
             }`}
           >
-            NPR {netProfit.toLocaleString()}
+            NPR {(netProfit || 0).toLocaleString()}
           </TableCell>
         </TableRow>
       </TableBody>
