@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import { useStore } from "@/store/store";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import GroupedOrdersList from "@/components/GroupedOrdersList";
 import {
   Table,
@@ -15,26 +14,30 @@ import {
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import OrderForm from "@/components/OrderForm";
-import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const Orders = () => {
-  const { orders, products, updateOrderStatus } = useStore();
+  const { orders, products } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [editingOrder, setEditingOrder] = useState(null);
 
-  // Calculate totals
+  // Calculate totals with separate QR tracking
   const totalUnpaidAmount = orders
     .filter(order => !order.isPaid)
     .reduce((sum, order) => sum + order.total, 0);
+
   const totalPaidAmount = orders
-    .filter(order => order.isPaid)
+    .filter(order => order.isPaid && !order.wasUnpaid && !order.paidWithQR)
     .reduce((sum, order) => sum + order.total, 0);
   
-  // Calculate total unpaid to paid amount
-  const unpaidToPaidOrders = orders.filter(order => order.isPaid && order.wasUnpaid);
+  // Separate unpaid-to-paid calculations
+  const unpaidToPaidOrders = orders.filter(order => order.isPaid && order.wasUnpaid && !order.paidWithQR);
   const totalUnpaidToPaidAmount = unpaidToPaidOrders
+    .reduce((sum, order) => sum + order.total, 0);
+
+  // New: Calculate unpaid-to-paid-with-QR amount
+  const unpaidToPaidQROrders = orders.filter(order => order.isPaid && order.wasUnpaid && order.paidWithQR);
+  const totalUnpaidToPaidQRAmount = unpaidToPaidQROrders
     .reduce((sum, order) => sum + order.total, 0);
 
   // Filter paid orders based on search criteria
@@ -46,18 +49,6 @@ const Orders = () => {
     return searchString.includes(searchTerm.toLowerCase()) && dateMatch;
   });
 
-  // Filter unpaid to paid orders
-  const filteredUnpaidToPaidOrders = unpaidToPaidOrders.filter(order => {
-    const product = products.find(p => p.id === order.productId);
-    const searchString = `${order.customerName} ${product?.name} ${order.total}`.toLowerCase();
-    const dateMatch = searchDate ? new Date(order.date).toLocaleDateString().includes(searchDate) : true;
-    return searchString.includes(searchTerm.toLowerCase()) && dateMatch;
-  });
-
-  const handleMarkAsPaid = (orderId: string) => {
-    updateOrderStatus(orderId, true);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -65,7 +56,7 @@ const Orders = () => {
         <div className="grid gap-6">
           <Card className="p-8">
             <h2 className="text-xl font-bold mb-6">Orders Summary</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
               <div>
                 <p className="text-sm text-muted-foreground">Total Unpaid Amount</p>
                 <p className="text-2xl font-bold text-red-600">
@@ -82,6 +73,12 @@ const Orders = () => {
                 <p className="text-sm text-muted-foreground">Total Unpaid to Paid Amount</p>
                 <p className="text-2xl font-bold text-blue-600">
                   NPR {totalUnpaidToPaidAmount.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Unpaid to Paid with QR</p>
+                <p className="text-2xl font-bold text-indigo-600">
+                  NPR {totalUnpaidToPaidQRAmount.toLocaleString()}
                 </p>
               </div>
               <div>
@@ -113,11 +110,11 @@ const Orders = () => {
 
             <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
 
-            <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
-              <DialogContent className="sm:max-w-[425px]">
-                <OrderForm editingOrder={editingOrder} />
-              </DialogContent>
-            </Dialog>
+          <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
+            <DialogContent className="sm:max-w-[425px]">
+              <OrderForm editingOrder={editingOrder} />
+            </DialogContent>
+          </Dialog>
 
             <div className="space-y-6">
               <h2 className="text-2xl font-bold">Unpaid to Paid Orders</h2>
@@ -180,7 +177,6 @@ const Orders = () => {
                 </Table>
               </div>
             </div>
-          </div>
         </div>
       </main>
     </div>
