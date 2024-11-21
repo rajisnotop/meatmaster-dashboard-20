@@ -17,6 +17,7 @@ interface BillingTableProps {
     quantity: number;
     sales: number;
     unpaid: number;
+    unpaidToPaidQR: number;
   };
   totalExpenses: number;
   netProfit: number;
@@ -39,6 +40,7 @@ const BillingTable = ({
           <TableHead>Quantity Sold</TableHead>
           <TableHead>Total Sales (NPR)</TableHead>
           <TableHead>Unpaid to Paid Amount (NPR)</TableHead>
+          <TableHead>Unpaid to Paid with QR (NPR)</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -60,6 +62,7 @@ const BillingTable = ({
             <TableCell>{product.quantity.toFixed(2)}</TableCell>
             <TableCell>{product.amount.toLocaleString()}</TableCell>
             <TableCell>{product.unpaid.toLocaleString()}</TableCell>
+            <TableCell>{product.unpaidToPaidQR.toLocaleString()}</TableCell>
           </TableRow>
         ))}
         <TableRow className="bg-muted/50 font-bold">
@@ -68,12 +71,13 @@ const BillingTable = ({
           <TableCell>{overallTotals.quantity.toFixed(2)}</TableCell>
           <TableCell>NPR {overallTotals.sales.toLocaleString()}</TableCell>
           <TableCell>NPR {overallTotals.unpaid.toLocaleString()}</TableCell>
+          <TableCell>NPR {overallTotals.unpaidToPaidQR.toLocaleString()}</TableCell>
         </TableRow>
         <TableRow className="bg-muted/50">
           <TableCell></TableCell>
           <TableCell className="font-bold">Total Expenses</TableCell>
           <TableCell></TableCell>
-          <TableCell colSpan={2} className="font-bold text-destructive">
+          <TableCell colSpan={3} className="font-bold text-destructive">
             NPR {totalExpenses.toLocaleString()}
           </TableCell>
         </TableRow>
@@ -82,7 +86,7 @@ const BillingTable = ({
           <TableCell className="font-bold">Net Profit</TableCell>
           <TableCell></TableCell>
           <TableCell
-            colSpan={2}
+            colSpan={3}
             className={`font-bold ${
               netProfit >= 0 ? "text-green-500" : "text-destructive"
             }`}
