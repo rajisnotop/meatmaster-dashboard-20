@@ -31,6 +31,9 @@ const BillingTable = ({
   totalExpenses,
   netProfit,
 }: BillingTableProps) => {
+  // Calculate cash in counter (total sales - expenses)
+  const cashInCounter = (overallTotals.sales || 0) - (totalExpenses || 0);
+
   return (
     <Table>
       <TableHeader>
@@ -79,6 +82,19 @@ const BillingTable = ({
           <TableCell></TableCell>
           <TableCell colSpan={3} className="font-bold text-destructive">
             NPR {(totalExpenses || 0).toLocaleString()}
+          </TableCell>
+        </TableRow>
+        <TableRow className="bg-muted/50">
+          <TableCell></TableCell>
+          <TableCell className="font-bold">Cash in Counter</TableCell>
+          <TableCell></TableCell>
+          <TableCell
+            colSpan={3}
+            className={`font-bold ${
+              cashInCounter >= 0 ? "text-green-500" : "text-destructive"
+            }`}
+          >
+            NPR {cashInCounter.toLocaleString()}
           </TableCell>
         </TableRow>
         <TableRow className="bg-muted/50">
