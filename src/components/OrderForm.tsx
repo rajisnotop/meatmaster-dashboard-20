@@ -58,6 +58,7 @@ const OrderForm = ({ editingOrder = null }) => {
       quantity: Number(order.quantity),
       total,
       isPaid,
+      wasUnpaid: editingOrder ? editingOrder.wasUnpaid : !isPaid,
       date: editingOrder?.date || new Date(),
     };
 
