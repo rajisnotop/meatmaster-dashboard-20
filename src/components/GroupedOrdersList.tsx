@@ -18,6 +18,7 @@ interface GroupedOrders {
   [key: string]: {
     orders: any[];
     totalAmount: number;
+    totalQRAmount: number;
   };
 }
 
@@ -46,29 +47,33 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
           acc[customerName] = {
             orders: [],
             totalAmount: 0,
+            totalQRAmount: 0,
           };
         }
         acc[customerName].orders.push(order);
         acc[customerName].totalAmount += order.total;
+        if (order.paidWithQR) {
+          acc[customerName].totalQRAmount += order.total;
+        }
       }
       return acc;
     }, {} as GroupedOrders);
 
-  const handleMarkAsPaid = (orderId: string) => {
-    console.log("Marking order as paid:", orderId);
-    updateOrderStatus(orderId, true);
+  const handleMarkAsPaid = (orderId: string, withQR: boolean = false) => {
+    console.log(`Marking order as paid${withQR ? ' with QR' : ''}:`, orderId);
+    updateOrderStatus(orderId, true, withQR);
   };
 
-  const handleMarkAllAsPaid = (customerOrders: any[]) => {
-    console.log("Marking all orders as paid for customer");
+  const handleMarkAllAsPaid = (customerOrders: any[], withQR: boolean = false) => {
+    console.log(`Marking all orders as paid${withQR ? ' with QR' : ''} for customer`);
     customerOrders.forEach(order => {
-      updateOrderStatus(order.id, true);
+      updateOrderStatus(order.id, true, withQR);
     });
   };
 
   return (
     <div className="space-y-6">
-      {Object.entries(groupedUnpaidOrders).map(([customerName, { orders: customerOrders, totalAmount }]) => (
+      {Object.entries(groupedUnpaidOrders).map(([customerName, { orders: customerOrders, totalAmount, totalQRAmount }]) => (
         <Card key={customerName} className="p-6">
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -76,32 +81,64 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
               <p className="text-red-600 font-bold">
                 Total Unpaid: NPR {totalAmount.toLocaleString()}
               </p>
+              {totalQRAmount > 0 && (
+                <p className="text-blue-600 font-bold">
+                  Total QR Payments: NPR {totalQRAmount.toLocaleString()}
+                </p>
+              )}
             </div>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className="bg-green-500/20 hover:bg-green-500/30 text-green-500"
-                >
-                  Pay All Orders
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Mark All Orders as Paid?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action will mark all unpaid orders for {customerName} as paid, totaling NPR {totalAmount.toLocaleString()}.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleMarkAllAsPaid(customerOrders)}>
-                    Confirm
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <div className="space-x-2">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-500"
+                  >
+                    Pay All with QR
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Mark All Orders as Paid with QR?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action will mark all unpaid orders for {customerName} as paid with QR, totaling NPR {totalAmount.toLocaleString()}.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleMarkAllAsPaid(customerOrders, true)}>
+                      Confirm
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="bg-green-500/20 hover:bg-green-500/30 text-green-500"
+                  >
+                    Pay All Orders
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Mark All Orders as Paid?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action will mark all unpaid orders for {customerName} as paid, totaling NPR {totalAmount.toLocaleString()}.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleMarkAllAsPaid(customerOrders)}>
+                      Confirm
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
           <div className="rounded-md border">
             <Table>
@@ -133,6 +170,31 @@ const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
                         >
                           Edit
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-500"
+                            >
+                              Mark as Paid with QR
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Mark Order as Paid with QR?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action will move the order to the paid with QR section and update the financial reports.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleMarkAsPaid(order.id, true)}>
+                                Confirm
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button 
