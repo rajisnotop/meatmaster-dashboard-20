@@ -1,21 +1,11 @@
 import Header from "@/components/Header";
 import { useStore } from "@/store/store";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import GroupedOrdersList from "@/components/GroupedOrdersList";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import OrderForm from "@/components/OrderForm";
-import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import OrdersSummary from "@/components/orders/OrdersSummary";
+import OrdersSearch from "@/components/orders/OrdersSearch";
+import GroupedOrdersList from "@/components/GroupedOrdersList";
 
 const Orders = () => {
   const { orders, products } = useStore();
@@ -32,170 +22,38 @@ const Orders = () => {
     .filter(order => order.isPaid && !order.wasUnpaid && !order.paidWithQR)
     .reduce((sum, order) => sum + order.total, 0);
   
-  // Separate unpaid-to-paid calculations
-  const unpaidToPaidOrders = orders.filter(order => order.isPaid && order.wasUnpaid && !order.paidWithQR);
-  const totalUnpaidToPaidAmount = unpaidToPaidOrders
+  const totalUnpaidToPaidAmount = orders
+    .filter(order => order.isPaid && order.wasUnpaid && !order.paidWithQR)
     .reduce((sum, order) => sum + order.total, 0);
 
-  // New: Calculate unpaid-to-paid-with-QR amount
-  const unpaidToPaidQROrders = orders.filter(order => order.isPaid && order.wasUnpaid && order.paidWithQR);
-  const totalUnpaidToPaidQRAmount = unpaidToPaidQROrders
+  const totalUnpaidToPaidQRAmount = orders
+    .filter(order => order.isPaid && order.wasUnpaid && order.paidWithQR)
     .reduce((sum, order) => sum + order.total, 0);
-
-  // Filter paid orders based on search criteria
-  const filteredPaidOrders = orders.filter(order => {
-    if (!order.isPaid) return false;
-    const product = products.find(p => p.id === order.productId);
-    const searchString = `${order.customerName} ${product?.name} ${order.total}`.toLowerCase();
-    const dateMatch = searchDate ? new Date(order.date).toLocaleDateString().includes(searchDate) : true;
-    return searchString.includes(searchTerm.toLowerCase()) && dateMatch;
-  });
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8 space-y-8">
-        <div className="grid gap-6">
-          <Card className="p-8">
-            <h2 className="text-xl font-bold mb-6">Orders Summary</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Unpaid Amount</p>
-                <p className="text-2xl font-bold text-red-600">
-                  NPR {totalUnpaidAmount.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Paid Amount</p>
-                <p className="text-2xl font-bold text-green-600">
-                  NPR {totalPaidAmount.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Unpaid to Paid Amount</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  NPR {totalUnpaidToPaidAmount.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Unpaid to Paid with QR</p>
-                <p className="text-2xl font-bold text-indigo-600">
-                  NPR {totalUnpaidToPaidQRAmount.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Transactions</p>
-                <p className="text-2xl font-bold">{orders.length}</p>
-              </div>
-            </div>
-          </Card>
+      <main className="container py-8 space-y-8 animate-fade-in">
+        <OrdersSummary
+          totalUnpaidAmount={totalUnpaidAmount}
+          totalPaidAmount={totalPaidAmount}
+          totalUnpaidToPaidAmount={totalUnpaidToPaidAmount}
+          totalUnpaidToPaidQRAmount={totalUnpaidToPaidQRAmount}
+          totalOrders={orders.length}
+        />
 
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-              <h2 className="text-2xl font-bold">Orders</h2>
-              <div className="flex gap-4 w-full md:w-auto">
-                <Input
-                  type="text"
-                  placeholder="Search orders..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full md:w-64"
-                />
-                <Input
-                  type="date"
-                  value={searchDate}
-                  onChange={(e) => setSearchDate(e.target.value)}
-                  className="w-full md:w-auto"
-                />
-              </div>
-            </div>
-
-            <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
-
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold">Unpaid to Paid Orders</h2>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Product</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {unpaidToPaidOrders.map((order) => {
-                      const product = products.find(p => p.id === order.productId);
-                      return (
-                        <TableRow key={order.id}>
-                          <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-                          <TableCell>{order.customerName || "Anonymous"}</TableCell>
-                          <TableCell>{product?.name}</TableCell>
-                          <TableCell>{order.quantity} kg</TableCell>
-                          <TableCell>NPR {order.total.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingOrder(order)}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold">Paid Orders</h2>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Product</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredPaidOrders.map((order) => {
-                      const product = products.find(p => p.id === order.productId);
-                      return (
-                        <TableRow key={order.id}>
-                          <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-                          <TableCell>{order.customerName || "Anonymous"}</TableCell>
-                          <TableCell>{product?.name}</TableCell>
-                          <TableCell>{order.quantity} kg</TableCell>
-                          <TableCell>NPR {order.total.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingOrder(order)}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
+        <div className="space-y-6">
+          <div className="flex flex-col gap-6">
+            <h2 className="text-2xl font-bold tracking-tight">Orders</h2>
+            <OrdersSearch
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              searchDate={searchDate}
+              setSearchDate={setSearchDate}
+            />
           </div>
+
+          <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
         </div>
 
         <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
