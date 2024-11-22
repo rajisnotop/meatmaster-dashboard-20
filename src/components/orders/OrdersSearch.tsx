@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Search, Calendar } from "lucide-react";
+import { formatNepaliDate } from "@/utils/nepaliDate";
 
 interface OrdersSearchProps {
   searchTerm: string;
@@ -28,7 +29,8 @@ const OrdersSearch = ({
       <div className="relative w-full sm:w-auto">
         <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          type="date"
+          type="text"
+          placeholder="YYYY/MM/DD"
           value={searchDate}
           onChange={(e) => setSearchDate(e.target.value)}
           className="pl-9 bg-background/60 backdrop-blur-sm border-border/50 w-full"

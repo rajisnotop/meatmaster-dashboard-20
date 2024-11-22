@@ -14,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { formatNepaliDate, formatNepaliDateFull } from "@/utils/nepaliDate";
 
 interface PaidOrdersListProps {
   searchTerm: string;
@@ -28,13 +29,13 @@ const PaidOrdersList = ({ searchTerm, searchDate }: PaidOrdersListProps) => {
     .filter((order) => order.isPaid)
     .reduce((acc, order) => {
       const orderDate = new Date(order.date);
-      const dateKey = orderDate.toDateString();
+      const dateKey = formatNepaliDate(orderDate);
       const searchDateObj = searchDate ? new Date(searchDate) : null;
       const product = products.find((p) => p.id === order.productId);
       const searchString = `${order.customerName} ${product?.name} ${order.total}`.toLowerCase();
       
       const dateMatch = searchDate
-        ? orderDate.toDateString() === searchDateObj?.toDateString()
+        ? formatNepaliDate(orderDate) === formatNepaliDate(searchDateObj!)
         : true;
 
       if (searchString.includes(searchTerm.toLowerCase()) && dateMatch) {
@@ -77,7 +78,7 @@ const PaidOrdersList = ({ searchTerm, searchDate }: PaidOrdersListProps) => {
           >
             <AccordionTrigger className="hover:no-underline">
               <div className="flex justify-between items-center w-full">
-                <span className="font-semibold">{new Date(date).toLocaleDateString()}</span>
+                <span className="font-semibold">{formatNepaliDateFull(new Date(date))}</span>
                 <div className="flex gap-4">
                   <span className="text-green-400">
                     Cash: NPR {(totalAmount - totalQRAmount).toLocaleString()}
