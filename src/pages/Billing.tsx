@@ -24,6 +24,7 @@ const Billing = () => {
   const [timeFilter, setTimeFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [openingBalance, setOpeningBalance] = useState<number>(0);
   const { products, orders, expenses } = useStore();
 
   // Filter data based on selected time period and date
@@ -196,6 +197,8 @@ const Billing = () => {
               overallTotals={overallTotals}
               totalExpenses={totalExpenses}
               netProfit={netProfit}
+              openingBalance={openingBalance}
+              setOpeningBalance={setOpeningBalance}
             />
           </div>
         </Card>
