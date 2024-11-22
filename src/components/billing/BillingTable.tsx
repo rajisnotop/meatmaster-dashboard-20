@@ -103,21 +103,21 @@ const BillingTable = ({
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Sales Overview Card */}
-        <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
+        <Card className="p-6 bg-gradient-to-br from-blue-900/30 to-blue-800/30 border-blue-700/50">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg text-foreground">Sales Overview</h3>
-            <Wallet className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <h3 className="font-semibold text-lg text-white">Sales Overview</h3>
+            <Wallet className="h-5 w-5 text-blue-400" />
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-foreground">Total Sales</span>
-              <span className="font-semibold text-lg text-foreground">
+              <span className="text-sm text-gray-300">Total Sales</span>
+              <span className="font-semibold text-lg text-white">
                 NPR {(overallTotals.sales || 0).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-foreground">Quantity Sold</span>
-              <span className="font-medium text-foreground">
+              <span className="text-sm text-gray-300">Quantity Sold</span>
+              <span className="font-medium text-white">
                 {(overallTotals.quantity || 0).toFixed(2)}
               </span>
             </div>
@@ -125,21 +125,21 @@ const BillingTable = ({
         </Card>
 
         {/* Digital Payments Card */}
-        <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
+        <Card className="p-6 bg-gradient-to-br from-purple-900/30 to-purple-800/30 border-purple-700/50">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg text-foreground">Digital Payments</h3>
-            <CreditCard className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <h3 className="font-semibold text-lg text-white">Digital Payments</h3>
+            <CreditCard className="h-5 w-5 text-purple-400" />
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-foreground">QR Payments</span>
-              <span className="font-medium text-foreground">
+              <span className="text-sm text-gray-300">QR Payments</span>
+              <span className="font-medium text-white">
                 NPR {(overallTotals.paidWithQR || 0).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-foreground">Unpaid to QR</span>
-              <span className="font-medium text-foreground">
+              <span className="text-sm text-gray-300">Unpaid to QR</span>
+              <span className="font-medium text-white">
                 NPR {(overallTotals.unpaidToPaidQR || 0).toLocaleString()}
               </span>
             </div>
@@ -147,38 +147,34 @@ const BillingTable = ({
         </Card>
 
         {/* Financial Summary Card */}
-        <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
+        <Card className="p-6 bg-gradient-to-br from-green-900/30 to-green-800/30 border-green-700/50">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg text-foreground">Financial Summary</h3>
-            <Calculator className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <h3 className="font-semibold text-lg text-white">Financial Summary</h3>
+            <Calculator className="h-5 w-5 text-green-400" />
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-foreground">Cash in Counter</span>
+              <span className="text-sm text-gray-300">Cash in Counter</span>
               <div className="flex items-center gap-2">
                 {cashInCounter >= 0 ? (
-                  <ArrowUpIcon className="h-4 w-4 text-green-600" />
+                  <ArrowUpIcon className="h-4 w-4 text-green-400" />
                 ) : (
-                  <ArrowDownIcon className="h-4 w-4 text-red-600" />
+                  <ArrowDownIcon className="h-4 w-4 text-red-400" />
                 )}
-                <span className={`font-semibold ${
-                  cashInCounter >= 0 ? "text-green-600" : "text-red-600"
-                }`}>
+                <span className={`font-semibold text-white`}>
                   NPR {cashInCounter.toLocaleString()}
                 </span>
               </div>
             </div>
-            <div className="flex justify-between items-center pt-2 border-t border-green-200 dark:border-green-700">
-              <span className="text-sm text-foreground">Net Profit</span>
+            <div className="flex justify-between items-center pt-2 border-t border-green-700">
+              <span className="text-sm text-gray-300">Net Profit</span>
               <div className="flex items-center gap-2">
                 {netProfit >= 0 ? (
-                  <ArrowUpIcon className="h-4 w-4 text-green-600" />
+                  <ArrowUpIcon className="h-4 w-4 text-green-400" />
                 ) : (
-                  <ArrowDownIcon className="h-4 w-4 text-red-600" />
+                  <ArrowDownIcon className="h-4 w-4 text-red-400" />
                 )}
-                <span className={`font-semibold ${
-                  netProfit >= 0 ? "text-green-600" : "text-red-600"
-                }`}>
+                <span className={`font-semibold text-white`}>
                   NPR {netProfit.toLocaleString()}
                 </span>
               </div>
