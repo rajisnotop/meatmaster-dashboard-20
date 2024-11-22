@@ -45,7 +45,7 @@ const BillingTable = ({
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
-        <Label htmlFor="openingBalance" className="text-sm font-medium">
+        <Label htmlFor="openingBalance" className="text-sm font-medium text-foreground">
           Opening Balance (NPR)
         </Label>
         <Input
@@ -58,22 +58,22 @@ const BillingTable = ({
         />
       </div>
       
-      <div className="rounded-lg border bg-card">
+      <div className="rounded-lg border bg-card text-card-foreground">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="w-12">Select</TableHead>
-              <TableHead>Product</TableHead>
-              <TableHead>Quantity Sold</TableHead>
-              <TableHead>Total Sales (NPR)</TableHead>
-              <TableHead>Paid with QR (NPR)</TableHead>
-              <TableHead>Unpaid to Paid Amount (NPR)</TableHead>
-              <TableHead>Unpaid to Paid with QR (NPR)</TableHead>
+              <TableHead className="w-12 text-foreground font-semibold">Select</TableHead>
+              <TableHead className="text-foreground font-semibold">Product</TableHead>
+              <TableHead className="text-foreground font-semibold">Quantity Sold</TableHead>
+              <TableHead className="text-foreground font-semibold">Total Sales (NPR)</TableHead>
+              <TableHead className="text-foreground font-semibold">Paid with QR (NPR)</TableHead>
+              <TableHead className="text-foreground font-semibold">Unpaid to Paid Amount (NPR)</TableHead>
+              <TableHead className="text-foreground font-semibold">Unpaid to Paid with QR (NPR)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {productTotals.map((product) => (
-              <TableRow key={product.id}>
+              <TableRow key={product.id} className="hover:bg-muted/50">
                 <TableCell>
                   <Checkbox
                     checked={selectedProducts.includes(product.id)}
@@ -86,12 +86,12 @@ const BillingTable = ({
                     }}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>{(product.quantity || 0).toFixed(2)}</TableCell>
-                <TableCell>{(product.amount || 0).toLocaleString()}</TableCell>
-                <TableCell>{(product.paidWithQR || 0).toLocaleString()}</TableCell>
-                <TableCell>{(product.unpaid || 0).toLocaleString()}</TableCell>
-                <TableCell>
+                <TableCell className="font-medium text-foreground">{product.name}</TableCell>
+                <TableCell className="text-foreground">{(product.quantity || 0).toFixed(2)}</TableCell>
+                <TableCell className="text-foreground">{(product.amount || 0).toLocaleString()}</TableCell>
+                <TableCell className="text-foreground">{(product.paidWithQR || 0).toLocaleString()}</TableCell>
+                <TableCell className="text-foreground">{(product.unpaid || 0).toLocaleString()}</TableCell>
+                <TableCell className="text-foreground">
                   {(product.unpaidToPaidQR || 0).toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -105,19 +105,19 @@ const BillingTable = ({
         {/* Sales Overview Card */}
         <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg text-blue-900 dark:text-blue-100">Sales Overview</h3>
+            <h3 className="font-semibold text-lg text-foreground">Sales Overview</h3>
             <Wallet className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-blue-700 dark:text-blue-300">Total Sales</span>
-              <span className="font-semibold text-lg">
+              <span className="text-sm text-foreground">Total Sales</span>
+              <span className="font-semibold text-lg text-foreground">
                 NPR {(overallTotals.sales || 0).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-blue-700 dark:text-blue-300">Quantity Sold</span>
-              <span className="font-medium">
+              <span className="text-sm text-foreground">Quantity Sold</span>
+              <span className="font-medium text-foreground">
                 {(overallTotals.quantity || 0).toFixed(2)}
               </span>
             </div>
@@ -127,19 +127,19 @@ const BillingTable = ({
         {/* Digital Payments Card */}
         <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg text-purple-900 dark:text-purple-100">Digital Payments</h3>
+            <h3 className="font-semibold text-lg text-foreground">Digital Payments</h3>
             <CreditCard className="h-5 w-5 text-purple-600 dark:text-purple-400" />
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-purple-700 dark:text-purple-300">QR Payments</span>
-              <span className="font-medium">
+              <span className="text-sm text-foreground">QR Payments</span>
+              <span className="font-medium text-foreground">
                 NPR {(overallTotals.paidWithQR || 0).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-purple-700 dark:text-purple-300">Unpaid to QR</span>
-              <span className="font-medium">
+              <span className="text-sm text-foreground">Unpaid to QR</span>
+              <span className="font-medium text-foreground">
                 NPR {(overallTotals.unpaidToPaidQR || 0).toLocaleString()}
               </span>
             </div>
@@ -149,12 +149,12 @@ const BillingTable = ({
         {/* Financial Summary Card */}
         <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-800">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg text-green-900 dark:text-green-100">Financial Summary</h3>
+            <h3 className="font-semibold text-lg text-foreground">Financial Summary</h3>
             <Calculator className="h-5 w-5 text-green-600 dark:text-green-400" />
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-green-700 dark:text-green-300">Cash in Counter</span>
+              <span className="text-sm text-foreground">Cash in Counter</span>
               <div className="flex items-center gap-2">
                 {cashInCounter >= 0 ? (
                   <ArrowUpIcon className="h-4 w-4 text-green-600" />
@@ -169,7 +169,7 @@ const BillingTable = ({
               </div>
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-green-200 dark:border-green-700">
-              <span className="text-sm text-green-700 dark:text-green-300">Net Profit</span>
+              <span className="text-sm text-foreground">Net Profit</span>
               <div className="flex items-center gap-2">
                 {netProfit >= 0 ? (
                   <ArrowUpIcon className="h-4 w-4 text-green-600" />
