@@ -8,12 +8,12 @@ import OrdersSearch from "@/components/orders/OrdersSearch";
 import GroupedOrdersList from "@/components/GroupedOrdersList";
 
 const Orders = () => {
-  const { orders, products } = useStore();
+  const { orders } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [editingOrder, setEditingOrder] = useState(null);
 
-  // Calculate totals with separate QR tracking
+  // Calculate totals
   const totalUnpaidAmount = orders
     .filter(order => !order.isPaid)
     .reduce((sum, order) => sum + order.total, 0);
@@ -31,7 +31,7 @@ const Orders = () => {
     .reduce((sum, order) => sum + order.total, 0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/95">
       <Header />
       <main className="container py-8 space-y-8 animate-fade-in">
         <OrdersSummary
@@ -44,7 +44,9 @@ const Orders = () => {
 
         <div className="space-y-6">
           <div className="flex flex-col gap-6">
-            <h2 className="text-2xl font-bold tracking-tight">Orders</h2>
+            <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+              Orders
+            </h2>
             <OrdersSearch
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}

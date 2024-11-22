@@ -22,7 +22,7 @@ const OrdersSearch = ({
           placeholder="Search orders..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9 bg-background/60 backdrop-blur-sm"
+          className="pl-9 bg-background/60 backdrop-blur-sm border-border/50"
         />
       </div>
       <div className="relative w-full sm:w-auto">
@@ -31,7 +31,7 @@ const OrdersSearch = ({
           type="date"
           value={searchDate}
           onChange={(e) => setSearchDate(e.target.value)}
-          className="pl-9 bg-background/60 backdrop-blur-sm w-full"
+          className="pl-9 bg-background/60 backdrop-blur-sm border-border/50 w-full"
         />
       </div>
     </div>
