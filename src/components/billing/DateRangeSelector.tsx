@@ -37,10 +37,6 @@ const DateRangeSelector = ({
     setEndDate(date);
   };
 
-  // Get tomorrow's date for min attribute
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
   return (
     <div className="flex items-center gap-3">
       <div className="flex gap-2">
@@ -74,7 +70,6 @@ const DateRangeSelector = ({
               disabled={(date) =>
                 endDate ? date > new Date(endDate) : false
               }
-              fromDate={new Date()} // Allow selection from today onwards
             />
           </PopoverContent>
         </Popover>
@@ -111,7 +106,6 @@ const DateRangeSelector = ({
               disabled={(date) =>
                 startDate ? date < new Date(startDate) : false
               }
-              fromDate={startDate ? new Date(startDate) : new Date()} // Allow selection from start date or today onwards
             />
           </PopoverContent>
         </Popover>
