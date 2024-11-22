@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Printer } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -50,28 +51,37 @@ const BillingHeader = ({
             <SelectItem value="yearly">Yearly</SelectItem>
           </SelectContent>
         </Select>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[180px] justify-start text-left font-normal",
-                !dateFilter && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {dateFilter ? format(new Date(dateFilter), "PPP") : "Pick a date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={dateFilter ? new Date(dateFilter) : undefined}
-              onSelect={(date) => setDateFilter(date ? format(date, "yyyy-MM-dd") : "")}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        
+        <div className="flex gap-2">
+          <Input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="w-[180px]"
+          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[42px] px-2",
+                  !dateFilter && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dateFilter ? new Date(dateFilter) : undefined}
+                onSelect={(date) => setDateFilter(date ? format(date, "yyyy-MM-dd") : "")}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
         <Button onClick={() => onPrint("all")} variant="outline">
           <Printer className="mr-2 h-4 w-4" />
           Print All
