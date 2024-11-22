@@ -111,7 +111,12 @@ const Billing = () => {
           { 
             v: netProfit,
             t: 'n',
-            s: { font: { bold: true }, font: { color: { rgb: netProfit >= 0 ? "008000" : "FF0000" } } },
+            s: { 
+              font: { 
+                bold: true,
+                color: { rgb: netProfit >= 0 ? "008000" : "FF0000" } 
+              }
+            },
             z: '#,##0.00'
           }
         ]
@@ -290,3 +295,4 @@ const Billing = () => {
 };
 
 export default Billing;
+
