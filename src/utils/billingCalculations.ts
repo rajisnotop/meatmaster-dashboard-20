@@ -5,7 +5,12 @@ export const calculateProductTotals = (
   orders: Order[],
   filterDateFn: (date: Date) => boolean
 ) => {
-  return products.map((product) => {
+  // First, get all products that have any orders
+  const productsWithOrders = products.filter(product => 
+    orders.some(order => order.productId === product.id)
+  );
+
+  return productsWithOrders.map((product) => {
     const productOrders = orders.filter((order) => {
       const orderDate = new Date(order.date);
       return order.productId === product.id && 
