@@ -12,11 +12,10 @@ const ProductsTable = () => {
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
-    stock: "",
   });
 
   const handleAddProduct = () => {
-    if (!newProduct.name || !newProduct.price || !newProduct.stock) {
+    if (!newProduct.name || !newProduct.price) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -28,10 +27,10 @@ const ProductsTable = () => {
     addProduct({
       name: newProduct.name,
       price: Number(newProduct.price),
-      stock: Number(newProduct.stock),
+      stock: 0, // We keep this to maintain compatibility with existing data structure
     });
 
-    setNewProduct({ name: "", price: "", stock: "" });
+    setNewProduct({ name: "", price: "" });
     toast({
       title: "Success",
       description: "Product added successfully",
@@ -60,12 +59,6 @@ const ProductsTable = () => {
           value={newProduct.price}
           onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
         />
-        <Input
-          type="number"
-          placeholder="Stock"
-          value={newProduct.stock}
-          onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
-        />
         <Button onClick={handleAddProduct}>
           <Plus className="h-4 w-4 mr-2" />
           Add Product
@@ -78,7 +71,6 @@ const ProductsTable = () => {
             <TableRow>
               <TableHead>Product Name</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -87,7 +79,6 @@ const ProductsTable = () => {
               <TableRow key={product.id}>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>NPR {product.price.toLocaleString()}</TableCell>
-                <TableCell>{product.stock}</TableCell>
                 <TableCell className="text-right">
                   <Button
                     variant="ghost"
