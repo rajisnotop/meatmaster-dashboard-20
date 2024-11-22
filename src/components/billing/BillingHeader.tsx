@@ -7,8 +7,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar, Printer } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Calendar as CalendarIcon, Printer } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface BillingHeaderProps {
   timeFilter: string;
@@ -43,15 +50,28 @@ const BillingHeader = ({
             <SelectItem value="yearly">Yearly</SelectItem>
           </SelectContent>
         </Select>
-        <div className="relative">
-          <Input
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="w-[180px] pl-9"
-          />
-          <Calendar className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-[180px] justify-start text-left font-normal",
+                !dateFilter && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {dateFilter ? format(new Date(dateFilter), "PPP") : "Pick a date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={dateFilter ? new Date(dateFilter) : undefined}
+              onSelect={(date) => setDateFilter(date ? format(date, "yyyy-MM-dd") : "")}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
         <Button onClick={() => onPrint("all")} variant="outline">
           <Printer className="mr-2 h-4 w-4" />
           Print All
