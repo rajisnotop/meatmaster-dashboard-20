@@ -26,6 +26,10 @@ interface BillingHeaderProps {
   dateFilter: string;
   setDateFilter: (value: string) => void;
   onExportExcel: () => void;
+  startDate: string | null;
+  endDate: string | null;
+  setStartDate: (date: string | null) => void;
+  setEndDate: (date: string | null) => void;
 }
 
 const BillingHeader = ({
@@ -36,12 +40,22 @@ const BillingHeader = ({
   dateFilter,
   setDateFilter,
   onExportExcel,
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
 }: BillingHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-6">
       <h1 className="text-2xl font-bold">Billing Summary</h1>
       <div className="flex gap-4">
-        <Select value={timeFilter} onValueChange={setTimeFilter}>
+        <Select value={timeFilter} onValueChange={(value) => {
+          setTimeFilter(value);
+          if (value !== "date-range") {
+            setStartDate(null);
+            setEndDate(null);
+          }
+        }}>
           <SelectTrigger className="w-[180px] bg-background">
             <SelectValue placeholder="Select time period" />
           </SelectTrigger>
@@ -51,38 +65,57 @@ const BillingHeader = ({
             <SelectItem value="weekly">Weekly</SelectItem>
             <SelectItem value="monthly">Monthly</SelectItem>
             <SelectItem value="yearly">Yearly</SelectItem>
+            <SelectItem value="date-range">Date Range</SelectItem>
           </SelectContent>
         </Select>
         
-        <div className="flex gap-2">
-          <Input
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="w-[180px]"
-          />
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-[42px] px-2",
-                  !dateFilter && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={dateFilter ? new Date(dateFilter) : undefined}
-                onSelect={(date) => setDateFilter(date ? format(date, "yyyy-MM-dd") : "")}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+        {timeFilter === "date-range" ? (
+          <div className="flex gap-2 items-center">
+            <Input
+              type="date"
+              value={startDate || ""}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-[180px]"
+            />
+            <span>to</span>
+            <Input
+              type="date"
+              value={endDate || ""}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-[180px]"
+            />
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-[180px]"
+            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-[42px] px-2",
+                    !dateFilter && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateFilter ? new Date(dateFilter) : undefined}
+                  onSelect={(date) => setDateFilter(date ? format(date, "yyyy-MM-dd") : "")}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        )}
 
         <Button onClick={onExportExcel} variant="outline">
           <FileSpreadsheet className="mr-2 h-4 w-4" />

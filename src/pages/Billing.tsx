@@ -2,70 +2,37 @@ import React, { useState } from "react";
 import { useStore } from "@/store/store";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { 
-  startOfDay, 
-  startOfWeek, 
-  startOfMonth, 
-  startOfYear, 
-  isAfter, 
-  isBefore, 
-  endOfDay, 
-  endOfWeek, 
-  endOfMonth, 
-  endOfYear,
-  parseISO,
-  format 
-} from "date-fns";
+import { format, parseISO } from "date-fns";
 import * as XLSX from 'xlsx';
 import BillingTable from "@/components/billing/BillingTable";
 import BillingHeader from "@/components/billing/BillingHeader";
 import Header from "@/components/Header";
 import { calculateProductTotals, calculateOverallTotals } from "@/utils/billingCalculations";
+import { isDateInRange, getDateRangeForFilter } from "@/utils/dateFilters";
 
 const Billing = () => {
   const [timeFilter, setTimeFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [openingBalance, setOpeningBalance] = useState<number>(0);
   const { products, orders, expenses } = useStore();
 
   const filterData = (date: Date) => {
-    let startDate, endDate;
-    const now = new Date();
+    if (timeFilter === "date-range" && startDate && endDate) {
+      return isDateInRange(date, startDate, endDate);
+    }
 
-    // Check date filter first
     if (dateFilter) {
       const filterDate = parseISO(dateFilter);
-      const start = startOfDay(filterDate);
-      const end = endOfDay(filterDate);
-      return isAfter(date, start) && isBefore(date, end);
+      return isDateInRange(date, format(filterDate, "yyyy-MM-dd"), format(filterDate, "yyyy-MM-dd"));
     }
 
-    // If no date filter, check time period filter
-    if (timeFilter === "all") return true;
-
-    switch (timeFilter) {
-      case "daily":
-        startDate = startOfDay(now);
-        endDate = endOfDay(now);
-        break;
-      case "weekly":
-        startDate = startOfWeek(now);
-        endDate = endOfWeek(now);
-        break;
-      case "monthly":
-        startDate = startOfMonth(now);
-        endDate = endOfMonth(now);
-        break;
-      case "yearly":
-        startDate = startOfYear(now);
-        endDate = endOfYear(now);
-        break;
-      default:
-        return true;
-    }
-
-    return isAfter(date, startDate) && isBefore(date, endDate);
+    const dateRange = getDateRangeForFilter(timeFilter, dateFilter);
+    if (!dateRange) return true;
+    
+    return isAfter(date, dateRange.start) && isBefore(date, dateRange.end);
   };
 
   // Calculate totals using the utility functions
@@ -79,11 +46,8 @@ const Billing = () => {
 
   const handleExportExcel = () => {
     try {
-      // Prepare data for Excel
       const excelData = [
-        // Headers
         ['Product', 'Quantity Sold', 'Total Sales (NPR)', 'Paid with QR (NPR)', 'Unpaid Amount (NPR)', 'Unpaid to Paid with QR (NPR)'],
-        // Product rows
         ...productTotals.map(product => [
           product.name,
           product.quantity,
@@ -92,9 +56,7 @@ const Billing = () => {
           product.unpaid,
           product.unpaidToPaidQR
         ]),
-        // Empty row
         [],
-        // Summary rows
         ['Total', overallTotals.quantity, overallTotals.sales, overallTotals.paidWithQR, overallTotals.unpaid, overallTotals.unpaidToPaidQR],
         ['Opening Balance', '', openingBalance],
         ['Total Expenses', '', totalExpenses],
@@ -102,17 +64,16 @@ const Billing = () => {
         ['Net Amount', '', netProfit]
       ];
 
-      // Create workbook and worksheet
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-      // Add worksheet to workbook
       XLSX.utils.book_append_sheet(wb, ws, 'Billing Summary');
 
-      // Generate filename with current date
-      const fileName = `billing-summary-${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
+      let fileName = `billing-summary-${format(new Date(), 'yyyy-MM-dd')}`;
+      if (timeFilter === "date-range" && startDate && endDate) {
+        fileName = `billing-summary-${startDate}-to-${endDate}`;
+      }
+      fileName += '.xlsx';
 
-      // Save file
       XLSX.writeFile(wb, fileName);
       toast.success('Excel file exported successfully');
     } catch (error) {
@@ -233,6 +194,10 @@ const Billing = () => {
             dateFilter={dateFilter}
             setDateFilter={setDateFilter}
             onExportExcel={handleExportExcel}
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
           />
           <div className="rounded-md border">
             <BillingTable
