@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { ArrowUpIcon, ArrowDownIcon, Wallet, CreditCard, Calculator } from "lucide-react";
+import { ArrowUpIcon, ArrowDownIcon, Wallet, CreditCard, Calculator, Receipt } from "lucide-react";
 
 interface BillingTableProps {
   productTotals: any[];
@@ -101,7 +101,7 @@ const BillingTable = ({
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Sales Overview Card */}
         <Card className="p-6 bg-gradient-to-br from-blue-900/30 to-blue-800/30 border-blue-700/50">
           <div className="flex items-center justify-between mb-4">
@@ -146,6 +146,28 @@ const BillingTable = ({
           </div>
         </Card>
 
+        {/* Expenses Card */}
+        <Card className="p-6 bg-gradient-to-br from-red-900/30 to-red-800/30 border-red-700/50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg text-white">Expenses</h3>
+            <Receipt className="h-5 w-5 text-red-400" />
+          </div>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-300">Total Expenses</span>
+              <span className="font-medium text-white">
+                NPR {(totalExpenses || 0).toLocaleString()}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-300">Opening Balance</span>
+              <span className="font-medium text-white">
+                NPR {(openingBalance || 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </Card>
+
         {/* Financial Summary Card */}
         <Card className="p-6 bg-gradient-to-br from-green-900/30 to-green-800/30 border-green-700/50">
           <div className="flex items-center justify-between mb-4">
@@ -161,7 +183,7 @@ const BillingTable = ({
                 ) : (
                   <ArrowDownIcon className="h-4 w-4 text-red-400" />
                 )}
-                <span className={`font-semibold text-white`}>
+                <span className="font-semibold text-white">
                   NPR {cashInCounter.toLocaleString()}
                 </span>
               </div>
@@ -174,7 +196,7 @@ const BillingTable = ({
                 ) : (
                   <ArrowDownIcon className="h-4 w-4 text-red-400" />
                 )}
-                <span className={`font-semibold text-white`}>
+                <span className="font-semibold text-white">
                   NPR {netProfit.toLocaleString()}
                 </span>
               </div>
