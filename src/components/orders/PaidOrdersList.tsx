@@ -14,7 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { formatNepaliDate, formatNepaliDateFull, isDateInValidRange } from "@/utils/nepaliDate";
+import { formatNepaliDate, formatNepaliDateFull } from "@/utils/nepaliDate";
 
 interface PaidOrdersListProps {
   searchTerm: string;
@@ -29,10 +29,8 @@ const PaidOrdersList = ({ searchTerm, searchDate }: PaidOrdersListProps) => {
     .filter((order) => order.isPaid)
     .reduce((acc, order) => {
       const orderDate = new Date(order.date);
-      const dateKey = isDateInValidRange(orderDate) 
-        ? formatNepaliDate(orderDate) 
-        : orderDate.toISOString().split('T')[0];
-        
+      const dateKey = formatNepaliDate(orderDate);
+      
       const searchDateObj = searchDate ? new Date(searchDate) : null;
       const product = products.find((p) => p.id === order.productId);
       const searchString = `${order.customerName} ${product?.name} ${order.total}`.toLowerCase();
