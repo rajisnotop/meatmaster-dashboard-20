@@ -2,10 +2,12 @@ import Header from "@/components/Header";
 import { useStore } from "@/store/store";
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OrderForm from "@/components/OrderForm";
 import OrdersSummary from "@/components/orders/OrdersSummary";
 import OrdersSearch from "@/components/orders/OrdersSearch";
 import GroupedOrdersList from "@/components/GroupedOrdersList";
+import PaidOrdersList from "@/components/orders/PaidOrdersList";
 
 const Orders = () => {
   const { orders } = useStore();
@@ -55,7 +57,20 @@ const Orders = () => {
             />
           </div>
 
-          <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
+          <Tabs defaultValue="unpaid" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="unpaid" className="text-lg">Unpaid Orders</TabsTrigger>
+              <TabsTrigger value="paid" className="text-lg">Paid Orders</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="unpaid" className="mt-0">
+              <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
+            </TabsContent>
+            
+            <TabsContent value="paid" className="mt-0">
+              <PaidOrdersList searchTerm={searchTerm} searchDate={searchDate} />
+            </TabsContent>
+          </Tabs>
         </div>
 
         <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
