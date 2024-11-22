@@ -10,6 +10,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 
 interface BillingTableProps {
   productTotals: any[];
@@ -98,43 +99,50 @@ const BillingTable = ({
         </Table>
       </div>
 
-      <div className="grid gap-4 rounded-lg border p-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total Quantity:</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Sales Summary Card */}
+        <Card className="p-6 space-y-4">
+          <h3 className="font-semibold text-lg">Sales Summary</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Total Quantity</span>
               <span className="font-medium">
                 {(overallTotals.quantity || 0).toFixed(2)}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total Sales:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Total Sales</span>
               <span className="font-medium">
                 NPR {(overallTotals.sales || 0).toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total QR Payments:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Total QR Payments</span>
               <span className="font-medium">
                 NPR {(overallTotals.paidWithQR || 0).toLocaleString()}
               </span>
             </div>
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Opening Balance:</span>
+        </Card>
+
+        {/* Financial Summary Card */}
+        <Card className="p-6 space-y-4">
+          <h3 className="font-semibold text-lg">Financial Summary</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Opening Balance</span>
               <span className="font-medium text-blue-500">
                 NPR {(openingBalance || 0).toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total Expenses:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Total Expenses</span>
               <span className="font-medium text-destructive">
                 NPR {(totalExpenses || 0).toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Cash in Counter:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Cash in Counter</span>
               <span
                 className={`font-medium ${
                   cashInCounter >= 0 ? "text-green-500" : "text-destructive"
@@ -143,8 +151,8 @@ const BillingTable = ({
                 NPR {cashInCounter.toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Net Amount:</span>
+            <div className="flex justify-between items-center border-t pt-3">
+              <span className="text-muted-foreground">Net Amount</span>
               <span
                 className={`font-medium ${
                   netProfit >= 0 ? "text-green-500" : "text-destructive"
@@ -154,7 +162,7 @@ const BillingTable = ({
               </span>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
