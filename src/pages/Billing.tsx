@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useStore } from "@/store/store";
 import { toast } from "sonner";
 import { format, parseISO, isAfter, isBefore } from "date-fns";
-import * as XLSX from 'xlsx';
 import BillingTable from "@/components/billing/BillingTable";
 import BillingHeader from "@/components/billing/BillingHeader";
 import BillingCard from "@/components/billing/BillingCard";
 import Header from "@/components/Header";
 import { calculateProductTotals, calculateOverallTotals } from "@/utils/billingCalculations";
 import { isDateInRange, getDateRangeForFilter } from "@/utils/dateFilters";
+import { exportToExcel } from "@/utils/excelExport";
 
 const Billing = () => {
   const [timeFilter, setTimeFilter] = useState("all");
@@ -46,112 +46,15 @@ const Billing = () => {
 
   const handleExportExcel = () => {
     try {
-      // Create workbook and worksheet
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet([
-        [{ v: 'Neelkanta Meat Shop', t: 's', s: { font: { bold: true, sz: 16 }, alignment: { horizontal: 'center' } } }],
-        [{ v: 'Billing Summary Report', t: 's', s: { font: { bold: true, sz: 14 }, alignment: { horizontal: 'center' } } }],
-        [{ 
-          v: timeFilter === "date-range" && startDate && endDate 
-            ? `Date Range: ${format(new Date(startDate), 'MMM dd, yyyy')} to ${format(new Date(endDate), 'MMM dd, yyyy')}`
-            : `Period: ${timeFilter.charAt(0).toUpperCase() + timeFilter.slice(1)}`,
-          t: 's',
-          s: { font: { sz: 12 }, alignment: { horizontal: 'center' } }
-        }],
-        [{ v: `Generated on: ${format(new Date(), 'MMM dd, yyyy HH:mm')}`, t: 's', s: { font: { sz: 12 }, alignment: { horizontal: 'center' } } }],
-        [''], // Empty row for spacing
-        [
-          { v: 'Product', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: "E5E7EB" } } } },
-          { v: 'Quantity Sold', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: "E5E7EB" } } } },
-          { v: 'Total Sales (NPR)', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: "E5E7EB" } } } },
-          { v: 'Paid with QR (NPR)', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: "E5E7EB" } } } },
-          { v: 'Unpaid Amount (NPR)', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: "E5E7EB" } } } },
-          { v: 'Unpaid to Paid with QR (NPR)', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: "E5E7EB" } } } }
-        ],
-        ...productTotals.map(product => [
-          { v: product.name, t: 's' },
-          { v: product.quantity, t: 'n', z: '#,##0.00' },
-          { v: product.amount, t: 'n', z: '#,##0.00' },
-          { v: product.paidWithQR, t: 'n', z: '#,##0.00' },
-          { v: product.unpaid, t: 'n', z: '#,##0.00' },
-          { v: product.unpaidToPaidQR, t: 'n', z: '#,##0.00' }
-        ]),
-        [''], // Empty row for spacing
-        [
-          { v: 'Total', t: 's', s: { font: { bold: true }, fill: { fgColor: { rgb: "F3F4F6" } } } },
-          { v: overallTotals.quantity, t: 'n', s: { font: { bold: true } }, z: '#,##0.00' },
-          { v: overallTotals.sales, t: 'n', s: { font: { bold: true } }, z: '#,##0.00' },
-          { v: overallTotals.paidWithQR, t: 'n', s: { font: { bold: true } }, z: '#,##0.00' },
-          { v: overallTotals.unpaid, t: 'n', s: { font: { bold: true } }, z: '#,##0.00' },
-          { v: overallTotals.unpaidToPaidQR, t: 'n', s: { font: { bold: true } }, z: '#,##0.00' }
-        ],
-        [''], // Empty row for spacing
-        [
-          { v: 'Additional Information', t: 's', s: { font: { bold: true, sz: 12 } } }
-        ],
-        [
-          { v: 'Opening Balance', t: 's' },
-          { v: openingBalance, t: 'n', z: '#,##0.00' }
-        ],
-        [
-          { v: 'Total Expenses', t: 's' },
-          { v: totalExpenses, t: 'n', z: '#,##0.00' }
-        ],
-        [
-          { v: 'Cash in Counter', t: 's', s: { font: { bold: true } } },
-          { 
-            v: (overallTotals.sales || 0) - (totalExpenses || 0) + (openingBalance || 0),
-            t: 'n',
-            s: { font: { bold: true } },
-            z: '#,##0.00'
-          }
-        ],
-        [
-          { v: 'Net Profit', t: 's', s: { font: { bold: true } } },
-          { 
-            v: netProfit,
-            t: 'n',
-            s: { 
-              font: { 
-                bold: true,
-                color: { rgb: netProfit >= 0 ? "008000" : "FF0000" } 
-              }
-            },
-            z: '#,##0.00'
-          }
-        ]
-      ]);
-
-      // Set column widths
-      ws['!cols'] = [
-        { wch: 30 }, // Product
-        { wch: 15 }, // Quantity
-        { wch: 20 }, // Sales
-        { wch: 20 }, // QR
-        { wch: 20 }, // Unpaid
-        { wch: 25 }, // Unpaid to QR
-      ];
-
-      // Merge cells for header
-      ws['!merges'] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // Shop name
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } }, // Report title
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 5 } }, // Date range
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 5 } }, // Generated date
-      ];
-
-      XLSX.utils.book_append_sheet(wb, ws, 'Billing Summary');
-
-      // Generate filename based on date range
-      let fileName = `billing-summary`;
-      if (timeFilter === "date-range" && startDate && endDate) {
-        fileName += `-${format(new Date(startDate), 'yyyy-MM-dd')}-to-${format(new Date(endDate), 'yyyy-MM-dd')}`;
-      } else {
-        fileName += `-${timeFilter}-${format(new Date(), 'yyyy-MM-dd')}`;
-      }
-      fileName += '.xlsx';
-
-      XLSX.writeFile(wb, fileName);
+      exportToExcel(
+        productTotals,
+        timeFilter,
+        startDate,
+        endDate,
+        netProfit,
+        totalExpenses,
+        openingBalance
+      );
       toast.success('Excel file exported successfully');
     } catch (error) {
       toast.error('Failed to export Excel file');
@@ -295,4 +198,3 @@ const Billing = () => {
 };
 
 export default Billing;
-
