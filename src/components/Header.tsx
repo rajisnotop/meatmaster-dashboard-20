@@ -10,7 +10,7 @@ const Header = () => {
           <Menu className="h-6 w-6" />
         </Button>
         <Link to="/" className="text-xl font-bold text-foreground hover:text-primary transition-colors">
-          Meat Shop Manager
+          Neelkantha Meat Shop
         </Link>
       </div>
       <nav className="hidden lg:flex items-center space-x-6">

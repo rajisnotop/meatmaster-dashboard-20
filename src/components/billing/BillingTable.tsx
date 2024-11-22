@@ -130,7 +130,7 @@ const BillingTable = ({
           </TableRow>
           <TableRow className="bg-muted/50">
             <TableCell></TableCell>
-            <TableCell className="font-bold">Net Profit</TableCell>
+            <TableCell className="font-bold">Net Amount</TableCell>
             <TableCell></TableCell>
             <TableCell
               colSpan={4}
