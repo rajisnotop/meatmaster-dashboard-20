@@ -12,7 +12,8 @@ import {
   endOfDay, 
   endOfWeek, 
   endOfMonth, 
-  endOfYear 
+  endOfYear,
+  parseISO 
 } from "date-fns";
 import BillingTable from "@/components/billing/BillingTable";
 import BillingHeader from "@/components/billing/BillingHeader";
@@ -21,14 +22,24 @@ import { calculateProductTotals, calculateOverallTotals } from "@/utils/billingC
 
 const Billing = () => {
   const [timeFilter, setTimeFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const { products, orders, expenses } = useStore();
 
-  // Filter data based on selected time period
+  // Filter data based on selected time period and date
   const filterData = (date: Date) => {
     let startDate, endDate;
     const now = new Date();
 
+    // Check date filter first
+    if (dateFilter) {
+      const filterDate = parseISO(dateFilter);
+      const start = startOfDay(filterDate);
+      const end = endOfDay(filterDate);
+      return isAfter(date, start) && isBefore(date, end);
+    }
+
+    // If no date filter, check time period filter
     if (timeFilter === "all") return true;
 
     switch (timeFilter) {
@@ -62,8 +73,7 @@ const Billing = () => {
   // Calculate filtered expenses and net profit
   const filteredExpenses = expenses.filter((expense) => filterData(new Date(expense.date)));
   const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  // Updated net profit calculation to add unpaid to paid amount instead of subtracting it
-  const netProfit = overallTotals.sales + overallTotals.unpaid - totalExpenses;
+  const netProfit = overallTotals.sales + overallTotals.paidWithQR + overallTotals.unpaid + overallTotals.unpaidToPaidQR - totalExpenses;
 
   const handlePrint = (type: "all" | "selected") => {
     const printWindow = window.open("", "_blank");
@@ -175,6 +185,8 @@ const Billing = () => {
             setTimeFilter={setTimeFilter}
             selectedProducts={selectedProducts}
             onPrint={handlePrint}
+            dateFilter={dateFilter}
+            setDateFilter={setDateFilter}
           />
           <div className="rounded-md border">
             <BillingTable

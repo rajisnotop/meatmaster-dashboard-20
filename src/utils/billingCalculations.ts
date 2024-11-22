@@ -22,6 +22,11 @@ export const calculateProductTotals = (
       .filter(order => !order.wasUnpaid)
       .reduce((sum, order) => sum + order.total, 0);
     
+    // Calculate paid with QR amount (direct QR payments)
+    const paidWithQRAmount = productOrders
+      .filter(order => !order.wasUnpaid && order.paidWithQR)
+      .reduce((sum, order) => sum + order.total, 0);
+
     // Calculate unpaid to paid amount (excluding QR payments)
     const unpaidToPaidAmount = productOrders
       .filter(order => order.wasUnpaid && !order.paidWithQR)
@@ -37,6 +42,7 @@ export const calculateProductTotals = (
       name: product.name,
       quantity: totalQuantity,
       amount: totalAmount,
+      paidWithQR: paidWithQRAmount,
       unpaid: unpaidToPaidAmount,
       unpaidToPaidQR: unpaidToPaidQRAmount,
     };
@@ -47,6 +53,7 @@ export const calculateOverallTotals = (productTotals: any[]) => {
   return {
     quantity: productTotals.reduce((sum, product) => sum + product.quantity, 0),
     sales: productTotals.reduce((sum, product) => sum + product.amount, 0),
+    paidWithQR: productTotals.reduce((sum, product) => sum + product.paidWithQR, 0),
     unpaid: productTotals.reduce((sum, product) => sum + product.unpaid, 0),
     unpaidToPaidQR: productTotals.reduce((sum, product) => sum + product.unpaidToPaidQR, 0),
   };

@@ -18,6 +18,7 @@ interface BillingTableProps {
     sales: number;
     unpaid: number;
     unpaidToPaidQR: number;
+    paidWithQR: number;
   };
   totalExpenses: number;
   netProfit: number;
@@ -42,6 +43,7 @@ const BillingTable = ({
           <TableHead>Product</TableHead>
           <TableHead>Quantity Sold</TableHead>
           <TableHead>Total Sales (NPR)</TableHead>
+          <TableHead>Paid with QR (NPR)</TableHead>
           <TableHead>Unpaid to Paid Amount (NPR)</TableHead>
           <TableHead>Unpaid to Paid with QR (NPR)</TableHead>
         </TableRow>
@@ -64,6 +66,7 @@ const BillingTable = ({
             <TableCell className="font-medium">{product.name}</TableCell>
             <TableCell>{(product.quantity || 0).toFixed(2)}</TableCell>
             <TableCell>{(product.amount || 0).toLocaleString()}</TableCell>
+            <TableCell>{(product.paidWithQR || 0).toLocaleString()}</TableCell>
             <TableCell>{(product.unpaid || 0).toLocaleString()}</TableCell>
             <TableCell>{(product.unpaidToPaidQR || 0).toLocaleString()}</TableCell>
           </TableRow>
@@ -73,6 +76,7 @@ const BillingTable = ({
           <TableCell>Total</TableCell>
           <TableCell>{(overallTotals.quantity || 0).toFixed(2)}</TableCell>
           <TableCell>NPR {(overallTotals.sales || 0).toLocaleString()}</TableCell>
+          <TableCell>NPR {(overallTotals.paidWithQR || 0).toLocaleString()}</TableCell>
           <TableCell>NPR {(overallTotals.unpaid || 0).toLocaleString()}</TableCell>
           <TableCell>NPR {(overallTotals.unpaidToPaidQR || 0).toLocaleString()}</TableCell>
         </TableRow>
@@ -80,7 +84,7 @@ const BillingTable = ({
           <TableCell></TableCell>
           <TableCell className="font-bold">Total Expenses</TableCell>
           <TableCell></TableCell>
-          <TableCell colSpan={3} className="font-bold text-destructive">
+          <TableCell colSpan={4} className="font-bold text-destructive">
             NPR {(totalExpenses || 0).toLocaleString()}
           </TableCell>
         </TableRow>
@@ -89,7 +93,7 @@ const BillingTable = ({
           <TableCell className="font-bold">Cash in Counter</TableCell>
           <TableCell></TableCell>
           <TableCell
-            colSpan={3}
+            colSpan={4}
             className={`font-bold ${
               cashInCounter >= 0 ? "text-green-500" : "text-destructive"
             }`}
@@ -102,7 +106,7 @@ const BillingTable = ({
           <TableCell className="font-bold">Net Profit</TableCell>
           <TableCell></TableCell>
           <TableCell
-            colSpan={3}
+            colSpan={4}
             className={`font-bold ${
               netProfit >= 0 ? "text-green-500" : "text-destructive"
             }`}

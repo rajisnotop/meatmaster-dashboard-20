@@ -8,12 +8,15 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface BillingHeaderProps {
   timeFilter: string;
   setTimeFilter: (value: string) => void;
   selectedProducts: string[];
   onPrint: (type: "all" | "selected") => void;
+  dateFilter: string;
+  setDateFilter: (value: string) => void;
 }
 
 const BillingHeader = ({
@@ -21,6 +24,8 @@ const BillingHeader = ({
   setTimeFilter,
   selectedProducts,
   onPrint,
+  dateFilter,
+  setDateFilter,
 }: BillingHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-6">
@@ -38,6 +43,12 @@ const BillingHeader = ({
             <SelectItem value="yearly">Yearly</SelectItem>
           </SelectContent>
         </Select>
+        <Input
+          type="date"
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="w-[180px]"
+        />
         <Button onClick={() => onPrint("all")} variant="outline">
           <Printer className="mr-2 h-4 w-4" />
           Print All
