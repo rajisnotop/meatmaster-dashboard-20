@@ -4,36 +4,36 @@
 
 @layer base {
   :root {
-    --background: 0 0% 2%;
-    --foreground: 0 0% 91%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
     
-    --card: 0 0% 3%;
-    --card-foreground: 0 0% 91%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
     
-    --popover: 0 0% 3%;
-    --popover-foreground: 0 0% 91%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 213 31% 91%;
     
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 1.2%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
     --primary-rgb: 249, 249, 249;
     
-    --secondary: 0 0% 11.2%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
     
-    --muted: 0 0% 11%;
-    --muted-foreground: 0 0% 56.9%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
     
-    --accent: 0 0% 17%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
     
     --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
     
-    --border: 0 0% 17%;
-    --input: 0 0% 17%;
-    --ring: 0 0% 17%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --ring: 216 34% 17%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -59,13 +59,21 @@
     @apply animate-glow-pulse;
   }
 
-  .card-glow {
-    @apply border border-primary/20 bg-accent/50 backdrop-blur-sm;
+  .card-modern {
+    @apply bg-accent/40 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
   }
 
-  /* Fix for transparent dropdowns */
-  [role="listbox"],
-  [role="dialog"] {
-    @apply bg-background border border-border;
+  .gradient-border {
+    @apply relative rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 p-[1px] overflow-hidden;
+  }
+
+  .gradient-border::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-50;
+    z-index: -1;
+  }
+
+  .glass-effect {
+    @apply bg-background/60 backdrop-blur-md border border-border/50;
   }
 }

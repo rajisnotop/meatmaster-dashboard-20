@@ -6,23 +6,31 @@ import OrderForm from "@/components/OrderForm";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-accent">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container py-8 space-y-8">
         <DashboardStats />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <RevenueChart />
+          <div className="lg:col-span-2 gradient-border">
+            <div className="card-modern p-6">
+              <h2 className="text-xl font-semibold mb-4">Revenue Overview</h2>
+              <RevenueChart />
+            </div>
           </div>
-          <div>
-            <OrderForm />
+          <div className="gradient-border">
+            <div className="card-modern p-6">
+              <h2 className="text-xl font-semibold mb-4">New Order</h2>
+              <OrderForm />
+            </div>
           </div>
         </div>
         
-        <div className="p-6 rounded-lg bg-background/95 border border-border/50 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold mb-4">Products Management</h2>
-          <ProductsTable />
+        <div className="gradient-border">
+          <div className="card-modern p-6">
+            <h2 className="text-xl font-semibold mb-4">Products Management</h2>
+            <ProductsTable />
+          </div>
         </div>
       </main>
     </div>
