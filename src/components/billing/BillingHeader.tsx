@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Printer } from "lucide-react";
+import { Calendar as CalendarIcon, Printer, FileSpreadsheet } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,6 +25,7 @@ interface BillingHeaderProps {
   onPrint: (type: "all" | "selected") => void;
   dateFilter: string;
   setDateFilter: (value: string) => void;
+  onExportExcel: () => void;
 }
 
 const BillingHeader = ({
@@ -34,6 +35,7 @@ const BillingHeader = ({
   onPrint,
   dateFilter,
   setDateFilter,
+  onExportExcel,
 }: BillingHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-6">
@@ -81,6 +83,11 @@ const BillingHeader = ({
             </PopoverContent>
           </Popover>
         </div>
+
+        <Button onClick={onExportExcel} variant="outline">
+          <FileSpreadsheet className="mr-2 h-4 w-4" />
+          Export Excel
+        </Button>
 
         <Button onClick={() => onPrint("all")} variant="outline">
           <Printer className="mr-2 h-4 w-4" />

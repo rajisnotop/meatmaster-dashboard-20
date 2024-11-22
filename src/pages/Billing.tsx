@@ -13,8 +13,10 @@ import {
   endOfWeek, 
   endOfMonth, 
   endOfYear,
-  parseISO 
+  parseISO,
+  format 
 } from "date-fns";
+import * as XLSX from 'xlsx';
 import BillingTable from "@/components/billing/BillingTable";
 import BillingHeader from "@/components/billing/BillingHeader";
 import Header from "@/components/Header";
@@ -27,7 +29,6 @@ const Billing = () => {
   const [openingBalance, setOpeningBalance] = useState<number>(0);
   const { products, orders, expenses } = useStore();
 
-  // Filter data based on selected time period and date
   const filterData = (date: Date) => {
     let startDate, endDate;
     const now = new Date();
@@ -75,6 +76,49 @@ const Billing = () => {
   const filteredExpenses = expenses.filter((expense) => filterData(new Date(expense.date)));
   const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   const netProfit = overallTotals.sales + overallTotals.paidWithQR + overallTotals.unpaid + overallTotals.unpaidToPaidQR - totalExpenses;
+
+  const handleExportExcel = () => {
+    try {
+      // Prepare data for Excel
+      const excelData = [
+        // Headers
+        ['Product', 'Quantity Sold', 'Total Sales (NPR)', 'Paid with QR (NPR)', 'Unpaid Amount (NPR)', 'Unpaid to Paid with QR (NPR)'],
+        // Product rows
+        ...productTotals.map(product => [
+          product.name,
+          product.quantity,
+          product.amount,
+          product.paidWithQR,
+          product.unpaid,
+          product.unpaidToPaidQR
+        ]),
+        // Empty row
+        [],
+        // Summary rows
+        ['Total', overallTotals.quantity, overallTotals.sales, overallTotals.paidWithQR, overallTotals.unpaid, overallTotals.unpaidToPaidQR],
+        ['Opening Balance', '', openingBalance],
+        ['Total Expenses', '', totalExpenses],
+        ['Cash in Counter', '', (overallTotals.sales || 0) - (totalExpenses || 0) + (openingBalance || 0)],
+        ['Net Amount', '', netProfit]
+      ];
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Billing Summary');
+
+      // Generate filename with current date
+      const fileName = `billing-summary-${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
+
+      // Save file
+      XLSX.writeFile(wb, fileName);
+      toast.success('Excel file exported successfully');
+    } catch (error) {
+      toast.error('Failed to export Excel file');
+    }
+  };
 
   const handlePrint = (type: "all" | "selected") => {
     const printWindow = window.open("", "_blank");
@@ -188,6 +232,7 @@ const Billing = () => {
             onPrint={handlePrint}
             dateFilter={dateFilter}
             setDateFilter={setDateFilter}
+            onExportExcel={handleExportExcel}
           />
           <div className="rounded-md border">
             <BillingTable
