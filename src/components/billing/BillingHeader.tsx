@@ -96,19 +96,69 @@ const BillingHeader = ({
         
         {timeFilter === "date-range" ? (
           <div className="flex items-center gap-3">
-            <Input
-              type="date"
-              value={startDate || ""}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-[180px]"
-            />
+            <div className="flex gap-2">
+              <Input
+                type="date"
+                value={startDate || ""}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-[180px]"
+              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[42px] px-2",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate ? new Date(startDate) : undefined}
+                    onSelect={(date) =>
+                      setStartDate(date ? format(date, "yyyy-MM-dd") : null)
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
             <span className="text-muted-foreground">to</span>
-            <Input
-              type="date"
-              value={endDate || ""}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-[180px]"
-            />
+            <div className="flex gap-2">
+              <Input
+                type="date"
+                value={endDate || ""}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-[180px]"
+              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[42px] px-2",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate ? new Date(endDate) : undefined}
+                    onSelect={(date) =>
+                      setEndDate(date ? format(date, "yyyy-MM-dd") : null)
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         ) : (
           <div className="flex gap-2">
