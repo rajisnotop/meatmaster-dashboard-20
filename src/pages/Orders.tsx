@@ -14,6 +14,8 @@ import {
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import OrderForm from "@/components/OrderForm";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 const Orders = () => {
   const { orders, products } = useStore();
@@ -110,12 +112,6 @@ const Orders = () => {
 
             <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
 
-            <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
-              <DialogContent className="sm:max-w-[425px]">
-                <OrderForm editingOrder={editingOrder} />
-              </DialogContent>
-            </Dialog>
-
             <div className="space-y-6">
               <h2 className="text-2xl font-bold">Unpaid to Paid Orders</h2>
               <div className="rounded-md border">
@@ -127,6 +123,7 @@ const Orders = () => {
                       <TableHead>Product</TableHead>
                       <TableHead>Quantity</TableHead>
                       <TableHead>Amount</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -139,6 +136,16 @@ const Orders = () => {
                           <TableCell>{product?.name}</TableCell>
                           <TableCell>{order.quantity} kg</TableCell>
                           <TableCell>NPR {order.total.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingOrder(order)}
+                            >
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -158,6 +165,7 @@ const Orders = () => {
                       <TableHead>Product</TableHead>
                       <TableHead>Quantity</TableHead>
                       <TableHead>Amount</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -170,6 +178,16 @@ const Orders = () => {
                           <TableCell>{product?.name}</TableCell>
                           <TableCell>{order.quantity} kg</TableCell>
                           <TableCell>NPR {order.total.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingOrder(order)}
+                            >
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -179,6 +197,12 @@ const Orders = () => {
             </div>
           </div>
         </div>
+
+        <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
+          <DialogContent>
+            <OrderForm editingOrder={editingOrder} />
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

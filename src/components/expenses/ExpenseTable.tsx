@@ -10,11 +10,15 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 const ExpenseTable = () => {
+  const { toast } = useToast();
   const expenses = useStore((state) => state.expenses);
+  const deleteExpense = useStore((state) => state.deleteExpense);
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredExpenses = expenses.filter((expense) =>
@@ -23,6 +27,14 @@ const ExpenseTable = () => {
   );
 
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+  const handleDelete = (id: string) => {
+    deleteExpense(id);
+    toast({
+      title: "Expense Deleted",
+      description: "The expense has been successfully deleted.",
+    });
+  };
 
   const exportToCSV = () => {
     const headers = ["Date", "Category", "Amount (NPR)", "Description"];
@@ -82,6 +94,7 @@ const ExpenseTable = () => {
                 <TableHead>Category</TableHead>
                 <TableHead>Amount (NPR)</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -93,6 +106,29 @@ const ExpenseTable = () => {
                   <TableCell className="capitalize">{expense.category}</TableCell>
                   <TableCell>NPR {expense.amount.toLocaleString()}</TableCell>
                   <TableCell>{expense.description}</TableCell>
+                  <TableCell>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Expense</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this expense? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(expense.id)}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

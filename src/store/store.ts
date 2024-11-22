@@ -12,6 +12,7 @@ interface StoreState {
   updateOrder: (order: Order) => void;
   updateOrderStatus: (id: string, isPaid: boolean, paidWithQR?: boolean) => void;
   addExpense: (expense: Omit<Expense, 'id'>) => void;
+  deleteExpense: (id: string) => void;
 }
 
 export const useStore = create<StoreState>()(
@@ -68,6 +69,10 @@ export const useStore = create<StoreState>()(
               ...state.expenses,
               { ...expense, id: crypto.randomUUID() },
             ],
+          })),
+        deleteExpense: (id) =>
+          set((state) => ({
+            expenses: state.expenses.filter((expense) => expense.id !== id),
           })),
       }),
       {
