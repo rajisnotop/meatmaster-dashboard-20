@@ -46,20 +46,45 @@ const BillingHeader = ({
   setEndDate,
 }: BillingHeaderProps) => {
   return (
-    <div className="flex justify-between items-center mb-6">
-      <h1 className="text-2xl font-bold">Billing Summary</h1>
-      <div className="flex gap-4">
-        <Select value={timeFilter} onValueChange={(value) => {
-          setTimeFilter(value);
-          if (value !== "date-range") {
-            setStartDate(null);
-            setEndDate(null);
-          }
-        }}>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Billing Summary</h1>
+        <div className="flex gap-3">
+          <Button onClick={onExportExcel} variant="outline" className="gap-2">
+            <FileSpreadsheet className="h-4 w-4" />
+            Export Excel
+          </Button>
+          <Button onClick={() => onPrint("all")} variant="outline" className="gap-2">
+            <Printer className="h-4 w-4" />
+            Print All
+          </Button>
+          <Button
+            onClick={() => onPrint("selected")}
+            variant="outline"
+            disabled={selectedProducts.length === 0}
+            className="gap-2"
+          >
+            <Printer className="h-4 w-4" />
+            Print Selected
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Select 
+          value={timeFilter} 
+          onValueChange={(value) => {
+            setTimeFilter(value);
+            if (value !== "date-range") {
+              setStartDate(null);
+              setEndDate(null);
+            }
+          }}
+        >
           <SelectTrigger className="w-[180px] bg-background">
             <SelectValue placeholder="Select time period" />
           </SelectTrigger>
-          <SelectContent className="bg-background border border-border">
+          <SelectContent>
             <SelectItem value="all">All Time</SelectItem>
             <SelectItem value="daily">Daily</SelectItem>
             <SelectItem value="weekly">Weekly</SelectItem>
@@ -70,14 +95,14 @@ const BillingHeader = ({
         </Select>
         
         {timeFilter === "date-range" ? (
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-3">
             <Input
               type="date"
               value={startDate || ""}
               onChange={(e) => setStartDate(e.target.value)}
               className="w-[180px]"
             />
-            <span>to</span>
+            <span className="text-muted-foreground">to</span>
             <Input
               type="date"
               value={endDate || ""}
@@ -109,31 +134,15 @@ const BillingHeader = ({
                 <Calendar
                   mode="single"
                   selected={dateFilter ? new Date(dateFilter) : undefined}
-                  onSelect={(date) => setDateFilter(date ? format(date, "yyyy-MM-dd") : "")}
+                  onSelect={(date) =>
+                    setDateFilter(date ? format(date, "yyyy-MM-dd") : "")
+                  }
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
           </div>
         )}
-
-        <Button onClick={onExportExcel} variant="outline">
-          <FileSpreadsheet className="mr-2 h-4 w-4" />
-          Export Excel
-        </Button>
-
-        <Button onClick={() => onPrint("all")} variant="outline">
-          <Printer className="mr-2 h-4 w-4" />
-          Print All
-        </Button>
-        <Button
-          onClick={() => onPrint("selected")}
-          variant="outline"
-          disabled={selectedProducts.length === 0}
-        >
-          <Printer className="mr-2 h-4 w-4" />
-          Print Selected
-        </Button>
       </div>
     </div>
   );

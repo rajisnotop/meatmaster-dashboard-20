@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useStore } from "@/store/store";
-import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isAfter, isBefore } from "date-fns";
 import * as XLSX from 'xlsx';
 import BillingTable from "@/components/billing/BillingTable";
 import BillingHeader from "@/components/billing/BillingHeader";
+import BillingCard from "@/components/billing/BillingCard";
 import Header from "@/components/Header";
 import { calculateProductTotals, calculateOverallTotals } from "@/utils/billingCalculations";
 import { isDateInRange, getDateRangeForFilter } from "@/utils/dateFilters";
@@ -184,8 +184,8 @@ const Billing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto py-8 space-y-6">
-        <Card className="p-6">
+      <main className="container mx-auto py-8 space-y-8">
+        <BillingCard>
           <BillingHeader
             timeFilter={timeFilter}
             setTimeFilter={setTimeFilter}
@@ -199,7 +199,7 @@ const Billing = () => {
             setStartDate={setStartDate}
             setEndDate={setEndDate}
           />
-          <div className="rounded-md border">
+          <div className="mt-8">
             <BillingTable
               productTotals={productTotals}
               selectedProducts={selectedProducts}
@@ -211,7 +211,7 @@ const Billing = () => {
               setOpeningBalance={setOpeningBalance}
             />
           </div>
-        </Card>
+        </BillingCard>
       </main>
     </div>
   );
