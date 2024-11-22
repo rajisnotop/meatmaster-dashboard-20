@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Calendar, Printer } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface BillingHeaderProps {
@@ -43,12 +43,15 @@ const BillingHeader = ({
             <SelectItem value="yearly">Yearly</SelectItem>
           </SelectContent>
         </Select>
-        <Input
-          type="date"
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          className="w-[180px]"
-        />
+        <div className="relative">
+          <Input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="w-[180px] pl-9"
+          />
+          <Calendar className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        </div>
         <Button onClick={() => onPrint("all")} variant="outline">
           <Printer className="mr-2 h-4 w-4" />
           Print All
