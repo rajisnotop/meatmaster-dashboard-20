@@ -8,7 +8,7 @@ interface StoreState {
   expenses: Expense[];
   addProduct: (product: Omit<Product, 'id'>) => void;
   deleteProduct: (id: string) => void;
-  addOrder: (order: Omit<Order, 'id' | 'wasUnpaid'>) => void;
+  addOrder: (order: Order) => void;
   updateOrder: (order: Order) => void;
   updateOrderStatus: (id: string, isPaid: boolean, paidWithQR?: boolean) => void;
   addExpense: (expense: Omit<Expense, 'id'>) => void;
@@ -35,10 +35,11 @@ export const useStore = create<StoreState>()(
             orders: [
               ...state.orders,
               { 
-                ...order, 
-                id: crypto.randomUUID(), 
+                ...order,
+                id: order.id || crypto.randomUUID(),
                 wasUnpaid: !order.isPaid,
-                paidWithQR: order.paidWithQR || false
+                paidWithQR: order.paidWithQR || false,
+                date: order.date || new Date()
               },
             ],
           }));
