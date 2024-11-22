@@ -22,16 +22,69 @@ export const exportToExcel = (
 ) => {
   // Create workbook and worksheet
   const wb = XLSX.utils.book_new();
+  
+  // Common styles
+  const headerStyle = { 
+    font: { bold: true, sz: 24 },
+    alignment: { horizontal: 'center', vertical: 'center' },
+    fill: { fgColor: { rgb: "E6F3F7" } },  // Light blue background
+    border: {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' }
+    }
+  };
+
+  const subHeaderStyle = {
+    font: { sz: 12 },
+    alignment: { horizontal: 'right', vertical: 'center' },
+    border: {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' }
+    }
+  };
+
+  const tableHeaderStyle = {
+    font: { bold: true, color: { rgb: "FFFFFF" } },
+    fill: { fgColor: { rgb: "000000" } },
+    alignment: { horizontal: 'center', vertical: 'center' },
+    border: {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' }
+    }
+  };
+
+  const cellStyle = {
+    alignment: { horizontal: 'center', vertical: 'center' },
+    border: {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' }
+    }
+  };
+
+  const summaryStyle = {
+    font: { bold: true },
+    alignment: { horizontal: 'right', vertical: 'center' },
+    border: {
+      top: { style: 'thin' },
+      bottom: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' }
+    }
+  };
+
   const ws = XLSX.utils.aoa_to_sheet([
-    // Logo and title row with merged cells and styling
     [{ 
       v: 'Neelkantha Meat Shop', 
       t: 's',
-      s: { 
-        font: { bold: true, sz: 24 },
-        alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: "E6F3F7" } }  // Light blue background
-      } 
+      s: headerStyle
     }],
     [''], // Spacing
     [{ 
@@ -39,52 +92,52 @@ export const exportToExcel = (
         ? `Date Range: ${format(new Date(startDate), 'MMM dd, yyyy')} to ${format(new Date(endDate), 'MMM dd, yyyy')}`
         : `Report Date: ${format(new Date(), 'MMM dd, yyyy')}`,
       t: 's',
-      s: { 
-        font: { sz: 12 },
-        alignment: { horizontal: 'right' }
-      }
+      s: subHeaderStyle
     }],
     [''], // Spacing
-    // Table headers with styling
+    // Table headers
     [
-      { v: 'Products', t: 's', s: { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "000000" } }, alignment: { horizontal: 'center' } } },
-      { v: 'Quantity Sold', t: 's', s: { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "000000" } }, alignment: { horizontal: 'center' } } },
-      { v: 'Total Sales', t: 's', s: { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "000000" } }, alignment: { horizontal: 'center' } } },
-      { v: 'Paid (QR)', t: 's', s: { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "000000" } }, alignment: { horizontal: 'center' } } },
-      { v: 'Unpaid to Paid', t: 's', s: { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "000000" } }, alignment: { horizontal: 'center' } } },
-      { v: 'Unpaid to Paid (QR)', t: 's', s: { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "000000" } }, alignment: { horizontal: 'center' } } }
+      { v: 'Products', t: 's', s: tableHeaderStyle },
+      { v: 'Quantity Sold', t: 's', s: tableHeaderStyle },
+      { v: 'Total Sales (NPR)', t: 's', s: tableHeaderStyle },
+      { v: 'Paid with QR (NPR)', t: 's', s: tableHeaderStyle },
+      { v: 'Unpaid Amount (NPR)', t: 's', s: tableHeaderStyle },
+      { v: 'Unpaid to Paid with QR (NPR)', t: 's', s: tableHeaderStyle }
     ],
     // Product rows
     ...productTotals.map(product => [
-      { v: product.name, t: 's', s: { alignment: { horizontal: 'left' } } },
-      { v: product.quantity, t: 'n', z: '#,##0.00', s: { alignment: { horizontal: 'right' } } },
-      { v: product.amount, t: 'n', z: '#,##0.00', s: { alignment: { horizontal: 'right' } } },
-      { v: product.paidWithQR, t: 'n', z: '#,##0.00', s: { alignment: { horizontal: 'right' } } },
-      { v: product.unpaid, t: 'n', z: '#,##0.00', s: { alignment: { horizontal: 'right' } } },
-      { v: product.unpaidToPaidQR, t: 'n', z: '#,##0.00', s: { alignment: { horizontal: 'right' } } }
+      { v: product.name, t: 's', s: cellStyle },
+      { v: product.quantity, t: 'n', z: '#,##0.00', s: cellStyle },
+      { v: product.amount, t: 'n', z: '#,##0.00', s: cellStyle },
+      { v: product.paidWithQR, t: 'n', z: '#,##0.00', s: cellStyle },
+      { v: product.unpaid, t: 'n', z: '#,##0.00', s: cellStyle },
+      { v: product.unpaidToPaidQR, t: 'n', z: '#,##0.00', s: cellStyle }
     ]),
     [''], // Spacing
     // Summary section
     [
-      { v: 'Opening Balance:', t: 's', s: { font: { bold: true } } },
-      { v: openingBalance, t: 'n', z: '#,##0.00', s: { font: { bold: true } } }
+      { v: 'Opening Balance:', t: 's', s: summaryStyle },
+      { v: openingBalance, t: 'n', z: '#,##0.00', s: cellStyle }
     ],
     [
-      { v: 'Total Expenses:', t: 's', s: { font: { bold: true } } },
-      { v: totalExpenses, t: 'n', z: '#,##0.00', s: { font: { bold: true, color: { rgb: "FF0000" } } } }
+      { v: 'Total Expenses:', t: 's', s: summaryStyle },
+      { 
+        v: totalExpenses, 
+        t: 'n', 
+        z: '#,##0.00', 
+        s: { ...cellStyle, font: { color: { rgb: "FF0000" } } }
+      }
     ],
     [
-      { v: 'Net Profit:', t: 's', s: { font: { bold: true } } },
+      { v: 'Net Profit:', t: 's', s: summaryStyle },
       { 
         v: netProfit,
         t: 'n',
+        z: '#,##0.00',
         s: { 
-          font: { 
-            bold: true,
-            color: { rgb: netProfit >= 0 ? "008000" : "FF0000" }
-          }
-        },
-        z: '#,##0.00'
+          ...cellStyle,
+          font: { color: { rgb: netProfit >= 0 ? "008000" : "FF0000" } }
+        }
       }
     ]
   ]);
@@ -93,10 +146,10 @@ export const exportToExcel = (
   ws['!cols'] = [
     { wch: 30 }, // Products
     { wch: 15 }, // Quantity
-    { wch: 15 }, // Sales
-    { wch: 15 }, // QR
-    { wch: 15 }, // Unpaid
-    { wch: 20 }, // Unpaid to QR
+    { wch: 20 }, // Sales
+    { wch: 20 }, // QR
+    { wch: 20 }, // Unpaid
+    { wch: 25 }, // Unpaid to QR
   ];
 
   // Merge cells for header
