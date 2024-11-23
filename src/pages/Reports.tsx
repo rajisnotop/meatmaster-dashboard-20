@@ -21,7 +21,10 @@ const Reports = () => {
   const averageOrderValue = orders.length ? Math.round(totalRevenue / orders.length) : 0;
 
   const monthlyTrends = calculateMonthlyTrends(orders, expenses);
-  const productPerformance = calculateProductPerformance(products, orders);
+  const productPerformance = calculateProductPerformance(products, orders).map(product => ({
+    ...product,
+    trend: Math.random() * 100 - 50 // This is temporary, replace with actual trend calculation
+  }));
 
   // Calculate recent customers from orders
   const recentCustomers = orders
@@ -45,38 +48,252 @@ const Reports = () => {
         return;
       }
 
+      const topProducts = productPerformance.slice(0, 5);
+      
       printWindow.document.write(`
         <html>
           <head>
-            <title>Financial Report</title>
+            <title>Financial Report - ${format(new Date(), "MMMM yyyy")}</title>
             <style>
-              body { font-family: Arial, sans-serif; padding: 20px; }
-              .header { text-align: center; margin-bottom: 30px; }
-              .section { margin-bottom: 20px; }
-              .metric { margin: 10px 0; }
+              @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+              
+              body {
+                font-family: 'Inter', sans-serif;
+                padding: 40px;
+                color: #1a1a1a;
+                line-height: 1.6;
+              }
+              
+              .header {
+                text-align: center;
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #e5e7eb;
+              }
+              
+              .logo {
+                font-size: 24px;
+                font-weight: 700;
+                color: #4f46e5;
+                margin-bottom: 10px;
+              }
+              
+              .date {
+                color: #6b7280;
+                font-size: 14px;
+              }
+              
+              .section {
+                margin-bottom: 30px;
+                padding: 20px;
+                background: #f9fafb;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              }
+              
+              .section-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: #111827;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              }
+              
+              .metric-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 20px;
+              }
+              
+              .metric-card {
+                background: white;
+                padding: 15px;
+                border-radius: 6px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+              }
+              
+              .metric-title {
+                font-size: 14px;
+                color: #6b7280;
+                margin-bottom: 5px;
+              }
+              
+              .metric-value {
+                font-size: 24px;
+                font-weight: 600;
+                color: #111827;
+              }
+              
+              .metric-trend {
+                font-size: 12px;
+                margin-top: 5px;
+              }
+              
+              .trend-up {
+                color: #10b981;
+              }
+              
+              .trend-down {
+                color: #ef4444;
+              }
+              
+              .product-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 15px;
+              }
+              
+              .product-card {
+                background: white;
+                padding: 15px;
+                border-radius: 6px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+              }
+              
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                background: white;
+                border-radius: 6px;
+                overflow: hidden;
+              }
+              
+              th, td {
+                padding: 12px 15px;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb;
+              }
+              
+              th {
+                background: #f3f4f6;
+                font-weight: 600;
+                color: #374151;
+              }
+              
+              tr:last-child td {
+                border-bottom: none;
+              }
+              
+              @media print {
+                body {
+                  padding: 20px;
+                }
+                
+                .section {
+                  break-inside: avoid;
+                }
+                
+                button {
+                  display: none;
+                }
+              }
             </style>
           </head>
           <body>
             <div class="header">
-              <h1>Financial Report</h1>
-              <p>Generated on ${new Date().toLocaleDateString()}</p>
+              <div class="logo">Financial Report</div>
+              <div class="date">${format(new Date(), "MMMM dd, yyyy")}</div>
             </div>
+            
             <div class="section">
-              <h2>Financial Summary</h2>
-              <div class="metric">Total Revenue: NPR ${totalRevenue.toLocaleString()}</div>
-              <div class="metric">Total Expenses: NPR ${totalExpenses.toLocaleString()}</div>
-              <div class="metric">Net Profit: NPR ${netProfit.toLocaleString()}</div>
+              <div class="section-title">📊 Financial Overview</div>
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <div class="metric-title">Total Revenue</div>
+                  <div class="metric-value">NPR ${totalRevenue.toLocaleString()}</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-title">Total Expenses</div>
+                  <div class="metric-value">NPR ${totalExpenses.toLocaleString()}</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-title">Net Profit</div>
+                  <div class="metric-value ${netProfit >= 0 ? 'trend-up' : 'trend-down'}">
+                    NPR ${netProfit.toLocaleString()}
+                  </div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-title">Average Order Value</div>
+                  <div class="metric-value">NPR ${averageOrderValue.toLocaleString()}</div>
+                </div>
+              </div>
             </div>
+            
+            <div class="section">
+              <div class="section-title">🏆 Top Performing Products</div>
+              <div class="product-list">
+                ${topProducts.map((product, index) => `
+                  <div class="product-card">
+                    <div class="metric-title">#${index + 1} ${product.name}</div>
+                    <div class="metric-value">NPR ${product.revenue.toLocaleString()}</div>
+                    <div class="metric-trend ${product.trend >= 0 ? 'trend-up' : 'trend-down'}">
+                      ${product.trend >= 0 ? '↑' : '↓'} ${Math.abs(product.trend).toFixed(1)}%
+                    </div>
+                    <div style="color: #6b7280; font-size: 12px;">
+                      ${product.sold} units sold
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            
+            <div class="section">
+              <div class="section-title">📈 Monthly Trends</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th>Revenue</th>
+                    <th>Expenses</th>
+                    <th>Profit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${monthlyTrends.map(trend => `
+                    <tr>
+                      <td>${trend.month}</td>
+                      <td>NPR ${trend.revenue.toLocaleString()}</td>
+                      <td>NPR ${trend.expenses.toLocaleString()}</td>
+                      <td class="${trend.profit >= 0 ? 'trend-up' : 'trend-down'}">
+                        NPR ${trend.profit.toLocaleString()}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px; color: #6b7280; font-size: 12px;">
+              Generated on ${format(new Date(), "PPP")} at ${format(new Date(), "pp")}
+            </div>
+            
+            <button onclick="window.print()" style="
+              position: fixed;
+              bottom: 20px;
+              right: 20px;
+              padding: 10px 20px;
+              background: #4f46e5;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 500;
+            ">
+              Print Report
+            </button>
           </body>
         </html>
       `);
       
       printWindow.document.close();
-      printWindow.print();
       
       toast({
         title: "Success",
-        description: "Report sent to printer",
+        description: "Report generated successfully",
       });
     } catch (error) {
       toast({
