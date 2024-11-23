@@ -5,13 +5,42 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
 import RevenueChart from "@/components/RevenueChart";
+import TopSellingProducts from "@/components/reports/TopSellingProducts";
+import LoyalCustomers from "@/components/reports/LoyalCustomers";
+import RecentCustomers from "@/components/reports/RecentCustomers";
+import MetricCard from "@/components/reports/MetricCard";
+import { DollarSign, TrendingUp, CreditCard, Receipt } from "lucide-react";
 
 const Reports = () => {
-  const { orders, products, expenses } = useStore();
+  const { orders, expenses } = useStore();
 
   const totalRevenue = orders.reduce((total, order) => total + order.total, 0);
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
   const netProfit = totalRevenue - totalExpenses;
+
+  // Calculate recent customers
+  const recentCustomers = orders
+    .filter(order => order.customerName)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5)
+    .map(order => ({
+      customerName: order.customerName || "Anonymous",
+      date: new Date(order.date),
+      total: order.total
+    }));
+
+  // Calculate loyal customers data
+  const customerFrequency = orders.reduce((acc: Record<string, number>, order) => {
+    if (order.customerName) {
+      acc[order.customerName] = (acc[order.customerName] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
+  const loyalCustomersData = Object.entries(customerFrequency)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .map(([name, value]) => ({ name, value }));
 
   const handlePrintReport = () => {
     try {
@@ -70,7 +99,7 @@ const Reports = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8 space-y-8">
+      <main className="container py-8 space-y-8 animate-fade-in">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-foreground">Financial Reports</h1>
           <Button 
@@ -83,46 +112,43 @@ const Reports = () => {
           </Button>
         </div>
 
-        <div className="grid gap-6">
-          <Card className="p-8">
-            <h2 className="text-xl font-bold mb-6">Financial Summary</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <p className="text-2xl font-bold text-green-600">NPR {totalRevenue.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Expenses</p>
-                <p className="text-2xl font-bold text-red-600">NPR {totalExpenses.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Net Profit</p>
-                <p className="text-2xl font-bold text-primary">NPR {netProfit.toLocaleString()}</p>
-              </div>
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <MetricCard
+            icon={DollarSign}
+            title="Total Revenue"
+            value={`NPR ${totalRevenue.toLocaleString()}`}
+          />
+          <MetricCard
+            icon={Receipt}
+            title="Total Expenses"
+            value={`NPR ${totalExpenses.toLocaleString()}`}
+          />
+          <MetricCard
+            icon={TrendingUp}
+            title="Net Profit"
+            value={`NPR ${netProfit.toLocaleString()}`}
+          />
+          <MetricCard
+            icon={CreditCard}
+            title="Average Order Value"
+            value={`NPR ${orders.length ? Math.round(totalRevenue / orders.length).toLocaleString() : 0}`}
+          />
+        </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="p-8">
             <h2 className="text-xl font-bold mb-6">Revenue Trend</h2>
             <RevenueChart />
           </Card>
+          <TopSellingProducts />
+        </div>
 
-          <Card className="p-8">
-            <h2 className="text-xl font-bold mb-6">Expense Breakdown</h2>
-            <div className="space-y-4">
-              {Object.entries(
-                expenses.reduce((acc, expense) => {
-                  acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-                  return acc;
-                }, {} as Record<string, number>)
-              ).map(([category, amount]) => (
-                <div key={category} className="flex justify-between items-center">
-                  <span className="capitalize">{category}</span>
-                  <span className="font-semibold">NPR {amount.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LoyalCustomers 
+            data={loyalCustomersData} 
+            colors={['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981']} 
+          />
+          <RecentCustomers customers={recentCustomers} />
         </div>
       </main>
     </div>

@@ -165,7 +165,7 @@ const Billing = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto py-8 space-y-8">
-        <BillingCard>
+        <BillingCard showTopSelling={true}>
           <BillingHeader
             timeFilter={timeFilter}
             setTimeFilter={setTimeFilter}
