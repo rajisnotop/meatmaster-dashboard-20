@@ -17,8 +17,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Filter } from "lucide-react";
-import DateRangeSelector from "../billing/DateRangeSelector";
+import { Filter, CalendarIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: any) => void;
@@ -117,12 +123,57 @@ const AdvancedFilters = ({
           {showDateFilter && (
             <div className="space-y-2">
               <Label>Date Range</Label>
-              <DateRangeSelector
-                startDate={filters.startDate}
-                endDate={filters.endDate}
-                setStartDate={(date) => handleFilterChange("startDate", date || "")}
-                setEndDate={(date) => handleFilterChange("endDate", date || "")}
-              />
+              <div className="flex flex-col gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <div className="relative">
+                      <Input
+                        type="date"
+                        value={filters.startDate}
+                        onChange={(e) => handleFilterChange("startDate", e.target.value)}
+                        className="w-full bg-background pr-10"
+                        placeholder="Start date"
+                      />
+                      <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={filters.startDate ? new Date(filters.startDate) : undefined}
+                      onSelect={(date) =>
+                        handleFilterChange("startDate", date ? format(date, "yyyy-MM-dd") : "")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <div className="relative">
+                      <Input
+                        type="date"
+                        value={filters.endDate}
+                        onChange={(e) => handleFilterChange("endDate", e.target.value)}
+                        className="w-full bg-background pr-10"
+                        placeholder="End date"
+                      />
+                      <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={filters.endDate ? new Date(filters.endDate) : undefined}
+                      onSelect={(date) =>
+                        handleFilterChange("endDate", date ? format(date, "yyyy-MM-dd") : "")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           )}
 

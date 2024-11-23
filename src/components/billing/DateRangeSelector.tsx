@@ -39,27 +39,19 @@ const DateRangeSelector = ({
 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
-      <div className="flex gap-2 w-full sm:w-auto">
-        <div className="flex-1">
-          <Input
-            type="date"
-            value={startDate || ""}
-            onChange={(e) => handleStartDateChange(e.target.value)}
-            className="w-full bg-background"
-            max={endDate || undefined}
-          />
-        </div>
+      <div className="w-full sm:w-auto">
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[42px] px-2",
-                !startDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="h-4 w-4" />
-            </Button>
+            <div className="relative">
+              <Input
+                type="date"
+                value={startDate || ""}
+                onChange={(e) => handleStartDateChange(e.target.value)}
+                className="w-full bg-background pr-10"
+                max={endDate || undefined}
+              />
+              <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            </div>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0 bg-background" align="start">
             <Calendar
@@ -77,27 +69,19 @@ const DateRangeSelector = ({
         </Popover>
       </div>
       <span className="text-muted-foreground hidden sm:block">to</span>
-      <div className="flex gap-2 w-full sm:w-auto">
-        <div className="flex-1">
-          <Input
-            type="date"
-            value={endDate || ""}
-            onChange={(e) => handleEndDateChange(e.target.value)}
-            className="w-full bg-background"
-            min={startDate || undefined}
-          />
-        </div>
+      <div className="w-full sm:w-auto">
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[42px] px-2",
-                !endDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="h-4 w-4" />
-            </Button>
+            <div className="relative">
+              <Input
+                type="date"
+                value={endDate || ""}
+                onChange={(e) => handleEndDateChange(e.target.value)}
+                className="w-full bg-background pr-10"
+                min={startDate || undefined}
+              />
+              <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            </div>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0 bg-background" align="start">
             <Calendar
