@@ -66,10 +66,10 @@ export const exportToExcel = (
   const totalPaidQR = productTotals.reduce((sum, p) => sum + p.paidWithQR, 0);
   const totalUnpaid = productTotals.reduce((sum, p) => sum + p.unpaid, 0);
   const totalUnpaidToPaidQR = productTotals.reduce((sum, p) => sum + p.unpaidToPaidQR, 0);
-  const cashInCounter = totalSales - totalPaidQR - totalUnpaid + totalUnpaidToPaidQR;
+  const cashInCounter = totalSales - totalExpenses + openingBalance;
 
   // Create worksheet data
-  const ws = XLSX.utils.aoa_to_sheet([
+  const data = [
     [{ v: 'Neelkantha Meat Shop', t: 's', s: headerStyle }],
     [''], // Spacing
     [{ 
@@ -97,56 +97,45 @@ export const exportToExcel = (
       { v: product.paidWithQR, t: 'n', z: '#,##0.00', s: cellStyle },
       { v: product.unpaid, t: 'n', z: '#,##0.00', s: cellStyle },
       { v: product.unpaidToPaidQR, t: 'n', z: '#,##0.00', s: cellStyle }
-    ]),
-    [''], // Spacing before summary
-    // Summary section
-    [
-      { v: 'Summary', t: 's', s: summaryStyle },
-      { v: totalQuantity, t: 'n', z: '#,##0', s: summaryStyle },
-      { v: totalSales, t: 'n', z: '#,##0.00', s: summaryStyle },
-      { v: totalPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle },
-      { v: totalUnpaid, t: 'n', z: '#,##0.00', s: summaryStyle },
-      { v: totalUnpaidToPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle }
-    ],
-    [''], // Spacing before financial summary
-    // Financial summary
-    [
-      { v: 'Opening Balance:', t: 's', s: summaryStyle },
-      { v: openingBalance, t: 'n', z: '#,##0.00', s: summaryStyle }
-    ],
-    [
-      { v: 'Total Expenses:', t: 's', s: summaryStyle },
-      { v: totalExpenses, t: 'n', z: '#,##0.00', s: { ...summaryStyle, font: { ...summaryStyle.font, color: { rgb: "FF0000" } } } }
-    ],
-    [
-      { v: 'Cash in Counter:', t: 's', s: summaryStyle },
-      { v: cashInCounter, t: 'n', z: '#,##0.00', s: summaryStyle }
-    ],
-    [
-      { v: 'Net Profit:', t: 's', s: summaryStyle },
-      { 
-        v: netProfit,
-        t: 'n',
-        z: '#,##0.00',
-        s: { 
-          ...summaryStyle,
-          font: { ...summaryStyle.font, color: { rgb: netProfit >= 0 ? "008000" : "FF0000" } }
-        }
-      }
-    ],
-    [''], // Spacing before footer
-    // Footer
-    [{ 
-      v: `Generated on ${format(new Date(), 'MMMM dd, yyyy HH:mm:ss')}`,
-      t: 's',
-      s: footerStyle
-    }],
-    [{ 
-      v: 'Neelkantha Meat Shop - Financial Report',
-      t: 's',
-      s: { ...footerStyle, font: { bold: true, sz: 11 } }
-    }]
-  ]);
+    ])
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+
+  // Add summary section
+  const summaryStartRow = data.length + 2;
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 0 })] = { v: 'Summary', t: 's', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 1 })] = { v: totalQuantity, t: 'n', z: '#,##0', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 2 })] = { v: totalSales, t: 'n', z: '#,##0.00', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 3 })] = { v: totalPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 4 })] = { v: totalUnpaid, t: 'n', z: '#,##0.00', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 5 })] = { v: totalUnpaidToPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle };
+
+  // Add financial summary
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 2, c: 0 })] = { v: 'Opening Balance:', t: 's', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 2, c: 1 })] = { v: openingBalance, t: 'n', z: '#,##0.00', s: summaryStyle };
+  
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 3, c: 0 })] = { v: 'Total Expenses:', t: 's', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 3, c: 1 })] = { v: totalExpenses, t: 'n', z: '#,##0.00', s: summaryStyle };
+  
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 4, c: 0 })] = { v: 'Cash in Counter:', t: 's', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 4, c: 1 })] = { v: cashInCounter, t: 'n', z: '#,##0.00', s: summaryStyle };
+  
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 5, c: 0 })] = { v: 'Net Profit:', t: 's', s: summaryStyle };
+  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 5, c: 1 })] = { v: netProfit, t: 'n', z: '#,##0.00', s: summaryStyle };
+
+  // Add footer
+  const footerRow = summaryStartRow + 7;
+  ws[XLSX.utils.encode_cell({ r: footerRow, c: 0 })] = { 
+    v: `Generated on ${format(new Date(), 'MMMM dd, yyyy HH:mm:ss')}`,
+    t: 's',
+    s: footerStyle
+  };
+  ws[XLSX.utils.encode_cell({ r: footerRow + 1, c: 0 })] = { 
+    v: 'Neelkantha Meat Shop - Financial Report',
+    t: 's',
+    s: { ...footerStyle, font: { bold: true, sz: 11 } }
+  };
 
   // Set column widths
   ws['!cols'] = [
@@ -158,12 +147,12 @@ export const exportToExcel = (
     { wch: 25 }, // Unpaid to QR
   ];
 
-  // Merge cells for header and footer
+  // Set merge ranges
   ws['!merges'] = [
     { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // Shop name
     { s: { r: 2, c: 0 }, e: { r: 2, c: 5 } }, // Date range
-    { s: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 2, c: 0 }, e: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 2, c: 5 } }, // Generated on
-    { s: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 1, c: 0 }, e: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 1, c: 5 } }  // Shop name in footer
+    { s: { r: footerRow, c: 0 }, e: { r: footerRow, c: 5 } }, // Generated on
+    { s: { r: footerRow + 1, c: 0 }, e: { r: footerRow + 1, c: 5 } }  // Shop name in footer
   ];
 
   // Add worksheet to workbook
