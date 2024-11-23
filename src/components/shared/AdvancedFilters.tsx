@@ -27,7 +27,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 
 interface AdvancedFiltersProps {
-  onFilterChange: (filters: any) => void;
+  onFilterChange?: (filters: any) => void;
   showPaymentFilter?: boolean;
   showAmountFilter?: boolean;
   showDateFilter?: boolean;
@@ -38,7 +38,7 @@ interface AdvancedFiltersProps {
 }
 
 const AdvancedFilters = ({
-  onFilterChange,
+  onFilterChange = () => {},
   showPaymentFilter = true,
   showAmountFilter = true,
   showDateFilter = true,
@@ -124,55 +124,27 @@ const AdvancedFilters = ({
             <div className="space-y-2">
               <Label>Date Range</Label>
               <div className="flex flex-col gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <div className="relative">
-                      <Input
-                        type="date"
-                        value={filters.startDate}
-                        onChange={(e) => handleFilterChange("startDate", e.target.value)}
-                        className="w-full bg-background pr-10"
-                        placeholder="Start date"
-                      />
-                      <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={filters.startDate ? new Date(filters.startDate) : undefined}
-                      onSelect={(date) =>
-                        handleFilterChange("startDate", date ? format(date, "yyyy-MM-dd") : "")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="relative">
+                  <Input
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) => handleFilterChange("startDate", e.target.value)}
+                    className="w-full bg-background pr-10"
+                    placeholder="Start date"
+                  />
+                  <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                </div>
 
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <div className="relative">
-                      <Input
-                        type="date"
-                        value={filters.endDate}
-                        onChange={(e) => handleFilterChange("endDate", e.target.value)}
-                        className="w-full bg-background pr-10"
-                        placeholder="End date"
-                      />
-                      <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={filters.endDate ? new Date(filters.endDate) : undefined}
-                      onSelect={(date) =>
-                        handleFilterChange("endDate", date ? format(date, "yyyy-MM-dd") : "")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="relative">
+                  <Input
+                    type="date"
+                    value={filters.endDate}
+                    onChange={(e) => handleFilterChange("endDate", e.target.value)}
+                    className="w-full bg-background pr-10"
+                    placeholder="End date"
+                  />
+                  <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                </div>
               </div>
             </div>
           )}

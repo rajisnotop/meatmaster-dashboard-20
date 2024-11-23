@@ -8,7 +8,7 @@ interface OrdersSearchProps {
   setSearchTerm: (value: string) => void;
   searchDate: string;
   setSearchDate: (value: string) => void;
-  onFilterChange?: (filters: any) => void;
+  onFilterChange: (filters: any) => void;
 }
 
 const OrdersSearch = ({
