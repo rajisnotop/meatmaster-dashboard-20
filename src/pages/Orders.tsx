@@ -40,14 +40,10 @@ const Orders = () => {
     .filter(order => order.isPaid && order.wasUnpaid && order.paidWithQR)
     .reduce((sum, order) => sum + order.total, 0);
 
-  const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/95">
       <Header />
-      <main className="container py-8 space-y-8 animate-fade-in">
+      <main className="container mx-auto py-8 px-4 space-y-8 animate-fade-in">
         <OrdersSummary
           totalUnpaidAmount={totalUnpaidAmount}
           totalPaidAmount={totalPaidAmount}
@@ -66,21 +62,21 @@ const Orders = () => {
               setSearchTerm={setSearchTerm}
               searchDate={searchDate}
               setSearchDate={setSearchDate}
-              onFilterChange={handleFilterChange}
+              onFilterChange={setFilters}
             />
           </div>
 
           <Tabs defaultValue="unpaid" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="unpaid" className="text-lg">Unpaid Orders</TabsTrigger>
-              <TabsTrigger value="paid" className="text-lg">Paid Orders</TabsTrigger>
+            <TabsList className="grid w-full max-w-[400px] grid-cols-2">
+              <TabsTrigger value="unpaid">Unpaid Orders</TabsTrigger>
+              <TabsTrigger value="paid">Paid Orders</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="unpaid" className="mt-0">
+            <TabsContent value="unpaid" className="mt-6">
               <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
             </TabsContent>
             
-            <TabsContent value="paid" className="mt-0">
+            <TabsContent value="paid" className="mt-6">
               <PaidOrdersList searchTerm={searchTerm} searchDate={searchDate} />
             </TabsContent>
           </Tabs>

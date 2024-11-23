@@ -1,6 +1,5 @@
 import { useStore } from "@/store/store";
 import { toast } from "@/components/ui/use-toast";
-import { format } from "date-fns";
 import Header from "@/components/Header";
 import ReportsHeader from "@/components/reports/ReportsHeader";
 import MetricsOverview from "@/components/reports/MetricsOverview";
@@ -48,7 +47,7 @@ const Reports = () => {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Financial Report - ${format(new Date(), "MMMM yyyy")}</title>
+          <title>Financial Report - ${new Date().toLocaleDateString()}</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
             
@@ -233,7 +232,7 @@ const Reports = () => {
               <div class="title-container">
                 <h1 class="company-name">Neelkantha Meat Shop</h1>
                 <p class="report-type">Financial Report</p>
-                <p class="date">${format(new Date(), "MMMM dd, yyyy")}</p>
+                <p class="date">${new Date().toLocaleDateString()}</p>
               </div>
             </div>
           </div>
@@ -270,7 +269,7 @@ const Reports = () => {
                   <div class="metric-title">#${index + 1} ${product.name}</div>
                   <div class="metric-value">NPR ${product.revenue.toLocaleString()}</div>
                   <div class="metric-trend ${product.trend >= 0 ? 'trend-up' : 'trend-down'}">
-                    ${product.trend >= 0 ? '↑' : '↓'} ${Math.abs(product.trend).toFixed(1)}%
+                    ${product.trend >= 0 ? '↑' : '↓'} ${Math.abs(product.trend)}%
                   </div>
                   <div style="color: #6b7280; font-size: 12px;">
                     ${product.sold} units sold
@@ -307,23 +306,8 @@ const Reports = () => {
           </div>
           
           <div style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px;">
-            Generated on ${format(new Date(), "PPP")} at ${format(new Date(), "pp")}
+            Generated on ${new Date().toLocaleDateString()}
           </div>
-          
-          <button onclick="window.print()" style="
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: #4f46e5;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-          ">
-            Print Report
-          </button>
         </body>
       </html>
     `);
@@ -339,7 +323,16 @@ const Reports = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8 space-y-8 animate-fade-in">
+      <main className="container mx-auto py-8 px-4 space-y-8 animate-fade-in">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+            Reports
+          </h1>
+          <p className="text-muted-foreground">
+            View detailed financial reports and analytics
+          </p>
+        </div>
+
         <ReportsHeader onPrint={handlePrintReport} />
         
         <MetricsOverview

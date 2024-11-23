@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useStore } from "@/store/store";
 import { toast } from "sonner";
-import { format, parseISO, isAfter, isBefore } from "date-fns";
 import BillingTable from "@/components/billing/BillingTable";
 import BillingHeader from "@/components/billing/BillingHeader";
 import BillingCard from "@/components/billing/BillingCard";
@@ -27,14 +26,13 @@ const Billing = () => {
     }
 
     if (dateFilter) {
-      const filterDate = parseISO(dateFilter);
-      return isDateInRange(date, format(filterDate, "yyyy-MM-dd"), format(filterDate, "yyyy-MM-dd"));
+      return isDateInRange(date, dateFilter, dateFilter);
     }
 
     const dateRange = getDateRangeForFilter(timeFilter, dateFilter);
     if (!dateRange) return true;
     
-    return isAfter(date, dateRange.start) && isBefore(date, dateRange.end);
+    return date >= dateRange.start && date <= dateRange.end;
   };
 
   const productTotals = calculateProductTotals(products, orders, filterData);
@@ -68,7 +66,7 @@ const Billing = () => {
       return;
     }
 
-    let productsToShow =
+    const productsToShow =
       type === "all"
         ? productTotals
         : productTotals.filter((product) => selectedProducts.includes(product.id));
@@ -90,7 +88,16 @@ const Billing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto py-8 space-y-8">
+      <main className="container mx-auto py-8 px-4 space-y-8">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+            Billing
+          </h1>
+          <p className="text-muted-foreground">
+            Generate and manage billing reports
+          </p>
+        </div>
+
         <BillingCard showTopSelling={true}>
           <BillingHeader
             timeFilter={timeFilter}
