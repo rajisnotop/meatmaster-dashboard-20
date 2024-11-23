@@ -5,7 +5,13 @@
 @layer base {
   :root {
     --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    --foreground: 210 40% 98%;
+    
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
     
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 1.2%;
@@ -15,7 +21,7 @@
     --secondary-foreground: 210 40% 98%;
     
     --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --muted-foreground: 210 40% 98%;
     
     --accent: 216 34% 17%;
     --accent-foreground: 210 40% 98%;
@@ -26,7 +32,7 @@
     --border: 216 34% 17%;
     --input: 216 34% 17%;
     --ring: 216 34% 17%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -44,93 +50,74 @@
     background-attachment: fixed;
   }
 
-  /* Modern Component Styles */
+  /* Component styles */
+  .glow {
+    @apply transition-shadow duration-300;
+  }
+
+  .glow:hover {
+    @apply animate-glow-pulse;
+  }
+
   .card-modern {
-    @apply bg-accent/40 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply bg-accent/40 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .gradient-border {
+    @apply relative rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 p-[1px] overflow-hidden;
+  }
+
+  .gradient-border::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-50;
+    z-index: -1;
   }
 
   .glass-effect {
     @apply bg-background/60 backdrop-blur-md border border-border/50;
   }
 
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary/90 to-primary/70 bg-clip-text text-transparent;
+  /* Dropdown and Select styles */
+  [data-radix-select-content],
+  [data-radix-dropdown-menu-content] {
+    @apply bg-background border border-border/50 !important;
   }
 
-  .hover-scale {
-    @apply transition-transform duration-200 hover:scale-[1.02];
+  [data-radix-select-item],
+  [data-radix-dropdown-menu-item] {
+    @apply bg-background hover:bg-accent focus:bg-accent !important;
   }
 
-  .section-title {
-    @apply text-2xl font-bold tracking-tight gradient-text mb-6;
+  /* Text visibility styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-foreground;
   }
 
-  .page-container {
-    @apply container mx-auto py-8 px-4 space-y-8 animate-fade-in;
+  p, span, div {
+    @apply text-foreground;
   }
 
-  .flex-center {
-    @apply flex items-center justify-center;
+  label {
+    @apply text-foreground font-medium;
   }
 
-  .flex-between {
-    @apply flex items-center justify-between;
+  input, select, textarea {
+    @apply text-foreground bg-background border-border;
   }
 
-  /* New Layout Components */
-  .sidebar {
-    @apply fixed top-0 left-0 h-full w-64 bg-background/95 backdrop-blur-lg border-r border-border/50 p-4 transition-transform duration-300 z-50;
+  button {
+    @apply text-foreground font-medium;
   }
 
-  .main-content {
-    @apply ml-64 p-8 min-h-screen;
+  table {
+    @apply text-foreground;
   }
 
-  .dashboard-card {
-    @apply card-modern p-6 hover:scale-[1.02] transition-all duration-300;
+  th {
+    @apply text-foreground font-semibold;
   }
 
-  .data-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
-  }
-
-  .action-button {
-    @apply px-4 py-2 rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-colors;
-  }
-
-  .status-badge {
-    @apply px-2 py-1 rounded-full text-xs font-medium;
-  }
-
-  .search-bar {
-    @apply w-full max-w-md relative;
-  }
-
-  .search-input {
-    @apply w-full pl-10 pr-4 py-2 rounded-lg bg-background/60 border border-border/50 focus:ring-2 focus:ring-primary/50;
-  }
-
-  .table-container {
-    @apply rounded-lg border border-border/50 overflow-hidden bg-background/60 backdrop-blur-sm;
-  }
-
-  .table-header {
-    @apply bg-accent/40 text-primary font-medium;
-  }
-
-  .table-row {
-    @apply hover:bg-accent/20 transition-colors;
-  }
-
-  .form-group {
-    @apply space-y-2;
-  }
-
-  .form-label {
-    @apply text-sm font-medium text-muted-foreground;
-  }
-
-  .form-input {
-    @apply w-full rounded-md bg-background/60 border border-border/50;
+  td {
+    @apply text-foreground;
   }
 }
