@@ -36,15 +36,19 @@ const Header = () => {
 
   return (
     <>
-      <aside className={cn("sidebar", isCollapsed && "sidebar-collapsed")}>
-        <div className="flex flex-col h-full">
+      <aside className={cn(
+        "fixed left-0 top-0 z-30 h-screen w-64 border-r border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+        "transition-all duration-300 ease-in-out",
+        isCollapsed && "w-20"
+      )}>
+        <div className="flex h-full flex-col">
           <div className="p-4 flex items-center justify-between">
             {!isCollapsed && (
               <Link to="/" className="flex items-center gap-4">
                 <img 
                   src="https://i.imgur.com/F4KFQkf.png" 
                   alt="Logo" 
-                  className="h-16 w-16 object-contain rounded-full shadow-lg" 
+                  className="h-12 w-12 rounded-full ring-2 ring-primary/20" 
                 />
                 <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                   Neelkantha
@@ -65,7 +69,7 @@ const Header = () => {
             </Button>
           </div>
 
-          <nav className="flex-1 px-2 py-4">
+          <nav className="flex-1 space-y-2 px-2 py-4">
             <TooltipProvider>
               {navigationItems.map(({ path, label, icon: Icon }) => (
                 <Tooltip key={path} delayDuration={0}>
@@ -73,8 +77,10 @@ const Header = () => {
                     <Link
                       to={path}
                       className={cn(
-                        "nav-link mb-2",
-                        isActive(path) ? "nav-link-active" : "nav-link-inactive"
+                        "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+                        "hover:bg-accent/50",
+                        isActive(path) ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                        isCollapsed && "justify-center"
                       )}
                     >
                       <Icon className="h-5 w-5" />
@@ -97,8 +103,11 @@ const Header = () => {
         </div>
       </aside>
 
-      <main className={cn("main-content", isCollapsed && "main-content-collapsed")}>
-        <div className="container mx-auto">
+      <main className={cn(
+        "min-h-screen transition-all duration-300 ease-in-out",
+        isCollapsed ? "pl-20" : "pl-64"
+      )}>
+        <div className="container mx-auto p-6">
           {/* Content will be rendered here */}
         </div>
       </main>
