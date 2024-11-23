@@ -9,7 +9,6 @@ import Reports from "./pages/Reports";
 import Expenditure from "./pages/Expenditure";
 import Orders from "./pages/Orders";
 import Billing from "./pages/Billing";
-import { LowStockAlert } from "./components/LowStockAlert";
 
 const queryClient = new QueryClient();
 
@@ -21,7 +20,6 @@ const App = () => {
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <LowStockAlert />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/orders" element={<Orders />} />
