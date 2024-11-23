@@ -1,49 +1,27 @@
 import Header from "@/components/Header";
 import { useStore } from "@/store/store";
-import { FileText, Printer, Users, Package, TrendingUp, DollarSign, CreditCard, Receipt, Calendar } from "lucide-react";
+import { FileText, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import TopSellingProducts from "@/components/reports/TopSellingProducts";
 import LoyalCustomers from "@/components/reports/LoyalCustomers";
 import RecentCustomers from "@/components/reports/RecentCustomers";
 import MetricCard from "@/components/reports/MetricCard";
+import ProfitTrendsChart from "@/components/reports/ProfitTrendsChart";
+import ProductPerformance from "@/components/reports/ProductPerformance";
+import { calculateMonthlyTrends, calculateProductPerformance } from "@/utils/analyticsCalculations";
 
 const Reports = () => {
-  const { orders, expenses } = useStore();
+  const { orders, products, expenses } = useStore();
 
   const totalRevenue = orders.reduce((total, order) => total + order.total, 0);
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
   const netProfit = totalRevenue - totalExpenses;
   const averageOrderValue = orders.length ? Math.round(totalRevenue / orders.length) : 0;
-  const totalOrders = orders.length;
-  const totalCustomers = new Set(orders.map(order => order.customerName)).size;
 
-  // Calculate recent customers
-  const recentCustomers = orders
-    .filter(order => order.customerName)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 5)
-    .map(order => ({
-      customerName: order.customerName || "Anonymous",
-      date: new Date(order.date),
-      total: order.total
-    }));
-
-  // Calculate loyal customers data
-  const customerFrequency = orders.reduce((acc: Record<string, number>, order) => {
-    if (order.customerName) {
-      acc[order.customerName] = (acc[order.customerName] || 0) + 1;
-    }
-    return acc;
-  }, {});
-
-  const loyalCustomersData = Object.entries(customerFrequency)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-    .map(([name, value]) => ({ name, value }));
+  const monthlyTrends = calculateMonthlyTrends(orders, expenses);
+  const productPerformance = calculateProductPerformance(products, orders);
 
   const handlePrintReport = () => {
     try {
@@ -143,66 +121,14 @@ const Reports = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="p-6 col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <Package className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Order Statistics</h2>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                <span className="text-muted-foreground">Total Orders</span>
-                <span className="font-medium">{totalOrders}</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                <span className="text-muted-foreground">Total Customers</span>
-                <span className="font-medium">{totalCustomers}</span>
-              </div>
-              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                <span className="text-muted-foreground">Average Daily Orders</span>
-                <span className="font-medium">
-                  {Math.round(totalOrders / Math.max(1, Math.ceil((Date.now() - new Date(orders[0]?.date || Date.now()).getTime()) / (1000 * 60 * 60 * 24))))}
-                </span>
-              </div>
-            </div>
-          </Card>
-
-          <div className="col-span-2">
-            <TopSellingProducts />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ProfitTrendsChart data={monthlyTrends} />
+          <ProductPerformance data={productPerformance} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentCustomers customers={recentCustomers} />
-          <Card className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Monthly Summary</h2>
-            </div>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-4">
-                {Array.from({ length: 6 }).map((_, index) => {
-                  const date = new Date();
-                  date.setMonth(date.getMonth() - index);
-                  const monthOrders = orders.filter(order => 
-                    new Date(order.date).getMonth() === date.getMonth() &&
-                    new Date(order.date).getFullYear() === date.getFullYear()
-                  );
-                  const monthRevenue = monthOrders.reduce((sum, order) => sum + order.total, 0);
-                  
-                  return (
-                    <div key={index} className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
-                      <span className="text-muted-foreground">{format(date, 'MMMM yyyy')}</span>
-                      <div className="text-right">
-                        <div className="font-medium">NPR {monthRevenue.toLocaleString()}</div>
-                        <div className="text-sm text-muted-foreground">{monthOrders.length} orders</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </ScrollArea>
-          </Card>
+          <TopSellingProducts />
         </div>
       </main>
     </div>
