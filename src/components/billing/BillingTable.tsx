@@ -189,7 +189,7 @@ const BillingTable = ({
               </div>
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-green-700">
-              <span className="text-sm text-gray-300">Net Profit</span>
+              <span className="text-sm text-gray-300">Net Amount</span>
               <div className="flex items-center gap-2">
                 {netProfit >= 0 ? (
                   <ArrowUpIcon className="h-4 w-4 text-green-400" />

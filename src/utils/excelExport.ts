@@ -1,102 +1,27 @@
 import * as XLSX from 'xlsx';
 import { format } from 'date-fns';
 
-interface ProductTotal {
-  id: string;
-  name: string;
-  quantity: number;
-  amount: number;
-  paidWithQR: number;
-  unpaid: number;
-  unpaidToPaidQR: number;
-}
-
 export const exportToExcel = (
-  productTotals: ProductTotal[],
+  productTotals: any[],
   timeFilter: string,
   startDate: string | null,
   endDate: string | null,
-  netProfit: number,
+  netAmount: number,
   totalExpenses: number,
   openingBalance: number
 ) => {
   const wb = XLSX.utils.book_new();
   
-  // Styles
-  const headerStyle = { 
-    font: { bold: true, sz: 24, color: { rgb: "FFFFFF" } },
-    alignment: { horizontal: 'center', vertical: 'center' },
-    fill: { fgColor: { rgb: "000000" } },
-    border: {
-      top: { style: 'thin' },
-      bottom: { style: 'thin' },
-      left: { style: 'thin' },
-      right: { style: 'thin' }
-    }
-  };
-
-  const tableHeaderStyle = {
-    font: { bold: true, color: { rgb: "FFFFFF" } },
-    fill: { fgColor: { rgb: "2563EB" } },
-    alignment: { horizontal: 'center', vertical: 'center' },
-    border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
-  };
-
-  const cellStyle = {
-    alignment: { horizontal: 'center', vertical: 'center' },
-    border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
-  };
-
-  const summaryStyle = {
-    font: { bold: true, sz: 12 },
-    alignment: { horizontal: 'right', vertical: 'center' },
-    fill: { fgColor: { rgb: "F3F4F6" } },
-    border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
-  };
-
-  const footerStyle = {
-    font: { italic: true, sz: 10 },
-    alignment: { horizontal: 'center', vertical: 'center' },
-    fill: { fgColor: { rgb: "F9FAFB" } }
-  };
-
-  // Calculate totals for summary
-  const totalQuantity = productTotals.reduce((sum, p) => sum + p.quantity, 0);
-  const totalSales = productTotals.reduce((sum, p) => sum + p.amount, 0);
-  const totalPaidQR = productTotals.reduce((sum, p) => sum + p.paidWithQR, 0);
-  const totalUnpaid = productTotals.reduce((sum, p) => sum + p.unpaid, 0);
-  const totalUnpaidToPaidQR = productTotals.reduce((sum, p) => sum + p.unpaidToPaidQR, 0);
-  const cashInCounter = totalSales - totalExpenses + openingBalance;
-
-  // Create worksheet data
+  // Create the main data array for products
   const data = [
-    [{ v: 'Neelkantha Meat Shop', t: 's', s: headerStyle }],
-    [''], // Spacing
-    [{ 
-      v: timeFilter === "date-range" && startDate && endDate 
-        ? `Date Range: ${format(new Date(startDate), 'MMM dd, yyyy')} to ${format(new Date(endDate), 'MMM dd, yyyy')}`
-        : `Report Date: ${format(new Date(), 'MMM dd, yyyy')}`,
-      t: 's',
-      s: footerStyle
-    }],
-    [''], // Spacing
-    // Table headers with style
-    [
-      { v: 'Products', t: 's', s: tableHeaderStyle },
-      { v: 'Quantity Sold', t: 's', s: tableHeaderStyle },
-      { v: 'Total Sales (NPR)', t: 's', s: tableHeaderStyle },
-      { v: 'Paid with QR (NPR)', t: 's', s: tableHeaderStyle },
-      { v: 'Unpaid Amount (NPR)', t: 's', s: tableHeaderStyle },
-      { v: 'Unpaid to Paid with QR (NPR)', t: 's', s: tableHeaderStyle }
-    ],
-    // Product rows
+    ['Products', 'Quantity Sold', 'Total Sales (NPR)', 'Paid with QR (NPR)', 'Unpaid Amount (NPR)', 'Unpaid to Paid with QR (NPR)'],
     ...productTotals.map(product => [
-      { v: product.name, t: 's', s: cellStyle },
-      { v: product.quantity, t: 'n', z: '#,##0', s: cellStyle },
-      { v: product.amount, t: 'n', z: '#,##0.00', s: cellStyle },
-      { v: product.paidWithQR, t: 'n', z: '#,##0.00', s: cellStyle },
-      { v: product.unpaid, t: 'n', z: '#,##0.00', s: cellStyle },
-      { v: product.unpaidToPaidQR, t: 'n', z: '#,##0.00', s: cellStyle }
+      product.name,
+      product.quantity,
+      product.amount,
+      product.paidWithQR,
+      product.unpaid,
+      product.unpaidToPaidQR
     ])
   ];
 
@@ -104,38 +29,42 @@ export const exportToExcel = (
 
   // Add summary section
   const summaryStartRow = data.length + 2;
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 0 })] = { v: 'Summary', t: 's', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 1 })] = { v: totalQuantity, t: 'n', z: '#,##0', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 2 })] = { v: totalSales, t: 'n', z: '#,##0.00', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 3 })] = { v: totalPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 4 })] = { v: totalUnpaid, t: 'n', z: '#,##0.00', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow, c: 5 })] = { v: totalUnpaidToPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle };
+  
+  // Helper function to create cell reference
+  const cellRef = (row: number, col: number) => XLSX.utils.encode_cell({r: row, c: col});
 
-  // Add financial summary
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 2, c: 0 })] = { v: 'Opening Balance:', t: 's', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 2, c: 1 })] = { v: openingBalance, t: 'n', z: '#,##0.00', s: summaryStyle };
-  
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 3, c: 0 })] = { v: 'Total Expenses:', t: 's', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 3, c: 1 })] = { v: totalExpenses, t: 'n', z: '#,##0.00', s: summaryStyle };
-  
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 4, c: 0 })] = { v: 'Cash in Counter:', t: 's', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 4, c: 1 })] = { v: cashInCounter, t: 'n', z: '#,##0.00', s: summaryStyle };
-  
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 5, c: 0 })] = { v: 'Net Profit:', t: 's', s: summaryStyle };
-  ws[XLSX.utils.encode_cell({ r: summaryStartRow + 5, c: 1 })] = { v: netProfit, t: 'n', z: '#,##0.00', s: summaryStyle };
+  // Add summary rows
+  ws[cellRef(summaryStartRow, 0)] = { v: 'Opening Balance', t: 's', s: { font: { bold: true } } };
+  ws[cellRef(summaryStartRow, 1)] = { v: openingBalance, t: 'n', z: '#,##0' };
+
+  ws[cellRef(summaryStartRow + 1, 0)] = { v: 'Total Expenses', t: 's', s: { font: { bold: true } } };
+  ws[cellRef(summaryStartRow + 1, 1)] = { v: totalExpenses, t: 'n', z: '#,##0' };
+
+  const cashInCounter = productTotals.reduce((sum, p) => sum + p.amount, 0) - totalExpenses + openingBalance;
+  ws[cellRef(summaryStartRow + 2, 0)] = { v: 'Cash in Counter', t: 's', s: { font: { bold: true } } };
+  ws[cellRef(summaryStartRow + 2, 1)] = { v: cashInCounter, t: 'n', z: '#,##0' };
+
+  ws[cellRef(summaryStartRow + 3, 0)] = { v: 'Net Amount', t: 's', s: { font: { bold: true, color: { rgb: netAmount >= 0 ? "008000" : "FF0000" } } } };
+  ws[cellRef(summaryStartRow + 3, 1)] = { v: netAmount, t: 'n', z: '#,##0' };
 
   // Add footer
-  const footerRow = summaryStartRow + 7;
-  ws[XLSX.utils.encode_cell({ r: footerRow, c: 0 })] = { 
+  const footerRow = summaryStartRow + 5;
+  ws[cellRef(footerRow, 0)] = { 
     v: `Generated on ${format(new Date(), 'MMMM dd, yyyy HH:mm:ss')}`,
     t: 's',
-    s: footerStyle
+    s: { font: { italic: true } }
   };
-  ws[XLSX.utils.encode_cell({ r: footerRow + 1, c: 0 })] = { 
+  ws[cellRef(footerRow + 1, 0)] = { 
     v: 'Neelkantha Meat Shop - Financial Report',
     t: 's',
-    s: { ...footerStyle, font: { bold: true, sz: 11 } }
+    s: { font: { bold: true } }
   };
+
+  // Merge cells for footer
+  ws['!merges'] = [
+    { s: { r: footerRow, c: 0 }, e: { r: footerRow, c: 5 } },
+    { s: { r: footerRow + 1, c: 0 }, e: { r: footerRow + 1, c: 5 } }
+  ];
 
   // Set column widths
   ws['!cols'] = [
@@ -145,14 +74,6 @@ export const exportToExcel = (
     { wch: 20 }, // QR
     { wch: 20 }, // Unpaid
     { wch: 25 }, // Unpaid to QR
-  ];
-
-  // Set merge ranges
-  ws['!merges'] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // Shop name
-    { s: { r: 2, c: 0 }, e: { r: 2, c: 5 } }, // Date range
-    { s: { r: footerRow, c: 0 }, e: { r: footerRow, c: 5 } }, // Generated on
-    { s: { r: footerRow + 1, c: 0 }, e: { r: footerRow + 1, c: 5 } }  // Shop name in footer
   ];
 
   // Add worksheet to workbook
