@@ -11,6 +11,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useStore } from "@/store/store";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -20,7 +27,18 @@ const formSchema = z.object({
   }),
   description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
+  category: z.string().min(1, "Category is required"),
 });
+
+const categories = [
+  "Utilities",
+  "Supplies",
+  "Maintenance",
+  "Salary",
+  "Rent",
+  "Marketing",
+  "Other"
+];
 
 const ExpenseForm = () => {
   const { toast } = useToast();
@@ -32,6 +50,7 @@ const ExpenseForm = () => {
       amount: "",
       description: "",
       date: new Date().toISOString().split("T")[0],
+      category: "",
     },
   });
 
@@ -40,7 +59,7 @@ const ExpenseForm = () => {
       amount: Number(values.amount),
       description: values.description,
       date: new Date(values.date),
-      category: "uncategorized",
+      category: values.category,
     });
 
     toast({
@@ -52,6 +71,7 @@ const ExpenseForm = () => {
       amount: "",
       description: "",
       date: new Date().toISOString().split("T")[0],
+      category: "",
     });
   };
 
@@ -67,6 +87,31 @@ const ExpenseForm = () => {
               <FormControl>
                 <Input placeholder="Enter expense description" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="bg-background">
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

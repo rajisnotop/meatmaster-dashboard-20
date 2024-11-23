@@ -18,6 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Filter } from "lucide-react";
+import DateRangeSelector from "../billing/DateRangeSelector";
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: any) => void;
@@ -63,7 +64,7 @@ const AdvancedFilters = ({
           <Filter className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="w-[400px] sm:w-[540px] bg-background">
         <SheetHeader>
           <SheetTitle>Advanced Filters</SheetTitle>
           <SheetDescription>
@@ -78,10 +79,10 @@ const AdvancedFilters = ({
                 value={filters.paymentStatus}
                 onValueChange={(value) => handleFilterChange("paymentStatus", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background">
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="paid">Paid</SelectItem>
                   <SelectItem value="unpaid">Unpaid</SelectItem>
@@ -100,12 +101,14 @@ const AdvancedFilters = ({
                   placeholder="Min"
                   value={filters.minAmount}
                   onChange={(e) => handleFilterChange("minAmount", e.target.value)}
+                  className="bg-background"
                 />
                 <Input
                   type="number"
                   placeholder="Max"
                   value={filters.maxAmount}
                   onChange={(e) => handleFilterChange("maxAmount", e.target.value)}
+                  className="bg-background"
                 />
               </div>
             </div>
@@ -114,18 +117,12 @@ const AdvancedFilters = ({
           {showDateFilter && (
             <div className="space-y-2">
               <Label>Date Range</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  type="date"
-                  value={filters.startDate}
-                  onChange={(e) => handleFilterChange("startDate", e.target.value)}
-                />
-                <Input
-                  type="date"
-                  value={filters.endDate}
-                  onChange={(e) => handleFilterChange("endDate", e.target.value)}
-                />
-              </div>
+              <DateRangeSelector
+                startDate={filters.startDate}
+                endDate={filters.endDate}
+                setStartDate={(date) => handleFilterChange("startDate", date || "")}
+                setEndDate={(date) => handleFilterChange("endDate", date || "")}
+              />
             </div>
           )}
 
@@ -136,10 +133,10 @@ const AdvancedFilters = ({
                 value={filters.productId}
                 onValueChange={(value) => handleFilterChange("productId", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Select product" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background">
                   <SelectItem value="all">All Products</SelectItem>
                   {products.map((product) => (
                     <SelectItem key={product.id} value={product.id}>
@@ -158,10 +155,10 @@ const AdvancedFilters = ({
                 value={filters.category}
                 onValueChange={(value) => handleFilterChange("category", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-background">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background">
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
