@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import { useStore } from "@/store/store";
-import { FileText, Printer } from "lucide-react";
+import { FileText, Printer, DollarSign, Receipt, TrendingUp, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
@@ -22,6 +22,16 @@ const Reports = () => {
 
   const monthlyTrends = calculateMonthlyTrends(orders, expenses);
   const productPerformance = calculateProductPerformance(products, orders);
+
+  // Calculate recent customers from orders
+  const recentCustomers = orders
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5)
+    .map(order => ({
+      customerName: order.customerName,
+      date: new Date(order.date),
+      total: order.total
+    }));
 
   const handlePrintReport = () => {
     try {
