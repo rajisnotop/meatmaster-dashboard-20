@@ -49,10 +49,16 @@ const Header = () => {
           
           <Link 
             to="/" 
-            className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hover:opacity-80 transition-opacity flex items-center gap-2"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <img src="/logo.png" alt="Logo" className="h-8 w-8" />
-            Neelkantha Meat Shop
+            <img 
+              src="/logo.png" 
+              alt="Neelkantha Meat Shop Logo" 
+              className="h-12 w-12 object-contain" 
+            />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Neelkantha Meat Shop
+            </span>
           </Link>
         </div>
 
@@ -61,13 +67,11 @@ const Header = () => {
             <Link
               key={path}
               to={path}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                isActive(path)
-                  ? "bg-accent text-primary font-medium"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+              className={`nav-link ${
+                isActive(path) ? "nav-link-active" : "nav-link-inactive"
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4 mr-2 inline-block" />
               {label}
             </Link>
           ))}
