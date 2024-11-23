@@ -76,4 +76,61 @@
   .flex-between {
     @apply flex items-center justify-between;
   }
+
+  /* New Layout Components */
+  .sidebar {
+    @apply fixed top-0 left-0 h-full w-64 bg-background/95 backdrop-blur-lg border-r border-border/50 p-4 transition-transform duration-300 z-50;
+  }
+
+  .main-content {
+    @apply ml-64 p-8 min-h-screen;
+  }
+
+  .dashboard-card {
+    @apply card-modern p-6 hover:scale-[1.02] transition-all duration-300;
+  }
+
+  .data-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+
+  .action-button {
+    @apply px-4 py-2 rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-colors;
+  }
+
+  .status-badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .search-bar {
+    @apply w-full max-w-md relative;
+  }
+
+  .search-input {
+    @apply w-full pl-10 pr-4 py-2 rounded-lg bg-background/60 border border-border/50 focus:ring-2 focus:ring-primary/50;
+  }
+
+  .table-container {
+    @apply rounded-lg border border-border/50 overflow-hidden bg-background/60 backdrop-blur-sm;
+  }
+
+  .table-header {
+    @apply bg-accent/40 text-primary font-medium;
+  }
+
+  .table-row {
+    @apply hover:bg-accent/20 transition-colors;
+  }
+
+  .form-group {
+    @apply space-y-2;
+  }
+
+  .form-label {
+    @apply text-sm font-medium text-muted-foreground;
+  }
+
+  .form-input {
+    @apply w-full rounded-md bg-background/60 border border-border/50;
+  }
 }
