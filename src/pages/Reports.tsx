@@ -23,10 +23,9 @@ const Reports = () => {
   const monthlyTrends = calculateMonthlyTrends(orders, expenses);
   const productPerformance = calculateProductPerformance(products, orders).map(product => ({
     ...product,
-    trend: Math.random() * 100 - 50 // This is temporary, replace with actual trend calculation
+    trend: Math.random() * 100 - 50
   }));
 
-  // Calculate recent customers from orders
   const recentCustomers = orders
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5)
@@ -57,72 +56,107 @@ const Reports = () => {
             <style>
               @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
               
+              @page {
+                size: A4;
+                margin: 20px;
+              }
+              
               body {
                 font-family: 'Inter', sans-serif;
-                padding: 40px;
+                padding: 20px;
                 color: #1a1a1a;
-                line-height: 1.6;
+                line-height: 1.4;
+                max-width: 100%;
+                margin: 0;
               }
               
               .header {
                 text-align: center;
-                margin-bottom: 40px;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #e5e7eb;
+                margin: -20px -20px 20px -20px;
+                padding: 20px;
+                background: linear-gradient(to right, #4f46e5, #7c3aed);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+              }
+              
+              .logo-container {
+                display: flex;
+                align-items: center;
+                gap: 15px;
               }
               
               .logo {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                object-fit: contain;
+                background: white;
+                padding: 5px;
+              }
+              
+              .title-container {
+                text-align: left;
+              }
+              
+              .company-name {
                 font-size: 24px;
                 font-weight: 700;
-                color: #4f46e5;
-                margin-bottom: 10px;
+                margin: 0;
+              }
+              
+              .report-type {
+                font-size: 16px;
+                opacity: 0.9;
+                margin: 5px 0;
               }
               
               .date {
-                color: #6b7280;
                 font-size: 14px;
+                opacity: 0.8;
               }
               
               .section {
-                margin-bottom: 30px;
-                padding: 20px;
-                background: #f9fafb;
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #f8fafc;
                 border-radius: 8px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
               }
               
               .section-title {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: 600;
                 color: #111827;
                 margin-bottom: 15px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #e2e8f0;
               }
               
               .metric-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
-                margin-bottom: 20px;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 15px;
+                margin-bottom: 15px;
               }
               
               .metric-card {
                 background: white;
-                padding: 15px;
+                padding: 12px;
                 border-radius: 6px;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
               }
               
               .metric-title {
-                font-size: 14px;
+                font-size: 12px;
                 color: #6b7280;
                 margin-bottom: 5px;
               }
               
               .metric-value {
-                font-size: 24px;
+                font-size: 16px;
                 font-weight: 600;
                 color: #111827;
               }
@@ -142,13 +176,13 @@ const Reports = () => {
               
               .product-list {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 15px;
               }
               
               .product-card {
                 background: white;
-                padding: 15px;
+                padding: 12px;
                 border-radius: 6px;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05);
               }
@@ -156,14 +190,15 @@ const Reports = () => {
               table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-top: 20px;
+                margin-top: 15px;
                 background: white;
                 border-radius: 6px;
                 overflow: hidden;
+                font-size: 12px;
               }
               
               th, td {
-                padding: 12px 15px;
+                padding: 8px 12px;
                 text-align: left;
                 border-bottom: 1px solid #e5e7eb;
               }
@@ -180,11 +215,13 @@ const Reports = () => {
               
               @media print {
                 body {
-                  padding: 20px;
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
                 }
                 
                 .section {
                   break-inside: avoid;
+                  page-break-inside: avoid;
                 }
                 
                 button {
@@ -195,8 +232,14 @@ const Reports = () => {
           </head>
           <body>
             <div class="header">
-              <div class="logo">Financial Report</div>
-              <div class="date">${format(new Date(), "MMMM dd, yyyy")}</div>
+              <div class="logo-container">
+                <img src="https://i.imgur.com/F4KFQkf.png" alt="Logo" class="logo">
+                <div class="title-container">
+                  <h1 class="company-name">Neelkantha Meat Shop</h1>
+                  <p class="report-type">Financial Report</p>
+                  <p class="date">${format(new Date(), "MMMM dd, yyyy")}</p>
+                </div>
+              </div>
             </div>
             
             <div class="section">
@@ -267,7 +310,7 @@ const Reports = () => {
               </table>
             </div>
             
-            <div style="text-align: center; margin-top: 40px; color: #6b7280; font-size: 12px;">
+            <div style="text-align: center; margin-top: 20px; color: #6b7280; font-size: 12px;">
               Generated on ${format(new Date(), "PPP")} at ${format(new Date(), "pp")}
             </div>
             

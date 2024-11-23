@@ -31,103 +31,125 @@ const BillingPrintTemplate = ({
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
           
+          @page {
+            size: A4;
+            margin: 20px;
+          }
+          
           body {
             font-family: 'Inter', sans-serif;
-            padding: 40px;
+            padding: 20px;
             color: #1a1a1a;
-            line-height: 1.6;
+            line-height: 1.4;
             background: #ffffff;
+            max-width: 100%;
+            margin: 0;
           }
           
           .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 20px;
+            padding: 20px;
             background: linear-gradient(to right, #4f46e5, #7c3aed);
-            margin: -40px -40px 40px -40px;
-            padding: 40px;
+            margin: -20px -20px 20px -20px;
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+          }
+          
+          .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
           }
           
           .logo {
-            font-size: 28px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: white;
+            padding: 5px;
+          }
+          
+          .title-container {
+            text-align: left;
+          }
+          
+          .company-name {
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin: 0;
+          }
+          
+          .report-type {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 5px 0;
           }
           
           .date {
-            color: rgba(255, 255, 255, 0.9);
             font-size: 14px;
+            opacity: 0.8;
           }
           
           .section {
-            margin-bottom: 30px;
-            padding: 24px;
+            margin-bottom: 20px;
+            padding: 15px;
             background: #f8fafc;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
           }
           
           .section-title {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
             color: #1e293b;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
           }
           
           .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
           }
           
           .metric-card {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
           }
           
           .metric-title {
-            font-size: 14px;
+            font-size: 12px;
             color: #64748b;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
           }
           
           .metric-value {
-            font-size: 24px;
+            font-size: 16px;
             font-weight: 600;
             color: #0f172a;
           }
-          
-          .metric-trend {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 13px;
-            margin-top: 8px;
-          }
-          
-          .trend-up { color: #22c55e; }
-          .trend-down { color: #ef4444; }
           
           table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            margin-top: 20px;
+            font-size: 12px;
             background: white;
-            border-radius: 8px;
+            border-radius: 6px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
           }
           
           th, td {
-            padding: 16px;
+            padding: 8px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
           }
@@ -143,42 +165,35 @@ const BillingPrintTemplate = ({
             border-bottom: none;
           }
           
-          tr:nth-child(even) {
-            background: #f8fafc;
-          }
-          
           .summary-section {
-            margin-top: 30px;
-            padding: 24px;
-            background: linear-gradient(to right, #f1f5f9, #e2e8f0);
-            border-radius: 12px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
           }
           
           .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
           }
           
           .summary-item {
             background: white;
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
           }
           
           @media print {
             body {
-              padding: 20px;
-            }
-            
-            .header {
-              margin: -20px -20px 30px -20px;
-              padding: 30px;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
             }
             
             .section {
               break-inside: avoid;
+              page-break-inside: avoid;
             }
             
             button {
@@ -189,8 +204,14 @@ const BillingPrintTemplate = ({
       </head>
       <body>
         <div class="header">
-          <div class="logo">Billing Report</div>
-          <div class="date">${format(new Date(), "MMMM dd, yyyy")}</div>
+          <div class="logo-container">
+            <img src="https://i.imgur.com/F4KFQkf.png" alt="Logo" class="logo">
+            <div class="title-container">
+              <h1 class="company-name">Neelkantha Meat Shop</h1>
+              <p class="report-type">Billing Report</p>
+              <p class="date">${format(new Date(), "MMMM dd, yyyy")}</p>
+            </div>
+          </div>
         </div>
         
         <div class="section">
