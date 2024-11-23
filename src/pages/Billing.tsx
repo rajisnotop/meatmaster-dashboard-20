@@ -9,6 +9,7 @@ import Header from "@/components/Header";
 import { calculateProductTotals, calculateOverallTotals } from "@/utils/billingCalculations";
 import { isDateInRange, getDateRangeForFilter } from "@/utils/dateFilters";
 import { exportToExcel } from "@/utils/excelExport";
+import BillingFilters from "@/components/billing/BillingFilters";
 
 const Billing = () => {
   const [timeFilter, setTimeFilter] = useState("all");
@@ -17,6 +18,15 @@ const Billing = () => {
   const [endDate, setEndDate] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [openingBalance, setOpeningBalance] = useState<number>(0);
+  const [filters, setFilters] = useState({
+    paymentStatus: "all",
+    minAmount: "",
+    maxAmount: "",
+    startDate: "",
+    endDate: "",
+    productId: "all"
+  });
+  
   const { products, orders, expenses } = useStore();
 
   const filterData = (date: Date) => {
@@ -179,6 +189,12 @@ const Billing = () => {
             setStartDate={setStartDate}
             setEndDate={setEndDate}
           />
+          <div className="mt-4">
+            <BillingFilters 
+              onFilterChange={setFilters}
+              products={products}
+            />
+          </div>
           <div className="mt-8">
             <BillingTable
               productTotals={productTotals}
