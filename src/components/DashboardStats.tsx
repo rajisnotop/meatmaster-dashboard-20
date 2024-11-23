@@ -46,9 +46,9 @@ const DashboardStats = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
       {stats.map((stat, index) => (
-        <div key={index} className="gradient-border">
-          <div className="card-modern p-6 h-full">
-            <div className="flex items-center space-x-4">
+        <div key={index} className="card-modern hover-scale">
+          <div className="p-6">
+            <div className="flex items-center gap-4">
               <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color}`}>
                 <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
               </div>

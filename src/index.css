@@ -5,13 +5,7 @@
 @layer base {
   :root {
     --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    
-    --card: 224 71% 4%;
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 224 71% 4%;
-    --popover-foreground: 210 40% 98%;
+    --foreground: 213 31% 91%;
     
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 1.2%;
@@ -21,7 +15,7 @@
     --secondary-foreground: 210 40% 98%;
     
     --muted: 223 47% 11%;
-    --muted-foreground: 210 40% 98%;
+    --muted-foreground: 215.4 16.3% 56.9%;
     
     --accent: 216 34% 17%;
     --accent-foreground: 210 40% 98%;
@@ -32,7 +26,7 @@
     --border: 216 34% 17%;
     --input: 216 34% 17%;
     --ring: 216 34% 17%;
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 }
 
@@ -50,74 +44,36 @@
     background-attachment: fixed;
   }
 
-  /* Component styles */
-  .glow {
-    @apply transition-shadow duration-300;
-  }
-
-  .glow:hover {
-    @apply animate-glow-pulse;
-  }
-
+  /* Modern Component Styles */
   .card-modern {
-    @apply bg-accent/40 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
-  }
-
-  .gradient-border {
-    @apply relative rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 p-[1px] overflow-hidden;
-  }
-
-  .gradient-border::before {
-    content: "";
-    @apply absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-50;
-    z-index: -1;
+    @apply bg-accent/40 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300;
   }
 
   .glass-effect {
     @apply bg-background/60 backdrop-blur-md border border-border/50;
   }
 
-  /* Dropdown and Select styles */
-  [data-radix-select-content],
-  [data-radix-dropdown-menu-content] {
-    @apply bg-background border border-border/50 !important;
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary/90 to-primary/70 bg-clip-text text-transparent;
   }
 
-  [data-radix-select-item],
-  [data-radix-dropdown-menu-item] {
-    @apply bg-background hover:bg-accent focus:bg-accent !important;
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-[1.02];
   }
 
-  /* Text visibility styles */
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-foreground;
+  .section-title {
+    @apply text-2xl font-bold tracking-tight gradient-text mb-6;
   }
 
-  p, span, div {
-    @apply text-foreground;
+  .page-container {
+    @apply container mx-auto py-8 px-4 space-y-8 animate-fade-in;
   }
 
-  label {
-    @apply text-foreground font-medium;
+  .flex-center {
+    @apply flex items-center justify-center;
   }
 
-  input, select, textarea {
-    @apply text-foreground bg-background border-border;
-  }
-
-  button {
-    @apply text-foreground font-medium;
-  }
-
-  table {
-    @apply text-foreground;
-  }
-
-  th {
-    @apply text-foreground font-semibold;
-  }
-
-  td {
-    @apply text-foreground;
+  .flex-between {
+    @apply flex items-center justify-between;
   }
 }
