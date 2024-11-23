@@ -60,12 +60,12 @@ const ExpenseForm = () => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="amount"
+          name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount (NPR)</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                <Input placeholder="Enter expense description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,12 +74,12 @@ const ExpenseForm = () => {
 
         <FormField
           control={form.control}
-          name="description"
+          name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Amount (NPR)</FormLabel>
               <FormControl>
-                <Input placeholder="Enter expense description" {...field} />
+                <Input type="number" step="0.01" placeholder="0.00" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
