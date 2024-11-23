@@ -1,6 +1,7 @@
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link, useLocation } from "react-router-dom";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Header = () => {
   const location = useLocation();
@@ -38,6 +39,7 @@ const Header = () => {
               {label}
             </Link>
           ))}
+          <ThemeToggle />
         </nav>
       </div>
     </header>
