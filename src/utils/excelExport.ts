@@ -12,69 +12,106 @@ export const exportToExcel = (
 ) => {
   const wb = XLSX.utils.book_new();
   
-  // Create the main data array for products
-  const data = [
-    ['Products', 'Quantity Sold', 'Total Sales (NPR)', 'Paid with QR (NPR)', 'Unpaid Amount (NPR)', 'Unpaid to Paid with QR (NPR)'],
-    ...productTotals.map(product => [
-      product.name,
-      product.quantity,
-      product.amount,
-      product.paidWithQR,
-      product.unpaid,
-      product.unpaidToPaidQR
-    ])
+  // Create header with logo and title
+  const headerData = [
+    ['Neelkantha Meat Shop', '', '', '', 'Data'],
+    ['', '', '', '', `Date: ${format(new Date(), 'MM/dd/yyyy')}`],
+    [''], // Empty row for spacing
   ];
 
-  const ws = XLSX.utils.aoa_to_sheet(data);
+  // Create the table headers
+  const tableHeaders = [
+    ['Product', 'Quantity', 'Sales', 'Paid (QR)', 'Unpaid to Paid', 'Unpaid to Paid(QR)']
+  ];
 
-  // Add summary section
-  const summaryStartRow = data.length + 2;
-  
-  // Helper function to create cell reference
-  const cellRef = (row: number, col: number) => XLSX.utils.encode_cell({r: row, c: col});
+  // Create the product rows
+  const productRows = productTotals.map(product => [
+    product.name,
+    product.quantity,
+    product.amount,
+    product.paidWithQR || 0,
+    product.unpaid || 0,
+    product.unpaidToPaidQR || 0
+  ]);
 
-  // Add summary rows
-  ws[cellRef(summaryStartRow, 0)] = { v: 'Opening Balance', t: 's', s: { font: { bold: true } } };
-  ws[cellRef(summaryStartRow, 1)] = { v: openingBalance, t: 'n', z: '#,##0' };
+  // Calculate totals row
+  const totalsRow = [
+    'Total',
+    productTotals.reduce((sum, p) => sum + p.quantity, 0),
+    productTotals.reduce((sum, p) => sum + p.amount, 0),
+    productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0),
+    productTotals.reduce((sum, p) => sum + (p.unpaid || 0), 0),
+    productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0)
+  ];
 
-  ws[cellRef(summaryStartRow + 1, 0)] = { v: 'Total Expenses', t: 's', s: { font: { bold: true } } };
-  ws[cellRef(summaryStartRow + 1, 1)] = { v: totalExpenses, t: 'n', z: '#,##0' };
+  // Add empty rows for spacing
+  const emptyRows = [[''], ['']];
 
+  // Create summary section
   const cashInCounter = productTotals.reduce((sum, p) => sum + p.amount, 0) - totalExpenses + openingBalance;
-  ws[cellRef(summaryStartRow + 2, 0)] = { v: 'Cash in Counter', t: 's', s: { font: { bold: true } } };
-  ws[cellRef(summaryStartRow + 2, 1)] = { v: cashInCounter, t: 'n', z: '#,##0' };
-
-  ws[cellRef(summaryStartRow + 3, 0)] = { v: 'Net Amount', t: 's', s: { font: { bold: true, color: { rgb: netAmount >= 0 ? "008000" : "FF0000" } } } };
-  ws[cellRef(summaryStartRow + 3, 1)] = { v: netAmount, t: 'n', z: '#,##0' };
-
-  // Add footer
-  const footerRow = summaryStartRow + 5;
-  ws[cellRef(footerRow, 0)] = { 
-    v: `Generated on ${format(new Date(), 'MMMM dd, yyyy HH:mm:ss')}`,
-    t: 's',
-    s: { font: { italic: true } }
-  };
-  ws[cellRef(footerRow + 1, 0)] = { 
-    v: 'Neelkantha Meat Shop - Financial Report',
-    t: 's',
-    s: { font: { bold: true } }
-  };
-
-  // Merge cells for footer
-  ws['!merges'] = [
-    { s: { r: footerRow, c: 0 }, e: { r: footerRow, c: 5 } },
-    { s: { r: footerRow + 1, c: 0 }, e: { r: footerRow + 1, c: 5 } }
+  const summaryRows = [
+    ['', '', '', '', 'Expenses', totalExpenses],
+    ['', '', '', '', 'Opening Balance', openingBalance],
+    ['', '', '', '', 'Cash in counter', cashInCounter],
+    ['', '', '', '', 'Net amount', netAmount]
   ];
+
+  // Combine all data
+  const allData = [
+    ...headerData,
+    ...tableHeaders,
+    ...productRows,
+    ...emptyRows,
+    totalsRow,
+    [''],
+    ...summaryRows,
+    [''],
+    [`This file was generated on "${format(new Date(), 'MM/dd/yyyy')} on ${format(new Date(), 'HH:mm')}"`],
+    ['Neelkantha Meat Shop | www.neelkanthameat.netlify.com']
+  ];
+
+  // Create worksheet
+  const ws = XLSX.utils.aoa_to_sheet(allData);
 
   // Set column widths
   ws['!cols'] = [
-    { wch: 30 }, // Products
+    { wch: 30 }, // Product
     { wch: 15 }, // Quantity
-    { wch: 20 }, // Sales
-    { wch: 20 }, // QR
-    { wch: 20 }, // Unpaid
-    { wch: 25 }, // Unpaid to QR
+    { wch: 15 }, // Sales
+    { wch: 15 }, // Paid QR
+    { wch: 20 }, // Unpaid to Paid
+    { wch: 20 }  // Unpaid to Paid QR
   ];
+
+  // Style the header cells
+  const headerStyle = {
+    font: { bold: true, sz: 14 },
+    fill: { fgColor: { rgb: "F0F8FF" } }, // Light blue background
+    alignment: { horizontal: "left" }
+  };
+
+  // Style the table header cells
+  const tableHeaderStyle = {
+    font: { bold: true, color: { rgb: "FFFFFF" } },
+    fill: { fgColor: { rgb: "000000" } }, // Black background
+    alignment: { horizontal: "left" }
+  };
+
+  // Apply styles
+  for (let i = 0; i < 2; i++) {
+    const headerRange = XLSX.utils.encode_range({ r: i, c: 0 }, { r: i, c: 5 });
+    Object.keys(ws).forEach(cell => {
+      if (cell[0] !== '!' && headerRange.includes(cell)) {
+        ws[cell].s = headerStyle;
+      }
+    });
+  }
+
+  // Style table headers
+  tableHeaders[0].forEach((_, index) => {
+    const cell = XLSX.utils.encode_cell({ r: 3, c: index });
+    if (ws[cell]) ws[cell].s = tableHeaderStyle;
+  });
 
   // Add worksheet to workbook
   XLSX.utils.book_append_sheet(wb, ws, 'Billing Summary');
