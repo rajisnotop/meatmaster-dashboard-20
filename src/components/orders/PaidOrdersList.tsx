@@ -14,7 +14,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { formatNepaliDateFull } from "@/utils/nepaliDate";
 
 interface PaidOrdersListProps {
   searchTerm: string;
@@ -80,7 +79,12 @@ const PaidOrdersList = ({ searchTerm, searchDate }: PaidOrdersListProps) => {
             <AccordionTrigger className="hover:no-underline">
               <div className="flex justify-between items-center w-full">
                 <span className="font-semibold">
-                  {formatNepaliDateFull(new Date(date))}
+                  {new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
                 </span>
                 <div className="flex gap-4">
                   <span className="text-green-400">

@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { useStore } from "@/store/store";
 import { useToast } from "./ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import { getCurrentNepaliDate, formatNepaliDate } from "@/utils/nepaliDate";
 
 const OrderForm = ({ editingOrder = null }) => {
   const { products, addOrder, updateOrder } = useStore();
@@ -19,7 +18,7 @@ const OrderForm = ({ editingOrder = null }) => {
     productId: editingOrder?.productId || "",
     quantity: editingOrder?.quantity?.toString() || "",
     price: editingOrder?.total?.toString() || "",
-    date: editingOrder ? formatNepaliDate(new Date(editingOrder.date)) : formatNepaliDate(new Date()),
+    date: editingOrder ? new Date(editingOrder.date).toLocaleDateString() : new Date().toLocaleDateString(),
   });
 
   const selectedProduct = products.find((p) => p.id === order.productId);
@@ -79,7 +78,7 @@ const OrderForm = ({ editingOrder = null }) => {
       });
     }
 
-    setOrder({ customerName: "", productId: "", quantity: "", price: "", date: formatNepaliDate(new Date()) });
+    setOrder({ customerName: "", productId: "", quantity: "", price: "", date: new Date().toLocaleDateString() });
     navigate("/orders");
   };
 
