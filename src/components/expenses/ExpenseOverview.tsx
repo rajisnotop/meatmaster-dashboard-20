@@ -1,18 +1,30 @@
 import { Card } from "@/components/ui/card";
 import { useStore } from "@/store/store";
-import { Receipt, TrendingUp, TrendingDown, Calendar } from "lucide-react";
+import { Receipt, TrendingUp, TrendingDown, Calendar, ArrowUp, ArrowDown } from "lucide-react";
+import { startOfDay, subDays } from "date-fns";
 
 const ExpenseOverview = () => {
   const expenses = useStore((state) => state.expenses);
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   
-  // Calculate today's expenses
-  const today = new Date().toISOString().split('T')[0];
+  const today = startOfDay(new Date());
+  const yesterday = startOfDay(subDays(today, 1));
+  
   const todayExpenses = expenses
-    .filter(expense => expense.date.toISOString().split('T')[0] === today)
+    .filter(expense => new Date(expense.date) >= today)
     .reduce((sum, expense) => sum + expense.amount, 0);
 
-  // Calculate average daily expense
+  const yesterdayExpenses = expenses
+    .filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate >= yesterday && expenseDate < today;
+    })
+    .reduce((sum, expense) => sum + expense.amount, 0);
+
+  const expenseChange = yesterdayExpenses === 0 
+    ? (todayExpenses > 0 ? 100 : 0)
+    : ((todayExpenses - yesterdayExpenses) / yesterdayExpenses) * 100;
+
   const uniqueDates = new Set(expenses.map(expense => 
     expense.date.toISOString().split('T')[0]
   ));
@@ -39,6 +51,16 @@ const ExpenseOverview = () => {
             <h3 className="text-2xl font-bold text-white mt-1">
               NPR {todayExpenses.toLocaleString()}
             </h3>
+            <div className="flex items-center mt-1">
+              {expenseChange > 0 ? (
+                <ArrowUp className="h-4 w-4 text-red-400" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-green-400" />
+              )}
+              <span className={`text-sm ${expenseChange > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                {Math.abs(expenseChange).toFixed(1)}% from yesterday
+              </span>
+            </div>
           </div>
           <Calendar className="h-8 w-8 text-blue-400" />
         </div>

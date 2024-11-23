@@ -1,21 +1,46 @@
-import { DollarSign, ShoppingCart, Package, TrendingUp } from "lucide-react";
+import { DollarSign, ShoppingCart, Package, TrendingUp, ArrowUp, ArrowDown } from "lucide-react";
 import { useStore } from "@/store/store";
+import { startOfDay, subDays } from "date-fns";
 
 const DashboardStats = () => {
   const { orders, products } = useStore();
   
+  const today = startOfDay(new Date());
+  const yesterday = startOfDay(subDays(today, 1));
+  
   const todaysSales = orders
     .filter(order => {
-      const today = new Date();
       const orderDate = new Date(order.date);
-      return orderDate.toDateString() === today.toDateString();
+      return orderDate >= today;
     })
     .reduce((total, order) => total + order.total, 0);
+
+  const yesterdaySales = orders
+    .filter(order => {
+      const orderDate = new Date(order.date);
+      return orderDate >= yesterday && orderDate < today;
+    })
+    .reduce((total, order) => total + order.total, 0);
+
+  const todaysOrders = orders.filter(order => new Date(order.date) >= today).length;
+  const yesterdaysOrders = orders.filter(order => {
+    const orderDate = new Date(order.date);
+    return orderDate >= yesterday && orderDate < today;
+  }).length;
+
+  const calculatePercentageChange = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const salesChange = calculatePercentageChange(todaysSales, yesterdaySales);
+  const ordersChange = calculatePercentageChange(todaysOrders, yesterdaysOrders);
 
   const stats = [
     {
       title: "Today's Sales",
       value: `NPR ${todaysSales.toLocaleString()}`,
+      change: salesChange,
       icon: DollarSign,
       color: "from-blue-500/20 to-blue-600/20",
       iconColor: "text-blue-500"
@@ -23,6 +48,7 @@ const DashboardStats = () => {
     {
       title: "Orders",
       value: orders.length.toString(),
+      change: ordersChange,
       icon: ShoppingCart,
       color: "from-purple-500/20 to-purple-600/20",
       iconColor: "text-purple-500"
@@ -38,7 +64,7 @@ const DashboardStats = () => {
       title: "Total Revenue",
       value: `NPR ${orders.reduce((total, order) => total + order.total, 0).toLocaleString()}`,
       icon: TrendingUp,
-      color: "from-orange-500/20 to-orange-600/20",
+      color: "from-orange-500/20 to-orange-800/20",
       iconColor: "text-orange-500"
     }
   ];
@@ -52,9 +78,21 @@ const DashboardStats = () => {
               <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color}`}>
                 <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm text-muted-foreground">{stat.title}</p>
                 <h3 className="text-2xl font-bold tracking-tight">{stat.value}</h3>
+                {typeof stat.change === 'number' && (
+                  <div className="flex items-center mt-1">
+                    {stat.change > 0 ? (
+                      <ArrowUp className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <ArrowDown className="h-4 w-4 text-red-500" />
+                    )}
+                    <span className={`text-sm ${stat.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {Math.abs(stat.change).toFixed(1)}% from yesterday
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
