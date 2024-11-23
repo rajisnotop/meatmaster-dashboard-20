@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "@/components/Header";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ExpenseOverview from "@/components/expenses/ExpenseOverview";
 import ExpenseFormCard from "@/components/expenses/ExpenseFormCard";
@@ -10,16 +11,7 @@ const Expenditure = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto py-8 px-4 space-y-8">
-        <div className="flex flex-col gap-6 animate-fade-in">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-              Expenditure
-            </h1>
-            <p className="text-muted-foreground">
-              Track and manage your business expenses
-            </p>
-          </div>
-
+        <div className="flex flex-col gap-6">
           <ExpenseOverview />
           
           <Tabs defaultValue="add" className="w-full">
