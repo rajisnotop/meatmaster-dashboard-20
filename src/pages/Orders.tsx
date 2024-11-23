@@ -14,6 +14,14 @@ const Orders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [editingOrder, setEditingOrder] = useState(null);
+  const [filters, setFilters] = useState({
+    paymentStatus: "all",
+    minAmount: "",
+    maxAmount: "",
+    startDate: "",
+    endDate: "",
+    productId: "all",
+  });
 
   // Calculate totals
   const totalUnpaidAmount = orders
@@ -31,6 +39,10 @@ const Orders = () => {
   const totalUnpaidToPaidQRAmount = orders
     .filter(order => order.isPaid && order.wasUnpaid && order.paidWithQR)
     .reduce((sum, order) => sum + order.total, 0);
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/95">
@@ -54,6 +66,7 @@ const Orders = () => {
               setSearchTerm={setSearchTerm}
               searchDate={searchDate}
               setSearchDate={setSearchDate}
+              onFilterChange={handleFilterChange}
             />
           </div>
 
