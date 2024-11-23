@@ -1,16 +1,28 @@
-import { Menu, Home, FileText, DollarSign, ShoppingBag, Receipt } from "lucide-react";
-import { Button } from "./ui/button";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Menu,
+  Home,
+  FileText,
+  DollarSign,
+  ShoppingBag,
+  Receipt,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Header = () => {
   const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   const isActive = (path: string) => location.pathname === path;
 
@@ -23,64 +35,74 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 glass-effect py-4">
-      <div className="container mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon" className="hover:bg-primary/20 hover:text-primary">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {navigationItems.map(({ path, label, icon: Icon }) => (
-                <DropdownMenuItem key={path} asChild>
-                  <Link 
-                    to={path}
-                    className="flex items-center space-x-2 w-full px-2 py-1.5"
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{label}</span>
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          <Link 
-            to="/" 
-            className="flex items-center gap-4 hover:opacity-80 transition-opacity"
-          >
-            <img 
-              src="https://i.imgur.com/F4KFQkf.png" 
-              alt="Neelkantha Meat Shop Logo" 
-              className="h-16 w-16 object-contain rounded-full shadow-lg" 
-            />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Neelkantha Meat Shop
-            </span>
-          </Link>
-        </div>
-
-        <nav className="hidden lg:flex items-center space-x-1">
-          {navigationItems.map(({ path, label, icon: Icon }) => (
-            <Link
-              key={path}
-              to={path}
-              className={`nav-link ${
-                isActive(path) ? "nav-link-active" : "nav-link-inactive"
-              }`}
+    <>
+      <aside className={cn("sidebar", isCollapsed && "sidebar-collapsed")}>
+        <div className="flex flex-col h-full">
+          <div className="p-4 flex items-center justify-between">
+            {!isCollapsed && (
+              <Link to="/" className="flex items-center gap-4">
+                <img 
+                  src="https://i.imgur.com/F4KFQkf.png" 
+                  alt="Logo" 
+                  className="h-16 w-16 object-contain rounded-full shadow-lg" 
+                />
+                <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  Neelkantha
+                </span>
+              </Link>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="ml-auto"
             >
-              <Icon className="h-4 w-4 mr-2 inline-block" />
-              {label}
-            </Link>
-          ))}
-          <div className="ml-4 border-l pl-4 border-border/50">
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+
+          <nav className="flex-1 px-2 py-4">
+            <TooltipProvider>
+              {navigationItems.map(({ path, label, icon: Icon }) => (
+                <Tooltip key={path} delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      to={path}
+                      className={cn(
+                        "nav-link mb-2",
+                        isActive(path) ? "nav-link-active" : "nav-link-inactive"
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {!isCollapsed && <span>{label}</span>}
+                    </Link>
+                  </TooltipTrigger>
+                  {isCollapsed && (
+                    <TooltipContent side="right">
+                      <p>{label}</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              ))}
+            </TooltipProvider>
+          </nav>
+
+          <div className="p-4 border-t border-border/50">
             <ThemeToggle />
           </div>
-        </nav>
-      </div>
-    </header>
+        </div>
+      </aside>
+
+      <main className={cn("main-content", isCollapsed && "main-content-collapsed")}>
+        <div className="container mx-auto">
+          {/* Content will be rendered here */}
+        </div>
+      </main>
+    </>
   );
 };
 

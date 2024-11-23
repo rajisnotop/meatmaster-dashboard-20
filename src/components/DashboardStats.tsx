@@ -69,21 +69,24 @@ const DashboardStats = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {stats.map((stat, index) => (
         <Card
           key={index}
           className={cn(
-            "relative overflow-hidden",
+            "stat-card animate-fade-up",
             "hover:shadow-lg transition-all duration-300",
             "bg-gradient-to-br backdrop-blur-sm border-border/50",
             stat.gradient
           )}
+          style={{
+            animationDelay: `${index * 100}ms`
+          }}
         >
-          <div className="p-6 flex items-center gap-4">
+          <div className="flex items-center gap-4">
             <div className={cn(
               "p-3 rounded-xl",
-              "bg-background/40 backdrop-blur-sm",
+              "glass-card",
               stat.iconColor
             )}>
               <stat.icon className="h-6 w-6" />
