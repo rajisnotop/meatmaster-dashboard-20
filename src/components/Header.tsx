@@ -52,7 +52,7 @@ const Header = () => {
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <img 
-              src="/logo.png" 
+              src="https://i.imgur.com/F4KFQkf.png" 
               alt="Neelkantha Meat Shop Logo" 
               className="h-12 w-12 object-contain rounded-full" 
             />
