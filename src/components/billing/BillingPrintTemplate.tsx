@@ -29,293 +29,200 @@ const BillingPrintTemplate = ({
       <head>
         <title>Billing Report</title>
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-          
           @page {
             size: A4;
             margin: 20px;
+            background-color: #f0f8ff;
           }
           
           body {
-            font-family: 'Inter', sans-serif;
+            font-family: Arial, sans-serif;
             padding: 20px;
-            color: #1a1a1a;
+            background-color: #f0f8ff;
             line-height: 1.4;
-            background: #ffffff;
-            max-width: 100%;
             margin: 0;
           }
           
           .header {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 20px;
-            background: linear-gradient(to right, #4f46e5, #7c3aed);
-            margin: -20px -20px 20px -20px;
-            color: white;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 20px;
+            margin-bottom: 30px;
           }
           
-          .logo-container {
+          .logo-section {
             display: flex;
             align-items: center;
             gap: 15px;
           }
           
           .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: contain;
-            background: white;
-            padding: 5px;
+            width: 60px;
+            height: 60px;
           }
           
-          .title-container {
-            text-align: left;
-          }
-          
-          .company-name {
+          .company-title {
             font-size: 24px;
-            font-weight: 700;
+            font-weight: bold;
             margin: 0;
           }
           
-          .report-type {
+          .date-section {
+            text-align: right;
+          }
+          
+          .date-label {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+          }
+          
+          .date-value {
             font-size: 16px;
-            opacity: 0.9;
-            margin: 5px 0;
-          }
-          
-          .date {
-            font-size: 14px;
-            opacity: 0.8;
-          }
-          
-          .section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-          }
-          
-          .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e2e8f0;
-          }
-          
-          .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-          }
-          
-          .metric-card {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-          }
-          
-          .metric-title {
-            font-size: 12px;
-            color: #64748b;
-            margin-bottom: 5px;
-          }
-          
-          .metric-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #0f172a;
+            margin: 5px 0 0 0;
           }
           
           table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 12px;
-            background: white;
-            border-radius: 6px;
-            overflow: hidden;
-          }
-          
-          th, td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
           }
           
           th {
-            background: #f1f5f9;
-            font-weight: 600;
-            color: #334155;
-            white-space: nowrap;
+            background-color: black;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            border: 1px solid black;
           }
           
-          tr:last-child td {
-            border-bottom: none;
+          td {
+            padding: 8px;
+            border: 1px solid black;
           }
           
-          .summary-section {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f1f5f9;
-            border-radius: 8px;
+          .totals-section {
+            width: 40%;
+            margin-left: auto;
           }
           
-          .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+          .totals-row {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid black;
+            margin-bottom: -1px;
+            background-color: white;
           }
           
-          .summary-item {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          .totals-label {
+            padding: 8px;
+            border-right: 1px solid black;
+            width: 50%;
+          }
+          
+          .totals-value {
+            padding: 8px;
+            width: 50%;
+            text-align: left;
+          }
+          
+          .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 14px;
+          }
+          
+          .website {
+            color: black;
+            text-decoration: none;
           }
           
           @media print {
             body {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+              background-color: #f0f8ff !important;
             }
             
-            .section {
-              break-inside: avoid;
-              page-break-inside: avoid;
-            }
-            
-            button {
-              display: none;
+            th {
+              background-color: black !important;
+              color: white !important;
             }
           }
         </style>
       </head>
       <body>
         <div class="header">
-          <div class="logo-container">
-            <img src="https://i.imgur.com/F4KFQkf.png" alt="Logo" class="logo">
-            <div class="title-container">
-              <h1 class="company-name">Neelkantha Meat Shop</h1>
-              <p class="report-type">Billing Report</p>
-              <p class="date">${format(new Date(), "MMMM dd, yyyy")}</p>
-            </div>
+          <div class="logo-section">
+            <img src="/logo.png" alt="Logo" class="logo">
+            <h1 class="company-title">Neelkantha<br>Meat Shop</h1>
+          </div>
+          <div class="date-section">
+            <h2 class="date-label">Data</h2>
+            <p class="date-value">${format(new Date(), "MM/dd/yyyy")}</p>
           </div>
         </div>
         
-        <div class="section">
-          <div class="section-title">Financial Overview</div>
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-title">Total Sales</div>
-              <div class="metric-value">NPR ${overallTotals.sales.toLocaleString()}</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-title">Total Expenses</div>
-              <div class="metric-value">NPR ${totalExpenses.toLocaleString()}</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-title">Net Profit</div>
-              <div class="metric-value ${netProfit >= 0 ? 'trend-up' : 'trend-down'}">
-                NPR ${netProfit.toLocaleString()}
-              </div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-title">Opening Balance</div>
-              <div class="metric-value">NPR ${openingBalance.toLocaleString()}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Product Sales Analysis</div>
-          <table>
-            <thead>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Sales</th>
+              <th>Paid (QR)</th>
+              <th>Unpaid to Paid</th>
+              <th>Unpaid to Paid(QR)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${productTotals.map((product) => `
               <tr>
-                <th>Product</th>
-                <th>Quantity Sold</th>
-                <th>Total Sales</th>
-                ${type === "all" ? "<th>Digital Payments</th>" : ""}
-                ${type === "all" ? "<th>Cash Payments</th>" : ""}
+                <td>${product.name}</td>
+                <td>${product.quantity.toFixed(2)}</td>
+                <td>${product.amount.toLocaleString()}</td>
+                <td>${(product.paidWithQR || 0).toLocaleString()}</td>
+                <td>${(product.unpaid || 0).toLocaleString()}</td>
+                <td>${(product.unpaidToPaidQR || 0).toLocaleString()}</td>
               </tr>
-            </thead>
-            <tbody>
-              ${productTotals.map((product) => `
-                <tr>
-                  <td>${product.name}</td>
-                  <td>${product.quantity.toFixed(2)}</td>
-                  <td>NPR ${product.amount.toLocaleString()}</td>
-                  ${type === "all" ? `<td>NPR ${(product.paidWithQR || 0).toLocaleString()}</td>` : ""}
-                  ${type === "all" ? `<td>NPR ${(product.amount - (product.paidWithQR || 0)).toLocaleString()}</td>` : ""}
-                </tr>
-              `).join("")}
-              <tr style="font-weight: 600; background: #f1f5f9;">
-                <td>Total</td>
-                <td>${productTotals.reduce((sum, p) => sum + p.quantity, 0).toFixed(2)}</td>
-                <td>NPR ${productTotals.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}</td>
-                ${type === "all" ? `
-                  <td>NPR ${productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0).toLocaleString()}</td>
-                  <td>NPR ${productTotals.reduce((sum, p) => sum + (p.amount - (p.paidWithQR || 0)), 0).toLocaleString()}</td>
-                ` : ""}
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            `).join("")}
+            <tr>
+              <td><strong>Total</strong></td>
+              <td><strong>${productTotals.reduce((sum, p) => sum + p.quantity, 0).toFixed(2)}</strong></td>
+              <td><strong>${productTotals.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}</strong></td>
+              <td><strong>${productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0).toLocaleString()}</strong></td>
+              <td><strong>${productTotals.reduce((sum, p) => sum + (p.unpaid || 0), 0).toLocaleString()}</strong></td>
+              <td><strong>${productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0).toLocaleString()}</strong></td>
+            </tr>
+          </tbody>
+        </table>
         
-        <div class="summary-section">
-          <div class="section-title">Payment Summary</div>
-          <div class="summary-grid">
-            <div class="summary-item">
-              <div class="metric-title">Cash in Counter</div>
-              <div class="metric-value ${cashInCounter >= 0 ? 'trend-up' : 'trend-down'}">
-                NPR ${cashInCounter.toLocaleString()}
-              </div>
-            </div>
-            <div class="summary-item">
-              <div class="metric-title">Digital Payments</div>
-              <div class="metric-value">
-                NPR ${overallTotals.paidWithQR.toLocaleString()}
-              </div>
-            </div>
-            <div class="summary-item">
-              <div class="metric-title">Previously Unpaid</div>
-              <div class="metric-value">
-                NPR ${(overallTotals.unpaid + overallTotals.unpaidToPaidQR).toLocaleString()}
-              </div>
-            </div>
+        <div class="totals-section">
+          <div class="totals-row">
+            <div class="totals-label">Expenses</div>
+            <div class="totals-value">${totalExpenses.toLocaleString()}</div>
+          </div>
+          <div class="totals-row">
+            <div class="totals-label">Opening Balance</div>
+            <div class="totals-value">${openingBalance.toLocaleString()}</div>
+          </div>
+          <div class="totals-row">
+            <div class="totals-label">Cash in counter</div>
+            <div class="totals-value">${cashInCounter.toLocaleString()}</div>
+          </div>
+          <div class="totals-row">
+            <div class="totals-label">Net amount</div>
+            <div class="totals-value">${netProfit.toLocaleString()}</div>
           </div>
         </div>
         
-        <div style="text-align: center; margin-top: 40px; color: #64748b; font-size: 12px;">
-          Generated on ${format(new Date(), "PPP")} at ${format(new Date(), "pp")}
+        <div class="footer">
+          This file was generated on "${format(new Date(), "MM/dd/yyyy 'on' HH:mm")}"<br>
+          Neelkantha Meat Shop | <a href="https://neelkanthameat.netlify.com" class="website">www.neelkanthameat.netlify.com</a>
         </div>
-        
-        <button onclick="window.print()" style="
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          padding: 12px 24px;
-          background: #4f46e5;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 500;
-          box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
-        ">
-          Print Report
-        </button>
       </body>
     </html>
   `;
