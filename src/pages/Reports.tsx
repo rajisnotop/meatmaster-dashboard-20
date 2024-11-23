@@ -1,15 +1,15 @@
 import Header from "@/components/Header";
 import { useStore } from "@/store/store";
-import { FileText, Printer } from "lucide-react";
+import { FileText, Printer, Users, Package, TrendingUp, DollarSign, CreditCard, Receipt, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Card } from "@/components/ui/card";
-import RevenueChart from "@/components/RevenueChart";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
 import TopSellingProducts from "@/components/reports/TopSellingProducts";
 import LoyalCustomers from "@/components/reports/LoyalCustomers";
 import RecentCustomers from "@/components/reports/RecentCustomers";
 import MetricCard from "@/components/reports/MetricCard";
-import { DollarSign, TrendingUp, CreditCard, Receipt } from "lucide-react";
 
 const Reports = () => {
   const { orders, expenses } = useStore();
@@ -17,6 +17,9 @@ const Reports = () => {
   const totalRevenue = orders.reduce((total, order) => total + order.total, 0);
   const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0);
   const netProfit = totalRevenue - totalExpenses;
+  const averageOrderValue = orders.length ? Math.round(totalRevenue / orders.length) : 0;
+  const totalOrders = orders.length;
+  const totalCustomers = new Set(orders.map(order => order.customerName)).size;
 
   // Calculate recent customers
   const recentCustomers = orders
@@ -101,7 +104,12 @@ const Reports = () => {
       <Header />
       <main className="container py-8 space-y-8 animate-fade-in">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-foreground">Financial Reports</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Financial Reports</h1>
+            <p className="text-muted-foreground mt-1">
+              Generated on {format(new Date(), "MMMM dd, yyyy")}
+            </p>
+          </div>
           <Button 
             variant="outline" 
             className="hover:bg-primary/20"
@@ -125,30 +133,76 @@ const Reports = () => {
           />
           <MetricCard
             icon={TrendingUp}
-            title="Net Profit"
+            title="Net Amount"
             value={`NPR ${netProfit.toLocaleString()}`}
           />
           <MetricCard
             icon={CreditCard}
-            title="Average Order Value"
-            value={`NPR ${orders.length ? Math.round(totalRevenue / orders.length).toLocaleString() : 0}`}
+            title="Average Order"
+            value={`NPR ${averageOrderValue.toLocaleString()}`}
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-8">
-            <h2 className="text-xl font-bold mb-6">Revenue Trend</h2>
-            <RevenueChart />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="p-6 col-span-1">
+            <div className="flex items-center gap-2 mb-4">
+              <Package className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Order Statistics</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                <span className="text-muted-foreground">Total Orders</span>
+                <span className="font-medium">{totalOrders}</span>
+              </div>
+              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                <span className="text-muted-foreground">Total Customers</span>
+                <span className="font-medium">{totalCustomers}</span>
+              </div>
+              <div className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                <span className="text-muted-foreground">Average Daily Orders</span>
+                <span className="font-medium">
+                  {Math.round(totalOrders / Math.max(1, Math.ceil((Date.now() - new Date(orders[0]?.date || Date.now()).getTime()) / (1000 * 60 * 60 * 24))))}
+                </span>
+              </div>
+            </div>
           </Card>
-          <TopSellingProducts />
+
+          <div className="col-span-2">
+            <TopSellingProducts />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <LoyalCustomers 
-            data={loyalCustomersData} 
-            colors={['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981']} 
-          />
           <RecentCustomers customers={recentCustomers} />
+          <Card className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Monthly Summary</h2>
+            </div>
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-4">
+                {Array.from({ length: 6 }).map((_, index) => {
+                  const date = new Date();
+                  date.setMonth(date.getMonth() - index);
+                  const monthOrders = orders.filter(order => 
+                    new Date(order.date).getMonth() === date.getMonth() &&
+                    new Date(order.date).getFullYear() === date.getFullYear()
+                  );
+                  const monthRevenue = monthOrders.reduce((sum, order) => sum + order.total, 0);
+                  
+                  return (
+                    <div key={index} className="flex justify-between items-center p-4 bg-muted/50 rounded-lg">
+                      <span className="text-muted-foreground">{format(date, 'MMMM yyyy')}</span>
+                      <div className="text-right">
+                        <div className="font-medium">NPR {monthRevenue.toLocaleString()}</div>
+                        <div className="text-sm text-muted-foreground">{monthOrders.length} orders</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </Card>
         </div>
       </main>
     </div>
