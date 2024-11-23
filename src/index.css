@@ -6,29 +6,21 @@
   :root {
     --background: 224 71% 4%;
     --foreground: 210 40% 98%;
-    
     --card: 224 71% 4%;
     --card-foreground: 210 40% 98%;
-    
     --popover: 224 71% 4%;
     --popover-foreground: 210 40% 98%;
-    
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 1.2%;
     --primary-rgb: 249, 249, 249;
-    
     --secondary: 222.2 47.4% 11.2%;
     --secondary-foreground: 210 40% 98%;
-    
     --muted: 223 47% 11%;
     --muted-foreground: 210 40% 98%;
-    
     --accent: 216 34% 17%;
     --accent-foreground: 210 40% 98%;
-    
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    
     --border: 216 34% 17%;
     --input: 216 34% 17%;
     --ring: 216 34% 17%;
@@ -50,74 +42,59 @@
     background-attachment: fixed;
   }
 
-  /* Component styles */
-  .glow {
-    @apply transition-shadow duration-300;
-  }
-
-  .glow:hover {
-    @apply animate-glow-pulse;
-  }
-
-  .card-modern {
-    @apply bg-accent/40 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
-  }
-
-  .gradient-border {
-    @apply relative rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 p-[1px] overflow-hidden;
-  }
-
-  .gradient-border::before {
-    content: "";
-    @apply absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-50;
-    z-index: -1;
-  }
-
-  .glass-effect {
-    @apply bg-background/60 backdrop-blur-md border border-border/50;
-  }
-
-  /* Dropdown and Select styles */
-  [data-radix-select-content],
-  [data-radix-dropdown-menu-content] {
-    @apply bg-background border border-border/50 !important;
-  }
-
-  [data-radix-select-item],
-  [data-radix-dropdown-menu-item] {
-    @apply bg-background hover:bg-accent focus:bg-accent !important;
-  }
-
-  /* Text visibility styles */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-foreground;
+    @apply font-semibold text-foreground tracking-tight;
   }
 
   p, span, div {
     @apply text-foreground;
   }
+}
 
-  label {
-    @apply text-foreground font-medium;
+@layer components {
+  .glass-effect {
+    @apply bg-background/60 backdrop-blur-md border border-border/50;
   }
 
-  input, select, textarea {
-    @apply text-foreground bg-background border-border;
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
   }
 
-  button {
-    @apply text-foreground font-medium;
+  .gradient-border {
+    @apply relative rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 p-[1px];
   }
 
-  table {
-    @apply text-foreground;
+  .gradient-border::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-50 -z-10;
   }
 
-  th {
-    @apply text-foreground font-semibold;
+  .nav-link {
+    @apply px-4 py-2 rounded-lg transition-colors duration-200;
   }
 
-  td {
-    @apply text-foreground;
+  .nav-link-active {
+    @apply bg-accent text-primary font-medium;
+  }
+
+  .nav-link-inactive {
+    @apply text-muted-foreground hover:text-primary hover:bg-accent/50;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
