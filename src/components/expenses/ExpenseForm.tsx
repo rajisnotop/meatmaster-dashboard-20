@@ -18,7 +18,7 @@ const formSchema = z.object({
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Amount must be a positive number",
   }),
-  description: z.string().optional(),
+  description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
 });
 
@@ -36,13 +36,11 @@ const ExpenseForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("Submitting expense:", values); // Debug log
-    
     addExpense({
       amount: Number(values.amount),
-      description: values.description || "",
+      description: values.description,
       date: new Date(values.date),
-      category: "uncategorized", // Default category since we removed the field
+      category: "uncategorized",
     });
 
     toast({
@@ -50,7 +48,6 @@ const ExpenseForm = () => {
       description: "Your expense has been successfully recorded.",
     });
 
-    // Reset form with default values
     form.reset({
       amount: "",
       description: "",
@@ -82,7 +79,7 @@ const ExpenseForm = () => {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Enter description" {...field} />
+                <Input placeholder="Enter expense description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
