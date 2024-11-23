@@ -14,42 +14,76 @@ interface GroupedOrders {
   };
 }
 
+interface AdvancedFilters {
+  paymentStatus: string;
+  minAmount: number;
+  maxAmount: number;
+  startDate: string;
+  endDate: string;
+  productId: string;
+}
+
 const GroupedOrdersList = ({ searchTerm = "", searchDate = "" }) => {
   const { orders, products, updateOrderStatus } = useStore();
   const [editingOrder, setEditingOrder] = useState(null);
   const { toast } = useToast();
+  const [filters, setFilters] = useState<AdvancedFilters>({
+    paymentStatus: 'all',
+    minAmount: 0,
+    maxAmount: Infinity,
+    startDate: '',
+    endDate: '',
+    productId: 'all'
+  });
 
-  // Group unpaid orders by customer
+  // Group unpaid orders by customer with advanced filtering
   const groupedUnpaidOrders = orders
-    .filter((order) => !order.isPaid)
-    .reduce((acc, order) => {
-      const customerName = order.customerName || "Anonymous";
-      
-      // Apply search filters
+    .filter((order) => {
+      // Basic filters
       const product = products.find((p) => p.id === order.productId);
-      const searchString = `${customerName} ${product?.name} ${order.total}`.toLowerCase();
+      const searchString = `${order.customerName} ${product?.name} ${order.total}`.toLowerCase();
       const orderDate = new Date(order.date);
       const searchDateObj = searchDate ? new Date(searchDate) : null;
       const dateMatch = searchDate
         ? orderDate.toDateString() === searchDateObj?.toDateString()
         : true;
 
-      if (
+      // Advanced filters
+      const paymentStatusMatch = filters.paymentStatus === 'all' || 
+        (filters.paymentStatus === 'paid' && order.isPaid) ||
+        (filters.paymentStatus === 'unpaid' && !order.isPaid) ||
+        (filters.paymentStatus === 'qr' && order.paidWithQR);
+
+      const amountMatch = order.total >= filters.minAmount && 
+        (filters.maxAmount === Infinity || order.total <= filters.maxAmount);
+
+      const dateRangeMatch = (!filters.startDate || orderDate >= new Date(filters.startDate)) &&
+        (!filters.endDate || orderDate <= new Date(filters.endDate));
+
+      const productMatch = filters.productId === 'all' || order.productId === filters.productId;
+
+      return !order.isPaid && 
         searchString.includes(searchTerm.toLowerCase()) &&
-        dateMatch
-      ) {
-        if (!acc[customerName]) {
-          acc[customerName] = {
-            orders: [],
-            totalAmount: 0,
-            totalQRAmount: 0,
-          };
-        }
-        acc[customerName].orders.push(order);
-        acc[customerName].totalAmount += order.total;
-        if (order.paidWithQR) {
-          acc[customerName].totalQRAmount += order.total;
-        }
+        dateMatch &&
+        paymentStatusMatch &&
+        amountMatch &&
+        dateRangeMatch &&
+        productMatch;
+    })
+    .reduce((acc, order) => {
+      const customerName = order.customerName || "Anonymous";
+      
+      if (!acc[customerName]) {
+        acc[customerName] = {
+          orders: [],
+          totalAmount: 0,
+          totalQRAmount: 0,
+        };
+      }
+      acc[customerName].orders.push(order);
+      acc[customerName].totalAmount += order.total;
+      if (order.paidWithQR) {
+        acc[customerName].totalQRAmount += order.total;
       }
       return acc;
     }, {} as GroupedOrders);
