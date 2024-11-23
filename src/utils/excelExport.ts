@@ -20,25 +20,13 @@ export const exportToExcel = (
   totalExpenses: number,
   openingBalance: number
 ) => {
-  // Create workbook and worksheet
   const wb = XLSX.utils.book_new();
   
-  // Common styles
+  // Styles
   const headerStyle = { 
-    font: { bold: true, sz: 24 },
+    font: { bold: true, sz: 24, color: { rgb: "FFFFFF" } },
     alignment: { horizontal: 'center', vertical: 'center' },
-    fill: { fgColor: { rgb: "E6F3F7" } },  // Light blue background
-    border: {
-      top: { style: 'thin' },
-      bottom: { style: 'thin' },
-      left: { style: 'thin' },
-      right: { style: 'thin' }
-    }
-  };
-
-  const subHeaderStyle = {
-    font: { sz: 12 },
-    alignment: { horizontal: 'right', vertical: 'center' },
+    fill: { fgColor: { rgb: "000000" } },
     border: {
       top: { style: 'thin' },
       bottom: { style: 'thin' },
@@ -49,53 +37,50 @@ export const exportToExcel = (
 
   const tableHeaderStyle = {
     font: { bold: true, color: { rgb: "FFFFFF" } },
-    fill: { fgColor: { rgb: "000000" } },
+    fill: { fgColor: { rgb: "2563EB" } },
     alignment: { horizontal: 'center', vertical: 'center' },
-    border: {
-      top: { style: 'thin' },
-      bottom: { style: 'thin' },
-      left: { style: 'thin' },
-      right: { style: 'thin' }
-    }
+    border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
   };
 
   const cellStyle = {
     alignment: { horizontal: 'center', vertical: 'center' },
-    border: {
-      top: { style: 'thin' },
-      bottom: { style: 'thin' },
-      left: { style: 'thin' },
-      right: { style: 'thin' }
-    }
+    border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
   };
 
   const summaryStyle = {
-    font: { bold: true },
+    font: { bold: true, sz: 12 },
     alignment: { horizontal: 'right', vertical: 'center' },
-    border: {
-      top: { style: 'thin' },
-      bottom: { style: 'thin' },
-      left: { style: 'thin' },
-      right: { style: 'thin' }
-    }
+    fill: { fgColor: { rgb: "F3F4F6" } },
+    border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
   };
 
+  const footerStyle = {
+    font: { italic: true, sz: 10 },
+    alignment: { horizontal: 'center', vertical: 'center' },
+    fill: { fgColor: { rgb: "F9FAFB" } }
+  };
+
+  // Calculate totals for summary
+  const totalQuantity = productTotals.reduce((sum, p) => sum + p.quantity, 0);
+  const totalSales = productTotals.reduce((sum, p) => sum + p.amount, 0);
+  const totalPaidQR = productTotals.reduce((sum, p) => sum + p.paidWithQR, 0);
+  const totalUnpaid = productTotals.reduce((sum, p) => sum + p.unpaid, 0);
+  const totalUnpaidToPaidQR = productTotals.reduce((sum, p) => sum + p.unpaidToPaidQR, 0);
+  const cashInCounter = totalSales - totalPaidQR - totalUnpaid + totalUnpaidToPaidQR;
+
+  // Create worksheet data
   const ws = XLSX.utils.aoa_to_sheet([
-    [{ 
-      v: 'Neelkantha Meat Shop', 
-      t: 's',
-      s: headerStyle
-    }],
+    [{ v: 'Neelkantha Meat Shop', t: 's', s: headerStyle }],
     [''], // Spacing
     [{ 
       v: timeFilter === "date-range" && startDate && endDate 
         ? `Date Range: ${format(new Date(startDate), 'MMM dd, yyyy')} to ${format(new Date(endDate), 'MMM dd, yyyy')}`
         : `Report Date: ${format(new Date(), 'MMM dd, yyyy')}`,
       t: 's',
-      s: subHeaderStyle
+      s: footerStyle
     }],
     [''], // Spacing
-    // Table headers
+    // Table headers with style
     [
       { v: 'Products', t: 's', s: tableHeaderStyle },
       { v: 'Quantity Sold', t: 's', s: tableHeaderStyle },
@@ -107,26 +92,35 @@ export const exportToExcel = (
     // Product rows
     ...productTotals.map(product => [
       { v: product.name, t: 's', s: cellStyle },
-      { v: product.quantity, t: 'n', z: '#,##0.00', s: cellStyle },
+      { v: product.quantity, t: 'n', z: '#,##0', s: cellStyle },
       { v: product.amount, t: 'n', z: '#,##0.00', s: cellStyle },
       { v: product.paidWithQR, t: 'n', z: '#,##0.00', s: cellStyle },
       { v: product.unpaid, t: 'n', z: '#,##0.00', s: cellStyle },
       { v: product.unpaidToPaidQR, t: 'n', z: '#,##0.00', s: cellStyle }
     ]),
-    [''], // Spacing
+    [''], // Spacing before summary
     // Summary section
     [
+      { v: 'Summary', t: 's', s: summaryStyle },
+      { v: totalQuantity, t: 'n', z: '#,##0', s: summaryStyle },
+      { v: totalSales, t: 'n', z: '#,##0.00', s: summaryStyle },
+      { v: totalPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle },
+      { v: totalUnpaid, t: 'n', z: '#,##0.00', s: summaryStyle },
+      { v: totalUnpaidToPaidQR, t: 'n', z: '#,##0.00', s: summaryStyle }
+    ],
+    [''], // Spacing before financial summary
+    // Financial summary
+    [
       { v: 'Opening Balance:', t: 's', s: summaryStyle },
-      { v: openingBalance, t: 'n', z: '#,##0.00', s: cellStyle }
+      { v: openingBalance, t: 'n', z: '#,##0.00', s: summaryStyle }
     ],
     [
       { v: 'Total Expenses:', t: 's', s: summaryStyle },
-      { 
-        v: totalExpenses, 
-        t: 'n', 
-        z: '#,##0.00', 
-        s: { ...cellStyle, font: { color: { rgb: "FF0000" } } }
-      }
+      { v: totalExpenses, t: 'n', z: '#,##0.00', s: { ...summaryStyle, font: { ...summaryStyle.font, color: { rgb: "FF0000" } } } }
+    ],
+    [
+      { v: 'Cash in Counter:', t: 's', s: summaryStyle },
+      { v: cashInCounter, t: 'n', z: '#,##0.00', s: summaryStyle }
     ],
     [
       { v: 'Net Profit:', t: 's', s: summaryStyle },
@@ -135,11 +129,23 @@ export const exportToExcel = (
         t: 'n',
         z: '#,##0.00',
         s: { 
-          ...cellStyle,
-          font: { color: { rgb: netProfit >= 0 ? "008000" : "FF0000" } }
+          ...summaryStyle,
+          font: { ...summaryStyle.font, color: { rgb: netProfit >= 0 ? "008000" : "FF0000" } }
         }
       }
-    ]
+    ],
+    [''], // Spacing before footer
+    // Footer
+    [{ 
+      v: `Generated on ${format(new Date(), 'MMMM dd, yyyy HH:mm:ss')}`,
+      t: 's',
+      s: footerStyle
+    }],
+    [{ 
+      v: 'Neelkantha Meat Shop - Financial Report',
+      t: 's',
+      s: { ...footerStyle, font: { bold: true, sz: 11 } }
+    }]
   ]);
 
   // Set column widths
@@ -152,10 +158,12 @@ export const exportToExcel = (
     { wch: 25 }, // Unpaid to QR
   ];
 
-  // Merge cells for header
+  // Merge cells for header and footer
   ws['!merges'] = [
     { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } }, // Shop name
     { s: { r: 2, c: 0 }, e: { r: 2, c: 5 } }, // Date range
+    { s: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 2, c: 0 }, e: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 2, c: 5 } }, // Generated on
+    { s: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 1, c: 0 }, e: { r: ws["!ref"].split(":")[1].replace(/[A-Z]/g, "") - 1, c: 5 } }  // Shop name in footer
   ];
 
   // Add worksheet to workbook
