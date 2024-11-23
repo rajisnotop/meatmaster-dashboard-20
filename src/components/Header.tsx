@@ -23,9 +23,9 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 glass-effect py-3">
+    <header className="sticky top-0 z-50 glass-effect py-4">
       <div className="container mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon" className="hover:bg-primary/20 hover:text-primary">
@@ -49,12 +49,12 @@ const Header = () => {
           
           <Link 
             to="/" 
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-4 hover:opacity-80 transition-opacity"
           >
             <img 
               src="https://i.imgur.com/F4KFQkf.png" 
               alt="Neelkantha Meat Shop Logo" 
-              className="h-12 w-12 object-contain rounded-full" 
+              className="h-16 w-16 object-contain rounded-full shadow-lg" 
             />
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Neelkantha Meat Shop
