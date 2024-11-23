@@ -54,7 +54,7 @@ const Header = () => {
             <img 
               src="/logo.png" 
               alt="Neelkantha Meat Shop Logo" 
-              className="h-12 w-12 object-contain" 
+              className="h-12 w-12 object-contain rounded-full" 
             />
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               Neelkantha Meat Shop
