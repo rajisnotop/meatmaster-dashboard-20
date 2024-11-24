@@ -1,11 +1,7 @@
-import { Client } from "@notionhq/client";
 import { format } from "date-fns";
 
-const notion = new Client({
-  auth: 'ntn_i890264361322cPgu4MncdjNyj4owiJPcm92mjX0MJW1DP'
-});
-
-const DATABASE_ID = 'c851c31aedd749c0953b9048fa9f5a25';
+// Replace this URL with your actual Make (Integromat) webhook URL
+const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/your-webhook-id';
 
 export const exportToNotion = async (
   productTotals: any[],
@@ -15,117 +11,37 @@ export const exportToNotion = async (
   netAmount: number
 ) => {
   try {
-    const response = await notion.pages.create({
-      parent: {
-        database_id: DATABASE_ID,
+    const data = {
+      title: `Daily Sales Report - ${format(new Date(), 'yyyy-MM-dd')}`,
+      productData: productTotals.map(product => ({
+        name: String(product.name),
+        quantity: String(product.quantity.toFixed(2)),
+        amount: String(product.amount.toLocaleString()),
+        paidWithQR: String((product.paidWithQR || 0).toLocaleString()),
+        unpaid: String((product.unpaid || 0).toLocaleString()),
+        unpaidToPaidQR: String((product.unpaidToPaidQR || 0).toLocaleString())
+      })),
+      summary: {
+        expenses: totalExpenses.toLocaleString(),
+        openingBalance: openingBalance.toLocaleString(),
+        cashInCounter: cashInCounter.toLocaleString(),
+        netAmount: netAmount.toLocaleString()
+      }
+    };
+
+    const response = await fetch(MAKE_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      properties: {
-        title: {
-          title: [
-            {
-              text: {
-                content: `Daily Sales Report - ${format(new Date(), 'yyyy-MM-dd')}`,
-              },
-            },
-          ],
-        },
-      },
-      children: [
-        {
-          object: 'block',
-          type: 'table',
-          table: {
-            table_width: 6,
-            has_column_header: true,
-            has_row_header: false,
-            children: [
-              {
-                type: 'table_row' as const,
-                table_row: {
-                  cells: [
-                    [{ type: 'text' as const, text: { content: 'Product' } }],
-                    [{ type: 'text' as const, text: { content: 'Quantity Sold' } }],
-                    [{ type: 'text' as const, text: { content: 'Total Sales' } }],
-                    [{ type: 'text' as const, text: { content: 'Paid (QR)' } }],
-                    [{ type: 'text' as const, text: { content: 'Unpaid to Paid' } }],
-                    [{ type: 'text' as const, text: { content: 'Unpaid to Paid (QR)' } }],
-                  ],
-                },
-              },
-              ...productTotals.map(product => ({
-                type: 'table_row' as const,
-                table_row: {
-                  cells: [
-                    [{ type: 'text' as const, text: { content: String(product.name) } }],
-                    [{ type: 'text' as const, text: { content: String(product.quantity.toFixed(2)) } }],
-                    [{ type: 'text' as const, text: { content: String(product.amount.toLocaleString()) } }],
-                    [{ type: 'text' as const, text: { content: String((product.paidWithQR || 0).toLocaleString()) } }],
-                    [{ type: 'text' as const, text: { content: String((product.unpaid || 0).toLocaleString()) } }],
-                    [{ type: 'text' as const, text: { content: String((product.unpaidToPaidQR || 0).toLocaleString()) } }],
-                  ],
-                },
-              })),
-            ],
-          },
-        },
-        {
-          object: 'block',
-          type: 'heading_2',
-          heading_2: {
-            rich_text: [{ type: 'text' as const, text: { content: 'Summary' } }],
-          },
-        },
-        {
-          object: 'block',
-          type: 'table',
-          table: {
-            table_width: 2,
-            has_column_header: false,
-            has_row_header: false,
-            children: [
-              {
-                type: 'table_row' as const,
-                table_row: {
-                  cells: [
-                    [{ type: 'text' as const, text: { content: 'Expenses' } }],
-                    [{ type: 'text' as const, text: { content: String(totalExpenses.toLocaleString()) } }],
-                  ],
-                },
-              },
-              {
-                type: 'table_row' as const,
-                table_row: {
-                  cells: [
-                    [{ type: 'text' as const, text: { content: 'Opening Balance' } }],
-                    [{ type: 'text' as const, text: { content: String(openingBalance.toLocaleString()) } }],
-                  ],
-                },
-              },
-              {
-                type: 'table_row' as const,
-                table_row: {
-                  cells: [
-                    [{ type: 'text' as const, text: { content: 'Cash in Counter' } }],
-                    [{ type: 'text' as const, text: { content: String(cashInCounter.toLocaleString()) } }],
-                  ],
-                },
-              },
-              {
-                type: 'table_row' as const,
-                table_row: {
-                  cells: [
-                    [{ type: 'text' as const, text: { content: 'Net Amount' } }],
-                    [{ type: 'text' as const, text: { content: String(netAmount.toLocaleString()) } }],
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      ],
+      body: JSON.stringify(data)
     });
 
-    return response;
+    if (!response.ok) {
+      throw new Error('Failed to export to Notion');
+    }
+
+    return response.json();
   } catch (error) {
     console.error('Error exporting to Notion:', error);
     throw error;
