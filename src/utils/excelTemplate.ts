@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { createExcelStyles } from "./excelStyles";
 
 export const generateExcelTemplate = (
   productTotals: any[],
