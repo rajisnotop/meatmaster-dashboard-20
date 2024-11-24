@@ -16,6 +16,8 @@ interface StoreState {
   getSuppliesExpenses: () => number;
   getCashExpenses: () => number;
   getOnlineExpenses: () => number;
+  setOrders: (orders: Order[]) => void;
+  setExpenses: (expenses: Expense[]) => void;
 }
 
 export const useStore = create<StoreState>()(
@@ -96,6 +98,8 @@ export const useStore = create<StoreState>()(
             .filter(expense => expense.paymentMethod === "online")
             .reduce((sum, expense) => sum + expense.amount, 0);
         },
+        setOrders: (orders) => set({ orders }),
+        setExpenses: (expenses) => set({ expenses }),
       }),
       {
         name: 'meat-shop-storage',
