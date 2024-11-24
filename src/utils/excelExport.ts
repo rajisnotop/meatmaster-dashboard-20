@@ -10,7 +10,10 @@ export const previewExcelTemplate = (
   endDate: string | null,
   netAmount: number,
   totalExpenses: number,
-  openingBalance: number
+  openingBalance: number,
+  suppliesExpenses: number = 0,
+  cashInCounter: number = 0,
+  cashInBank: number = 0
 ) => {
   try {
     const html = generateExcelTemplate(
@@ -20,7 +23,10 @@ export const previewExcelTemplate = (
       endDate,
       netAmount,
       totalExpenses,
-      openingBalance
+      openingBalance,
+      suppliesExpenses,
+      cashInCounter,
+      cashInBank
     );
 
     const previewWindow = window.open('', '_blank');
