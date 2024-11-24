@@ -7,7 +7,7 @@ interface PrintHeaderProps {
 const PrintHeader = ({ date }: PrintHeaderProps) => `
   <div class="header">
     <div class="logo-section">
-      <img src="/logo.png" alt="Logo" class="logo">
+      <img src="https://i.imgur.com/2IkqsVA.png" alt="Logo" class="logo">
       <div class="company-info">
         <h1 class="company-title">Neelkantha Meat Shop</h1>
         <p class="company-subtitle">Quality Meat Products</p>
