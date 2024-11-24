@@ -43,12 +43,12 @@ export const exportToNotion = async (
                 type: 'table_row',
                 table_row: {
                   cells: [
-                    [{ type: 'text', text: { content: 'Product' } }],
-                    [{ type: 'text', text: { content: 'Quantity Sold' } }],
-                    [{ type: 'text', text: { content: 'Total Sales' } }],
-                    [{ type: 'text', text: { content: 'Paid (QR)' } }],
-                    [{ type: 'text', text: { content: 'Unpaid to Paid' } }],
-                    [{ type: 'text', text: { content: 'Unpaid to Paid (QR)' } }],
+                    [{ type: "text", text: { content: 'Product' } }],
+                    [{ type: "text", text: { content: 'Quantity Sold' } }],
+                    [{ type: "text", text: { content: 'Total Sales' } }],
+                    [{ type: "text", text: { content: 'Paid (QR)' } }],
+                    [{ type: "text", text: { content: 'Unpaid to Paid' } }],
+                    [{ type: "text", text: { content: 'Unpaid to Paid (QR)' } }],
                   ],
                 },
               },
@@ -56,12 +56,12 @@ export const exportToNotion = async (
                 type: 'table_row',
                 table_row: {
                   cells: [
-                    [{ text: { content: product.name, link: null }, type: 'text' }],
-                    [{ text: { content: product.quantity.toFixed(2), link: null }, type: 'text' }],
-                    [{ text: { content: product.amount.toLocaleString(), link: null }, type: 'text' }],
-                    [{ text: { content: (product.paidWithQR || 0).toLocaleString(), link: null }, type: 'text' }],
-                    [{ text: { content: (product.unpaid || 0).toLocaleString(), link: null }, type: 'text' }],
-                    [{ text: { content: (product.unpaidToPaidQR || 0).toLocaleString(), link: null }, type: 'text' }],
+                    [{ type: "text", text: { content: product.name } }],
+                    [{ type: "text", text: { content: product.quantity.toFixed(2) } }],
+                    [{ type: "text", text: { content: product.amount.toLocaleString() } }],
+                    [{ type: "text", text: { content: (product.paidWithQR || 0).toLocaleString() } }],
+                    [{ type: "text", text: { content: (product.unpaid || 0).toLocaleString() } }],
+                    [{ type: "text", text: { content: (product.unpaidToPaidQR || 0).toLocaleString() } }],
                   ],
                 },
               })),
@@ -72,7 +72,7 @@ export const exportToNotion = async (
           object: 'block',
           type: 'heading_2',
           heading_2: {
-            rich_text: [{ type: 'text', text: { content: 'Summary' } }],
+            rich_text: [{ type: "text", text: { content: 'Summary' } }],
           },
         },
         {
@@ -87,8 +87,8 @@ export const exportToNotion = async (
                 type: 'table_row',
                 table_row: {
                   cells: [
-                    [{ text: { content: 'Expenses', link: null }, type: 'text' }],
-                    [{ text: { content: totalExpenses.toLocaleString(), link: null }, type: 'text' }],
+                    [{ type: "text", text: { content: 'Expenses' } }],
+                    [{ type: "text", text: { content: totalExpenses.toLocaleString() } }],
                   ],
                 },
               },
@@ -96,8 +96,8 @@ export const exportToNotion = async (
                 type: 'table_row',
                 table_row: {
                   cells: [
-                    [{ text: { content: 'Opening Balance', link: null }, type: 'text' }],
-                    [{ text: { content: openingBalance.toLocaleString(), link: null }, type: 'text' }],
+                    [{ type: "text", text: { content: 'Opening Balance' } }],
+                    [{ type: "text", text: { content: openingBalance.toLocaleString() } }],
                   ],
                 },
               },
@@ -105,8 +105,8 @@ export const exportToNotion = async (
                 type: 'table_row',
                 table_row: {
                   cells: [
-                    [{ text: { content: 'Cash in Counter', link: null }, type: 'text' }],
-                    [{ text: { content: cashInCounter.toLocaleString(), link: null }, type: 'text' }],
+                    [{ type: "text", text: { content: 'Cash in Counter' } }],
+                    [{ type: "text", text: { content: cashInCounter.toLocaleString() } }],
                   ],
                 },
               },
@@ -114,8 +114,8 @@ export const exportToNotion = async (
                 type: 'table_row',
                 table_row: {
                   cells: [
-                    [{ text: { content: 'Net Amount', link: null }, type: 'text' }],
-                    [{ text: { content: netAmount.toLocaleString(), link: null }, type: 'text' }],
+                    [{ type: "text", text: { content: 'Net Amount' } }],
+                    [{ type: "text", text: { content: netAmount.toLocaleString() } }],
                   ],
                 },
               },
