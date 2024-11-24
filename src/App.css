@@ -60,3 +60,21 @@
   z-index: 1000 !important;
   position: relative !important;
 }
+
+/* Fix select dropdown positioning */
+[data-radix-select-content] {
+  position: fixed !important;
+  z-index: 9999 !important;
+  background: var(--background) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  margin-top: 4px !important;
+  overflow: hidden !important;
+}
+
+/* Ensure proper stacking context for dropdown triggers */
+[data-radix-select-trigger] {
+  position: relative !important;
+  z-index: 1 !important;
+}
