@@ -53,3 +53,10 @@
   border-radius: 6px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+/* Ensure dropdowns are always on top and properly positioned */
+[role="menu"],
+[role="listbox"] {
+  z-index: 1000 !important;
+  position: relative !important;
+}

@@ -8,23 +8,30 @@ export const exportToExcel = (
   endDate: string | null,
   netAmount: number,
   totalExpenses: number,
-  openingBalance: number,
-  suppliesExpenses: number = 0,
-  cashInCounter: number = 0,
-  cashInBank: number = 0
+  openingBalance: number
 ) => {
-  // Create workbook and worksheet
+  // Create workbook
   const wb = XLSX.utils.book_new();
   
-  // Prepare data for the main table
-  const tableData = productTotals.map(product => ({
-    'Product Name': product.name,
-    'Quantity Sold': product.quantity.toFixed(2),
-    'Total Sales (NPR)': product.amount,
-    'Paid with QR (NPR)': product.paidWithQR || 0,
-    'Unpaid to Paid (NPR)': product.unpaid || 0,
-    'Unpaid to Paid QR (NPR)': product.unpaidToPaidQR || 0
-  }));
+  // Create header rows
+  const headerRows = [
+    ["Neelkantha Meat Shop"],
+    ["Bill"],
+    [`Date: ${format(new Date(), 'yyyy-MM-dd')}`],
+    [],
+    ["S.N", "Product", "Quantity", "Sales", "Paid (QR)", "Unpaid to Paid", "Unpaid to Paid(QR)"]
+  ];
+
+  // Prepare product data
+  const productData = productTotals.map((product, index) => [
+    index + 1,
+    product.name,
+    product.quantity.toFixed(2),
+    product.amount,
+    product.paidWithQR || 0,
+    product.unpaid || 0,
+    product.unpaidToPaidQR || 0
+  ]);
 
   // Calculate totals
   const totals = productTotals.reduce((acc, curr) => ({
@@ -36,36 +43,59 @@ export const exportToExcel = (
   }), { quantity: 0, sales: 0, paidQR: 0, unpaid: 0, unpaidQR: 0 });
 
   // Add totals row
-  tableData.push({
-    'Product Name': 'TOTAL',
-    'Quantity Sold': totals.quantity.toFixed(2),
-    'Total Sales (NPR)': totals.sales,
-    'Paid with QR (NPR)': totals.paidQR,
-    'Unpaid to Paid (NPR)': totals.unpaid,
-    'Unpaid to Paid QR (NPR)': totals.unpaidQR
-  });
-
-  // Add summary data
-  const summaryData = [
-    ['Financial Summary', ''],
-    ['Opening Balance', openingBalance],
-    ['Total Expenses', totalExpenses],
-    ['Supplies Expenses', suppliesExpenses],
-    ['Cash in Counter', cashInCounter],
-    ['Cash in Bank', cashInBank],
-    ['Net Amount', netAmount]
+  const totalsRow = [
+    "Total",
+    "",
+    totals.quantity.toFixed(2),
+    totals.sales,
+    totals.paidQR,
+    totals.unpaid,
+    totals.unpaidQR
   ];
 
-  // Create worksheets
-  const ws1 = XLSX.utils.json_to_sheet(tableData);
-  const ws2 = XLSX.utils.aoa_to_sheet(summaryData);
+  // Add summary section
+  const summaryRows = [
+    ["", "", "", "", "Expenses", ""],
+    ["", "", "", "", "Opening Balance", openingBalance],
+    ["", "", "", "", "Cash in Counter", totals.sales - totalExpenses + openingBalance],
+    ["", "", "", "", "Net Amount", netAmount]
+  ];
 
-  // Add worksheets to workbook
-  XLSX.utils.book_append_sheet(wb, ws1, 'Sales Report');
-  XLSX.utils.book_append_sheet(wb, ws2, 'Financial Summary');
+  // Combine all rows
+  const allRows = [
+    ...headerRows,
+    ...productData,
+    totalsRow,
+    [],
+    ...summaryRows
+  ];
 
-  // Generate filename based on date range
-  const fileName = `neelkantha-meat-shop-billing${
+  // Create worksheet
+  const ws = XLSX.utils.aoa_to_sheet(allRows);
+
+  // Set column widths
+  const colWidths = [
+    { wch: 5 },  // S.N
+    { wch: 20 }, // Product
+    { wch: 10 }, // Quantity
+    { wch: 12 }, // Sales
+    { wch: 12 }, // Paid QR
+    { wch: 15 }, // Unpaid to Paid
+    { wch: 18 }  // Unpaid to Paid QR
+  ];
+  ws['!cols'] = colWidths;
+
+  // Style the header
+  ws['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } }, // Merge first row for shop name
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 6 } }  // Merge second row for "Bill"
+  ];
+
+  // Add worksheet to workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Bill');
+
+  // Generate filename
+  const fileName = `neelkantha-meat-shop-bill${
     timeFilter === "date-range" && startDate && endDate 
       ? `-${format(new Date(startDate), 'yyyy-MM-dd')}-to-${format(new Date(endDate), 'yyyy-MM-dd')}` 
       : `-${timeFilter}-${format(new Date(), 'yyyy-MM-dd')}`
