@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Printer, FileSpreadsheet } from "lucide-react";
+import { Calendar as CalendarIcon, Printer, FileSpreadsheet, Database } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +18,8 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import DateRangeSelector from "./DateRangeSelector";
+import { toast } from "sonner";
+import { exportToNotion } from "@/utils/notionExport";
 
 interface BillingHeaderProps {
   timeFilter: string;
@@ -31,6 +33,11 @@ interface BillingHeaderProps {
   endDate: string | null;
   setStartDate: (date: string | null) => void;
   setEndDate: (date: string | null) => void;
+  productTotals: any[];
+  totalExpenses: number;
+  openingBalance: number;
+  cashInCounter: number;
+  netProfit: number;
 }
 
 const BillingHeader = ({
@@ -45,12 +52,36 @@ const BillingHeader = ({
   endDate,
   setStartDate,
   setEndDate,
+  productTotals,
+  totalExpenses,
+  openingBalance,
+  cashInCounter,
+  netProfit,
 }: BillingHeaderProps) => {
+  const handleNotionExport = async () => {
+    try {
+      await exportToNotion(
+        productTotals,
+        totalExpenses,
+        openingBalance,
+        cashInCounter,
+        netProfit
+      );
+      toast.success("Successfully exported to Notion");
+    } catch (error) {
+      toast.error("Failed to export to Notion");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Billing Summary</h1>
         <div className="flex gap-3">
+          <Button onClick={handleNotionExport} variant="outline" className="gap-2">
+            <Database className="h-4 w-4" />
+            Export to Notion
+          </Button>
           <Button onClick={onExportExcel} variant="outline" className="gap-2">
             <FileSpreadsheet className="h-4 w-4" />
             Export Excel

@@ -43,6 +43,7 @@ const Billing = () => {
   const filteredExpenses = expenses.filter((expense) => filterData(new Date(expense.date)));
   const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   const netProfit = overallTotals.sales + overallTotals.paidWithQR + overallTotals.unpaid + overallTotals.unpaidToPaidQR - totalExpenses;
+  const cashInCounter = (overallTotals.sales || 0) - (totalExpenses || 0) + (openingBalance || 0);
 
   const handleExportExcel = () => {
     try {
@@ -104,6 +105,11 @@ const Billing = () => {
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            productTotals={productTotals}
+            totalExpenses={totalExpenses}
+            openingBalance={openingBalance}
+            cashInCounter={cashInCounter}
+            netProfit={netProfit}
           />
           <div className="mt-8">
             <BillingTable
