@@ -40,6 +40,7 @@ export const exportToNotion = async (
             has_row_header: false,
             children: [
               {
+                object: 'block',
                 type: 'table_row',
                 table_row: {
                   cells: [
@@ -53,15 +54,16 @@ export const exportToNotion = async (
                 },
               },
               ...productTotals.map(product => ({
+                object: 'block',
                 type: 'table_row',
                 table_row: {
                   cells: [
-                    [{ type: "text", text: { content: product.name } }],
-                    [{ type: "text", text: { content: product.quantity.toFixed(2) } }],
-                    [{ type: "text", text: { content: product.amount.toLocaleString() } }],
-                    [{ type: "text", text: { content: (product.paidWithQR || 0).toLocaleString() } }],
-                    [{ type: "text", text: { content: (product.unpaid || 0).toLocaleString() } }],
-                    [{ type: "text", text: { content: (product.unpaidToPaidQR || 0).toLocaleString() } }],
+                    [{ type: "text", text: { content: String(product.name) } }],
+                    [{ type: "text", text: { content: String(product.quantity.toFixed(2)) } }],
+                    [{ type: "text", text: { content: String(product.amount.toLocaleString()) } }],
+                    [{ type: "text", text: { content: String((product.paidWithQR || 0).toLocaleString()) } }],
+                    [{ type: "text", text: { content: String((product.unpaid || 0).toLocaleString()) } }],
+                    [{ type: "text", text: { content: String((product.unpaidToPaidQR || 0).toLocaleString()) } }],
                   ],
                 },
               })),
@@ -84,38 +86,42 @@ export const exportToNotion = async (
             has_row_header: false,
             children: [
               {
+                object: 'block',
                 type: 'table_row',
                 table_row: {
                   cells: [
                     [{ type: "text", text: { content: 'Expenses' } }],
-                    [{ type: "text", text: { content: totalExpenses.toLocaleString() } }],
+                    [{ type: "text", text: { content: String(totalExpenses.toLocaleString()) } }],
                   ],
                 },
               },
               {
+                object: 'block',
                 type: 'table_row',
                 table_row: {
                   cells: [
                     [{ type: "text", text: { content: 'Opening Balance' } }],
-                    [{ type: "text", text: { content: openingBalance.toLocaleString() } }],
+                    [{ type: "text", text: { content: String(openingBalance.toLocaleString()) } }],
                   ],
                 },
               },
               {
+                object: 'block',
                 type: 'table_row',
                 table_row: {
                   cells: [
                     [{ type: "text", text: { content: 'Cash in Counter' } }],
-                    [{ type: "text", text: { content: cashInCounter.toLocaleString() } }],
+                    [{ type: "text", text: { content: String(cashInCounter.toLocaleString()) } }],
                   ],
                 },
               },
               {
+                object: 'block',
                 type: 'table_row',
                 table_row: {
                   cells: [
                     [{ type: "text", text: { content: 'Net Amount' } }],
-                    [{ type: "text", text: { content: netAmount.toLocaleString() } }],
+                    [{ type: "text", text: { content: String(netAmount.toLocaleString()) } }],
                   ],
                 },
               },
