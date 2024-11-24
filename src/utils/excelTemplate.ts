@@ -8,7 +8,10 @@ export const generateExcelTemplate = (
   endDate: string | null,
   netAmount: number,
   totalExpenses: number,
-  openingBalance: number
+  openingBalance: number,
+  suppliesExpenses: number,
+  cashInCounter: number,
+  cashInBank: number
 ) => {
   const currentDate = new Date();
   const dateRange = timeFilter === "date-range" && startDate && endDate
@@ -95,6 +98,18 @@ export const generateExcelTemplate = (
               <div class="summary-value">NPR ${totalExpenses.toLocaleString()}</div>
             </div>
             <div class="summary-item">
+              <div class="summary-label">Supplies Expenses</div>
+              <div class="summary-value">NPR ${suppliesExpenses.toLocaleString()}</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">Cash in Counter</div>
+              <div class="summary-value">NPR ${cashInCounter.toLocaleString()}</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">Cash in Bank</div>
+              <div class="summary-value">NPR ${cashInBank.toLocaleString()}</div>
+            </div>
+            <div class="summary-item">
               <div class="summary-label">Net Amount</div>
               <div class="summary-value">NPR ${netAmount.toLocaleString()}</div>
             </div>
@@ -104,22 +119,6 @@ export const generateExcelTemplate = (
         <div class="footer">
           <p>Generated on ${format(currentDate, "MMMM dd, yyyy 'at' hh:mm a")}</p>
           <p>Neelkantha Meat Shop | <a href="https://neelkanthameat.netlify.com" class="website">www.neelkanthameat.netlify.com</a></p>
-        </div>
-
-        <div class="export-buttons">
-          <button onclick="window.print()" class="export-button">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 8.5h-9v-6h9v6zm0-6h-9v-1.5h9v1.5zm-9 7.5h9v4.5h-9v-4.5z" fill="currentColor"/>
-            </svg>
-            Print Preview
-          </button>
-          <button onclick="window.exportToExcel()" class="export-button">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3.5 2v11h8V2h-8zm7 10h-6V3h6v9z" fill="currentColor"/>
-              <path d="M5 4h5v1H5V4zm0 2h5v1H5V6zm0 2h5v1H5V8zm0 2h3v1H5v-1z" fill="currentColor"/>
-            </svg>
-            Export to Excel
-          </button>
         </div>
       </body>
     </html>

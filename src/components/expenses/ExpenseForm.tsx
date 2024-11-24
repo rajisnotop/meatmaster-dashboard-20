@@ -28,6 +28,7 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
   category: z.string().min(1, "Category is required"),
+  paymentMethod: z.enum(["cash", "online"]),
 });
 
 const categories = [
@@ -51,6 +52,7 @@ const ExpenseForm = () => {
       description: "",
       date: new Date().toISOString().split("T")[0],
       category: "",
+      paymentMethod: "cash",
     },
   });
 
@@ -60,6 +62,7 @@ const ExpenseForm = () => {
       description: values.description,
       date: new Date(values.date),
       category: values.category,
+      paymentMethod: values.paymentMethod,
     });
 
     toast({
@@ -72,6 +75,7 @@ const ExpenseForm = () => {
       description: "",
       date: new Date().toISOString().split("T")[0],
       category: "",
+      paymentMethod: "cash",
     });
   };
 
@@ -140,6 +144,28 @@ const ExpenseForm = () => {
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="paymentMethod"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Payment Method</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select payment method" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="bg-background">
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="online">Online Pay</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

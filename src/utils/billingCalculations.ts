@@ -63,3 +63,31 @@ export const calculateOverallTotals = (productTotals: any[]) => {
     unpaidToPaidQR: productTotals.reduce((sum, product) => sum + product.unpaidToPaidQR, 0),
   };
 };
+
+export const calculateFinancialSummary = (
+  overallTotals: any,
+  totalExpenses: number,
+  openingBalance: number,
+  cashExpenses: number,
+  onlineExpenses: number
+) => {
+  const netAmount = overallTotals.sales + 
+                   overallTotals.paidWithQR + 
+                   overallTotals.unpaid + 
+                   overallTotals.unpaidToPaidQR + 
+                   openingBalance - 
+                   totalExpenses;
+
+  const cashInCounter = overallTotals.sales + 
+                       overallTotals.unpaid - 
+                       cashExpenses;
+
+  const cashInBank = overallTotals.paidWithQR - 
+                    onlineExpenses;
+
+  return {
+    netAmount,
+    cashInCounter,
+    cashInBank
+  };
+};

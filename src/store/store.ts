@@ -13,12 +13,15 @@ interface StoreState {
   updateOrderStatus: (id: string, isPaid: boolean, paidWithQR?: boolean) => void;
   addExpense: (expense: Omit<Expense, 'id'>) => void;
   deleteExpense: (id: string) => void;
+  getSuppliesExpenses: () => number;
+  getCashExpenses: () => number;
+  getOnlineExpenses: () => number;
 }
 
 export const useStore = create<StoreState>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
         products: [],
         orders: [],
         expenses: [],
@@ -75,6 +78,24 @@ export const useStore = create<StoreState>()(
           set((state) => ({
             expenses: state.expenses.filter((expense) => expense.id !== id),
           })),
+        getSuppliesExpenses: () => {
+          const expenses = get().expenses;
+          return expenses
+            .filter(expense => expense.category === "Supplies")
+            .reduce((sum, expense) => sum + expense.amount, 0);
+        },
+        getCashExpenses: () => {
+          const expenses = get().expenses;
+          return expenses
+            .filter(expense => expense.paymentMethod === "cash")
+            .reduce((sum, expense) => sum + expense.amount, 0);
+        },
+        getOnlineExpenses: () => {
+          const expenses = get().expenses;
+          return expenses
+            .filter(expense => expense.paymentMethod === "online")
+            .reduce((sum, expense) => sum + expense.amount, 0);
+        },
       }),
       {
         name: 'meat-shop-storage',
