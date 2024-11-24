@@ -110,15 +110,22 @@ const BillingTable = ({
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-300">Cash in Counter</span>
+              <div className="flex items-center gap-2">
+                {cashInCounter >= 0 ? (
+                  <ArrowUpIcon className="h-4 w-4 text-green-400" />
+                ) : (
+                  <ArrowDownIcon className="h-4 w-4 text-red-400" />
+                )}
+                <span className="font-semibold text-white">
+                  NPR {cashInCounter.toLocaleString()}
+                </span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
               <span className="text-sm text-gray-300">Total Sales</span>
               <span className="font-semibold text-lg text-white">
                 NPR {(overallTotals.sales || 0).toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-300">Quantity Sold</span>
-              <span className="font-medium text-white">
-                {(overallTotals.quantity || 0).toFixed(2)}
               </span>
             </div>
           </div>
@@ -175,19 +182,6 @@ const BillingTable = ({
             <Calculator className="h-5 w-5 text-green-400" />
           </div>
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-300">Cash in Counter</span>
-              <div className="flex items-center gap-2">
-                {cashInCounter >= 0 ? (
-                  <ArrowUpIcon className="h-4 w-4 text-green-400" />
-                ) : (
-                  <ArrowDownIcon className="h-4 w-4 text-red-400" />
-                )}
-                <span className="font-semibold text-white">
-                  NPR {cashInCounter.toLocaleString()}
-                </span>
-              </div>
-            </div>
             <div className="flex justify-between items-center pt-2 border-t border-green-700">
               <span className="text-sm text-gray-300">Net Amount</span>
               <div className="flex items-center gap-2">
