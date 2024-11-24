@@ -49,6 +49,7 @@ export const exportToCoda = async (
       throw new Error('No response from Coda API');
     }
 
+    console.log('Successfully exported to Coda:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error exporting to Coda:', error);
