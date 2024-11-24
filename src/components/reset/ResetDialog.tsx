@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,13 +18,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Calendar, CalendarIcon } from "lucide-react";
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, format } from "date-fns";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 interface ResetDialogProps {
   open: boolean;
@@ -32,10 +33,10 @@ interface ResetDialogProps {
 }
 
 const ResetDialog = ({ open, onOpenChange }: ResetDialogProps) => {
-  const [timeFilter, setTimeFilter] = React.useState("custom");
-  const [startDate, setStartDate] = React.useState("");
-  const [endDate, setEndDate] = React.useState("");
-  const [showConfirm, setShowConfirm] = React.useState(false);
+  const [timeFilter, setTimeFilter] = useState("custom");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
   
   const { orders, expenses, setOrders, setExpenses } = useStore();
 
@@ -121,9 +122,18 @@ const ResetDialog = ({ open, onOpenChange }: ResetDialogProps) => {
                           className="w-full bg-background pr-10"
                           max={endDate || undefined}
                         />
-                        <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer" />
                       </div>
                     </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate ? new Date(startDate) : undefined}
+                        onSelect={(date) => setStartDate(date ? format(date, 'yyyy-MM-dd') : '')}
+                        disabled={(date) => endDate ? date > new Date(endDate) : false}
+                        initialFocus
+                      />
+                    </PopoverContent>
                   </Popover>
                 </div>
                 <div className="grid w-full items-center gap-1.5">
@@ -137,9 +147,18 @@ const ResetDialog = ({ open, onOpenChange }: ResetDialogProps) => {
                           className="w-full bg-background pr-10"
                           min={startDate || undefined}
                         />
-                        <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer" />
                       </div>
                     </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate ? new Date(endDate) : undefined}
+                        onSelect={(date) => setEndDate(date ? format(date, 'yyyy-MM-dd') : '')}
+                        disabled={(date) => startDate ? date < new Date(startDate) : false}
+                        initialFocus
+                      />
+                    </PopoverContent>
                   </Popover>
                 </div>
               </div>
