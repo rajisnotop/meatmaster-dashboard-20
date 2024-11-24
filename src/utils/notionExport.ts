@@ -40,7 +40,7 @@ export const exportToNotion = async (
             has_row_header: false,
             children: [
               {
-                type: 'table_row',
+                type: 'table_row' as const,
                 table_row: {
                   cells: [
                     [{ type: 'text' as const, text: { content: 'Product' } }],
@@ -53,7 +53,7 @@ export const exportToNotion = async (
                 },
               },
               ...productTotals.map(product => ({
-                type: 'table_row',
+                type: 'table_row' as const,
                 table_row: {
                   cells: [
                     [{ type: 'text' as const, text: { content: String(product.name) } }],
@@ -84,7 +84,7 @@ export const exportToNotion = async (
             has_row_header: false,
             children: [
               {
-                type: 'table_row',
+                type: 'table_row' as const,
                 table_row: {
                   cells: [
                     [{ type: 'text' as const, text: { content: 'Expenses' } }],
@@ -93,7 +93,7 @@ export const exportToNotion = async (
                 },
               },
               {
-                type: 'table_row',
+                type: 'table_row' as const,
                 table_row: {
                   cells: [
                     [{ type: 'text' as const, text: { content: 'Opening Balance' } }],
@@ -102,7 +102,7 @@ export const exportToNotion = async (
                 },
               },
               {
-                type: 'table_row',
+                type: 'table_row' as const,
                 table_row: {
                   cells: [
                     [{ type: 'text' as const, text: { content: 'Cash in Counter' } }],
@@ -111,7 +111,7 @@ export const exportToNotion = async (
                 },
               },
               {
-                type: 'table_row',
+                type: 'table_row' as const,
                 table_row: {
                   cells: [
                     [{ type: 'text' as const, text: { content: 'Net Amount' } }],
