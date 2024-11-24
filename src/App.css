@@ -40,3 +40,16 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Fix dropdown menu styles */
+[data-radix-popper-content-wrapper] {
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+
+.dropdown-content {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}

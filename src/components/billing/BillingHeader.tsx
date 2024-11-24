@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import DateRangeSelector from "./DateRangeSelector";
 import { toast } from "sonner";
-import { exportToCoda } from "@/utils/codaExport";
 
 interface BillingHeaderProps {
   timeFilter: string;
@@ -52,36 +51,12 @@ const BillingHeader = ({
   endDate,
   setStartDate,
   setEndDate,
-  productTotals,
-  totalExpenses,
-  openingBalance,
-  cashInCounter,
-  netProfit,
 }: BillingHeaderProps) => {
-  const handleCodaExport = async () => {
-    try {
-      await exportToCoda(
-        productTotals,
-        totalExpenses,
-        openingBalance,
-        cashInCounter,
-        netProfit
-      );
-      toast.success("Successfully exported to Coda");
-    } catch (error) {
-      toast.error("Failed to export to Coda");
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Billing Summary</h1>
         <div className="flex gap-3">
-          <Button onClick={handleCodaExport} variant="outline" className="gap-2">
-            <Database className="h-4 w-4" />
-            Export to Coda
-          </Button>
           <Button onClick={onExportExcel} variant="outline" className="gap-2">
             <FileSpreadsheet className="h-4 w-4" />
             Export Excel
