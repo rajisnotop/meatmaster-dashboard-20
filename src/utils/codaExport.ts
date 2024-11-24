@@ -5,7 +5,7 @@ const DOCUMENT_ID = 'dIn4HugYZ0E';
 const TABLE_ID = 'sua2uvkF';
 
 // This should be stored in an environment variable in production
-const CODA_API_TOKEN = 'your-coda-api-token';
+const CODA_API_TOKEN = '5f10ee35-7511-4e3a-8441-0bdad2094b97';
 
 export const exportToCoda = async (
   productTotals: any[],
