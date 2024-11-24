@@ -88,20 +88,20 @@ const BillingPrintTemplate = ({
           }
           
           .date-section {
-            text-align: right;
+              text-align: right;
           }
           
           .date-label {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin: 0;
-            color: #1a1a1a;
+              font-size: 1.25rem;
+              font-weight: bold;
+              margin: 0;
+              color: #1a1a1a;
           }
           
           .date-value, .time-value {
-            font-size: 0.875rem;
-            color: #666;
-            margin: 0.25rem 0 0;
+              font-size: 0.875rem;
+              color: #666;
+              margin: 0.25rem 0 0;
           }
           
           .table-container {
@@ -204,6 +204,14 @@ const BillingPrintTemplate = ({
             }
           }
         </style>
+        <script>
+          // Wait for content to load then trigger print
+          window.onload = function() {
+            setTimeout(() => {
+              window.print();
+            }, 500);
+          };
+        </script>
       </head>
       <body>
         ${PrintHeader({ date: currentDate })}

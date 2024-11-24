@@ -85,7 +85,16 @@ const Billing = () => {
 
     printWindow.document.write(html);
     printWindow.document.close();
-    toast.success("Preparing print view...");
+    
+    // Log for debugging
+    console.log("Print window opened with data:", {
+      productsCount: productsToShow.length,
+      type,
+      totalExpenses,
+      netProfit
+    });
+    
+    toast.success("Opening print preview...");
   };
 
   return (
