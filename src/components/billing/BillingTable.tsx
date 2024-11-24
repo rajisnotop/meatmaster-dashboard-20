@@ -14,6 +14,7 @@ import SalesCard from "./cards/SalesCard";
 import PaymentsCard from "./cards/PaymentsCard";
 import ExpensesCard from "./cards/ExpensesCard";
 import FinancialSummaryCard from "./cards/FinancialSummaryCard";
+import { useStore } from "@/store/store";
 
 interface BillingTableProps {
   productTotals: any[];
@@ -42,8 +43,15 @@ const BillingTable = ({
   openingBalance,
   setOpeningBalance,
 }: BillingTableProps) => {
-  const cashInCounter = (overallTotals.sales || 0) - (totalExpenses || 0) + (openingBalance || 0);
-  const cashInBank = (overallTotals.paidWithQR || 0) + (overallTotals.unpaidToPaidQR || 0);
+  const getCashExpenses = useStore((state) => state.getCashExpenses);
+  const getOnlineExpenses = useStore((state) => state.getOnlineExpenses);
+  
+  const cashExpenses = getCashExpenses();
+  const onlineExpenses = getOnlineExpenses();
+  
+  // Updated calculations based on new formulas
+  const cashInCounter = (overallTotals.sales || 0) + (overallTotals.unpaid || 0) - cashExpenses;
+  const cashInBank = (overallTotals.paidWithQR || 0) + (overallTotals.unpaidToPaidQR || 0) - onlineExpenses;
 
   return (
     <div className="space-y-8">
@@ -101,7 +109,6 @@ const BillingTable = ({
         </Table>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <SalesCard 
           sales={overallTotals.sales} 
