@@ -47,6 +47,7 @@
   z-index: 50 !important;
 }
 
+/* Enhanced dropdown styles */
 [role="menu"],
 [role="listbox"],
 [role="dialog"],
@@ -54,11 +55,13 @@
 [data-radix-select-content],
 [data-radix-select-viewport] {
   @apply bg-background border border-border rounded-lg shadow-lg !important;
+  background-color: hsl(var(--background)) !important;
 }
 
 [role="menuitem"],
 [data-radix-select-item] {
   @apply text-foreground !important;
+  background-color: hsl(var(--background)) !important;
 }
 
 [role="menuitem"]:hover,
@@ -69,7 +72,7 @@
 /* Calendar specific styles */
 .rdp {
   margin: 0 !important;
-  @apply bg-background !important;
+  background-color: hsl(var(--background)) !important;
 }
 
 .rdp-day {
@@ -104,4 +107,22 @@
 /* Glass effect */
 .glass-effect {
   @apply bg-background/80 backdrop-blur-sm;
+}
+
+/* Enhanced Select styles */
+[data-radix-select-content] {
+  overflow: hidden !important;
+  background-color: hsl(var(--background)) !important;
+}
+
+[data-radix-select-viewport] {
+  padding: 4px !important;
+  background-color: hsl(var(--background)) !important;
+}
+
+[data-radix-select-item] {
+  position: relative !important;
+  padding: 8px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
 }
