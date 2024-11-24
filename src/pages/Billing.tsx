@@ -42,7 +42,15 @@ const Billing = () => {
 
   const filteredExpenses = expenses.filter((expense) => filterData(new Date(expense.date)));
   const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const netProfit = overallTotals.sales + overallTotals.paidWithQR + overallTotals.unpaid + overallTotals.unpaidToPaidQR - totalExpenses;
+
+  // Updated net profit calculation
+  const netProfit = overallTotals.sales + 
+                   overallTotals.paidWithQR + 
+                   overallTotals.unpaid + 
+                   overallTotals.unpaidToPaidQR + 
+                   openingBalance - 
+                   totalExpenses;
+
   const cashInCounter = (overallTotals.sales || 0) - (totalExpenses || 0) + (openingBalance || 0);
 
   const handleExportExcel = () => {
@@ -85,14 +93,6 @@ const Billing = () => {
 
     printWindow.document.write(html);
     printWindow.document.close();
-    
-    // Log for debugging
-    console.log("Print window opened with data:", {
-      productsCount: productsToShow.length,
-      type,
-      totalExpenses,
-      netProfit
-    });
     
     toast.success("Opening print preview...");
   };
