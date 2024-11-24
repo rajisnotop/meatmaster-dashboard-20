@@ -106,6 +106,7 @@ const BillingTable = ({
         <SalesCard 
           sales={overallTotals.sales} 
           openingBalance={openingBalance}
+          quantity={overallTotals.quantity}
         />
         <PaymentsCard 
           paidWithQR={overallTotals.paidWithQR}
