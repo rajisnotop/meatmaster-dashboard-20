@@ -6,29 +6,32 @@ import { ResetConfirmDialog } from "@/components/reset/ResetConfirmDialog";
 import Header from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
-import { isWithinInterval } from "date-fns";
+import { isWithinInterval, startOfDay, endOfDay } from "date-fns";
 
 const Reset = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [filters, setFilters] = useState({
-    timeFilter: "custom",
+    timeFilter: "specific",
     startDate: "",
     endDate: "",
+    specificDate: "",
   });
   
   const { orders, expenses, setOrders, setExpenses } = useStore();
 
   const handleReset = () => {
-    const { timeFilter, startDate, endDate } = filters;
+    const { timeFilter, startDate, endDate, specificDate } = filters;
     let start: Date;
     let end: Date;
 
     switch (timeFilter) {
+      case "specific":
+        start = startOfDay(new Date(specificDate));
+        end = endOfDay(new Date(specificDate));
+        break;
       case "today":
-        start = new Date();
-        start.setHours(0, 0, 0, 0);
-        end = new Date();
-        end.setHours(23, 59, 59, 999);
+        start = startOfDay(new Date());
+        end = endOfDay(new Date());
         break;
       case "week":
         start = new Date();
@@ -47,10 +50,8 @@ const Reset = () => {
         end.setHours(23, 59, 59, 999);
         break;
       default:
-        start = new Date(startDate);
-        start.setHours(0, 0, 0, 0);
-        end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
+        start = startOfDay(new Date(startDate));
+        end = endOfDay(new Date(endDate));
     }
 
     const filteredOrders = orders.filter(

@@ -22,11 +22,13 @@ interface ResetFiltersProps {
     timeFilter: string;
     startDate: string;
     endDate: string;
+    specificDate: string;
   };
   setFilters: React.Dispatch<React.SetStateAction<{
     timeFilter: string;
     startDate: string;
     endDate: string;
+    specificDate: string;
   }>>;
   onResetClick: () => void;
 }
@@ -48,13 +50,15 @@ export const ResetFilters = ({
               timeFilter: value,
               startDate: "",
               endDate: "",
+              specificDate: "",
             });
           }}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full bg-background">
             <SelectValue placeholder="Select time period" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background">
+            <SelectItem value="specific">Specific Day</SelectItem>
             <SelectItem value="custom">Custom Range</SelectItem>
             <SelectItem value="today">Today</SelectItem>
             <SelectItem value="week">This Week</SelectItem>
@@ -62,6 +66,40 @@ export const ResetFilters = ({
           </SelectContent>
         </Select>
       </div>
+
+      {filters.timeFilter === "specific" && (
+        <div className="space-y-2">
+          <Label>Select Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal bg-background"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.specificDate ? (
+                  format(new Date(filters.specificDate), "PPP")
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-background" align="start">
+              <Calendar
+                mode="single"
+                selected={filters.specificDate ? new Date(filters.specificDate) : undefined}
+                onSelect={(date) =>
+                  setFilters({
+                    ...filters,
+                    specificDate: date ? format(date, "yyyy-MM-dd") : "",
+                  })
+                }
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
 
       {filters.timeFilter === "custom" && (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -71,7 +109,7 @@ export const ResetFilters = ({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className="w-full justify-start text-left font-normal bg-background"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {filters.startDate ? (
@@ -81,7 +119,7 @@ export const ResetFilters = ({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-background" align="start">
                 <Calendar
                   mode="single"
                   selected={filters.startDate ? new Date(filters.startDate) : undefined}
@@ -106,7 +144,7 @@ export const ResetFilters = ({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal"
+                  className="w-full justify-start text-left font-normal bg-background"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {filters.endDate ? (
@@ -116,7 +154,7 @@ export const ResetFilters = ({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 bg-background" align="start">
                 <Calendar
                   mode="single"
                   selected={filters.endDate ? new Date(filters.endDate) : undefined}
@@ -141,7 +179,10 @@ export const ResetFilters = ({
         variant="destructive"
         className="w-full"
         onClick={onResetClick}
-        disabled={filters.timeFilter === "custom" && (!filters.startDate || !filters.endDate)}
+        disabled={
+          (filters.timeFilter === "custom" && (!filters.startDate || !filters.endDate)) ||
+          (filters.timeFilter === "specific" && !filters.specificDate)
+        }
       >
         Reset Data
       </Button>
