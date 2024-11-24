@@ -1,7 +1,6 @@
 import { format } from "date-fns";
 
-// Replace this URL with your actual Make (Integromat) webhook URL
-const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/your-webhook-id';
+const MAKE_WEBHOOK_URL = 'https://hook.eu2.make.com/cbnfov0n79yi7s20jiv8d9mc3wtb21dy';
 
 export const exportToNotion = async (
   productTotals: any[],
