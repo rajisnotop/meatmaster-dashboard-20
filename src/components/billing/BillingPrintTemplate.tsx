@@ -1,4 +1,7 @@
 import { format } from "date-fns";
+import PrintHeader from "./print/PrintHeader";
+import PrintProductsTable from "./print/PrintProductsTable";
+import PrintSummary from "./print/PrintSummary";
 
 interface BillingPrintTemplateProps {
   productTotals: any[];
@@ -23,47 +26,64 @@ const BillingPrintTemplate = ({
   netProfit
 }: BillingPrintTemplateProps) => {
   const cashInCounter = (overallTotals.sales || 0) - (totalExpenses || 0) + (openingBalance || 0);
+  const currentDate = new Date();
   
   return `
     <html>
       <head>
-        <title>Billing Report</title>
+        <title>Billing Report - ${format(currentDate, "MM/dd/yyyy")}</title>
         <style>
           @page {
             size: A4;
             margin: 20px;
-            background-color: #f0f8ff;
           }
           
           body {
             font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f0f8ff;
-            line-height: 1.4;
+            line-height: 1.6;
             margin: 0;
+            padding: 20px;
+            background: #fff;
+            color: #333;
           }
           
           .header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
           }
           
           .logo-section {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 1rem;
           }
           
           .logo {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+          }
+          
+          .company-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
           }
           
           .company-title {
-            font-size: 24px;
+            font-size: 1.5rem;
             font-weight: bold;
+            margin: 0;
+            color: #1a1a1a;
+          }
+          
+          .company-subtitle {
+            font-size: 0.875rem;
+            color: #666;
             margin: 0;
           }
           
@@ -72,72 +92,104 @@ const BillingPrintTemplate = ({
           }
           
           .date-label {
-            font-size: 24px;
+            font-size: 1.25rem;
             font-weight: bold;
             margin: 0;
+            color: #1a1a1a;
           }
           
-          .date-value {
-            font-size: 16px;
-            margin: 5px 0 0 0;
+          .date-value, .time-value {
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0.25rem 0 0;
+          }
+          
+          .table-container {
+            margin: 2rem 0;
+            overflow-x: auto;
           }
           
           table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            background-color: white;
+            margin-bottom: 2rem;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
           }
           
           th {
-            background-color: black;
-            color: white;
-            padding: 8px;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            font-weight: 600;
+            padding: 12px;
             text-align: left;
-            border: 1px solid black;
+            border-bottom: 2px solid #dee2e6;
           }
           
           td {
-            padding: 8px;
-            border: 1px solid black;
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            color: #333;
           }
           
-          .totals-section {
-            width: 40%;
-            margin-left: auto;
+          .totals-row td {
+            background: #f8f9fa;
+            font-weight: 600;
           }
           
-          .totals-row {
-            display: flex;
-            justify-content: space-between;
-            border: 1px solid black;
-            margin-bottom: -1px;
-            background-color: white;
+          .summary-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
           }
           
-          .totals-label {
-            padding: 8px;
-            border-right: 1px solid black;
-            width: 50%;
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
           }
           
-          .totals-value {
-            padding: 8px;
-            width: 50%;
-            text-align: left;
+          .summary-item {
+            padding: 1rem;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          }
+          
+          .summary-label {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+          }
+          
+          .summary-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+          }
+          
+          .highlight {
+            background: #e8f4ff;
+          }
+          
+          .profit .summary-value {
+            color: #10b981;
+          }
+          
+          .loss .summary-value {
+            color: #ef4444;
           }
           
           .footer {
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            right: 0;
+            margin-top: 3rem;
             text-align: center;
-            font-size: 14px;
+            font-size: 0.875rem;
+            color: #666;
           }
           
           .website {
-            color: black;
+            color: #666;
             text-decoration: none;
           }
           
@@ -145,83 +197,22 @@ const BillingPrintTemplate = ({
             body {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
-              background-color: #f0f8ff !important;
             }
             
-            th {
-              background-color: black !important;
-              color: white !important;
+            .summary-section {
+              break-inside: avoid;
             }
           }
         </style>
       </head>
       <body>
-        <div class="header">
-          <div class="logo-section">
-            <img src="/logo.png" alt="Logo" class="logo">
-            <h1 class="company-title">Neelkantha<br>Meat Shop</h1>
-          </div>
-          <div class="date-section">
-            <h2 class="date-label">Data</h2>
-            <p class="date-value">${format(new Date(), "MM/dd/yyyy")}</p>
-          </div>
-        </div>
-        
-        <table>
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Sales</th>
-              <th>Paid (QR)</th>
-              <th>Unpaid to Paid</th>
-              <th>Unpaid to Paid(QR)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${productTotals.map((product) => `
-              <tr>
-                <td>${product.name}</td>
-                <td>${product.quantity.toFixed(2)}</td>
-                <td>${product.amount.toLocaleString()}</td>
-                <td>${(product.paidWithQR || 0).toLocaleString()}</td>
-                <td>${(product.unpaid || 0).toLocaleString()}</td>
-                <td>${(product.unpaidToPaidQR || 0).toLocaleString()}</td>
-              </tr>
-            `).join("")}
-            <tr>
-              <td><strong>Total</strong></td>
-              <td><strong>${productTotals.reduce((sum, p) => sum + p.quantity, 0).toFixed(2)}</strong></td>
-              <td><strong>${productTotals.reduce((sum, p) => sum + p.amount, 0).toLocaleString()}</strong></td>
-              <td><strong>${productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0).toLocaleString()}</strong></td>
-              <td><strong>${productTotals.reduce((sum, p) => sum + (p.unpaid || 0), 0).toLocaleString()}</strong></td>
-              <td><strong>${productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0).toLocaleString()}</strong></td>
-            </tr>
-          </tbody>
-        </table>
-        
-        <div class="totals-section">
-          <div class="totals-row">
-            <div class="totals-label">Expenses</div>
-            <div class="totals-value">${totalExpenses.toLocaleString()}</div>
-          </div>
-          <div class="totals-row">
-            <div class="totals-label">Opening Balance</div>
-            <div class="totals-value">${openingBalance.toLocaleString()}</div>
-          </div>
-          <div class="totals-row">
-            <div class="totals-label">Cash in counter</div>
-            <div class="totals-value">${cashInCounter.toLocaleString()}</div>
-          </div>
-          <div class="totals-row">
-            <div class="totals-label">Net amount</div>
-            <div class="totals-value">${netProfit.toLocaleString()}</div>
-          </div>
-        </div>
+        ${PrintHeader({ date: currentDate })}
+        ${PrintProductsTable({ productTotals })}
+        ${PrintSummary({ totalExpenses, openingBalance, cashInCounter, netProfit })}
         
         <div class="footer">
-          This file was generated on "${format(new Date(), "MM/dd/yyyy 'on' HH:mm")}"<br>
-          Neelkantha Meat Shop | <a href="https://neelkanthameat.netlify.com" class="website">www.neelkanthameat.netlify.com</a>
+          <p>Generated on ${format(currentDate, "MMMM dd, yyyy 'at' hh:mm a")}</p>
+          <p>Neelkantha Meat Shop | <a href="https://neelkanthameat.netlify.com" class="website">www.neelkanthameat.netlify.com</a></p>
         </div>
       </body>
     </html>
