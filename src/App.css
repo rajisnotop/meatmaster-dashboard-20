@@ -41,10 +41,10 @@
   color: #888;
 }
 
-/* Fix dropdown and calendar styles */
+/* Dropdown and Calendar styles */
 [data-radix-popper-content-wrapper] {
   position: fixed !important;
-  z-index: 9999 !important;
+  z-index: 50 !important;
 }
 
 [role="menu"],
@@ -53,53 +53,55 @@
 .rdp,
 [data-radix-select-content],
 [data-radix-select-viewport] {
-  background-color: hsl(var(--background)) !important;
-  border: 1px solid hsl(var(--border)) !important;
-  border-radius: var(--radius) !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+  @apply bg-background border border-border rounded-lg shadow-lg !important;
 }
 
 [role="menuitem"],
 [data-radix-select-item] {
-  color: hsl(var(--foreground)) !important;
+  @apply text-foreground !important;
 }
 
 [role="menuitem"]:hover,
-[data-radix-select-item"]:hover {
-  background: hsl(var(--accent)) !important;
-  color: hsl(var(--accent-foreground)) !important;
+[data-radix-select-item]:hover {
+  @apply bg-accent text-accent-foreground !important;
 }
 
 /* Calendar specific styles */
+.rdp {
+  margin: 0 !important;
+  @apply bg-background !important;
+}
+
 .rdp-day {
-  color: hsl(var(--foreground)) !important;
+  @apply text-foreground !important;
 }
 
 .rdp-day_selected {
-  background: hsl(var(--primary)) !important;
-  color: hsl(var(--primary-foreground)) !important;
+  @apply bg-primary text-primary-foreground !important;
 }
 
 .rdp-day:hover:not(.rdp-day_selected) {
-  background: hsl(var(--accent)) !important;
-  color: hsl(var(--accent-foreground)) !important;
+  @apply bg-accent text-accent-foreground !important;
 }
 
 .rdp-caption_label,
 .rdp-head_cell {
-  color: hsl(var(--foreground)) !important;
-  font-weight: 500 !important;
+  @apply text-foreground font-medium !important;
 }
 
 .rdp-nav_button {
-  color: hsl(var(--foreground)) !important;
+  @apply text-foreground !important;
 }
 
 .rdp-day_today:not(.rdp-day_outside) {
-  font-weight: bold !important;
-  border: 1px solid hsl(var(--primary)) !important;
+  @apply font-bold border border-primary !important;
 }
 
 .rdp-day_outside {
-  opacity: 0.5 !important;
+  @apply opacity-50 !important;
+}
+
+/* Glass effect */
+.glass-effect {
+  @apply bg-background/80 backdrop-blur-sm;
 }
