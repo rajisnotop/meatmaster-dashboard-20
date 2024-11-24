@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import DateRangeSelector from "./DateRangeSelector";
 import { toast } from "sonner";
-import { exportToNotion } from "@/utils/notionExport";
+import { exportToCoda } from "@/utils/codaExport";
 
 interface BillingHeaderProps {
   timeFilter: string;
@@ -58,18 +58,18 @@ const BillingHeader = ({
   cashInCounter,
   netProfit,
 }: BillingHeaderProps) => {
-  const handleNotionExport = async () => {
+  const handleCodaExport = async () => {
     try {
-      await exportToNotion(
+      await exportToCoda(
         productTotals,
         totalExpenses,
         openingBalance,
         cashInCounter,
         netProfit
       );
-      toast.success("Successfully exported to Notion");
+      toast.success("Successfully exported to Coda");
     } catch (error) {
-      toast.error("Failed to export to Notion");
+      toast.error("Failed to export to Coda");
     }
   };
 
@@ -78,9 +78,9 @@ const BillingHeader = ({
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Billing Summary</h1>
         <div className="flex gap-3">
-          <Button onClick={handleNotionExport} variant="outline" className="gap-2">
+          <Button onClick={handleCodaExport} variant="outline" className="gap-2">
             <Database className="h-4 w-4" />
-            Export to Notion
+            Export to Coda
           </Button>
           <Button onClick={onExportExcel} variant="outline" className="gap-2">
             <FileSpreadsheet className="h-4 w-4" />
