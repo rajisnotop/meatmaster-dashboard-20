@@ -1,4 +1,4 @@
-import { Menu, Home, FileText, DollarSign, ShoppingBag, Receipt, RotateCcw } from "lucide-react";
+import { Menu, Home, FileText, DollarSign, ShoppingBag, Receipt, RotateCcw, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
@@ -21,6 +21,7 @@ const Header = () => {
     { path: "/expenditure", label: "Expenditure", icon: Receipt },
     { path: "/billing", label: "Billing", icon: DollarSign },
     { path: "/reset", label: "Reset Data", icon: RotateCcw },
+    { path: "/settings", label: "Settings", icon: SettingsIcon },
   ];
 
   return (
