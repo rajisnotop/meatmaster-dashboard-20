@@ -10,6 +10,7 @@ import Expenditure from "./pages/Expenditure";
 import Orders from "./pages/Orders";
 import Billing from "./pages/Billing";
 import Reset from "./pages/Reset";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => {
               <Route path="/expenditure" element={<Expenditure />} />
               <Route path="/billing" element={<Billing />} />
               <Route path="/reset" element={<Reset />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </TooltipProvider>
         </BrowserRouter>
