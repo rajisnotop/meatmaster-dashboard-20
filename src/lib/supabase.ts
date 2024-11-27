@@ -13,14 +13,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 console.log('Supabase client initialized successfully');
 
 // Add connection status logging
-supabase.realtime.onOpen(() => {
+supabase.realtime.on('connected', () => {
   console.log('Realtime connection established');
 });
 
-supabase.realtime.onClose(() => {
+supabase.realtime.on('disconnected', () => {
   console.log('Realtime connection closed');
 });
 
-supabase.realtime.onError((error) => {
+supabase.realtime.on('error', (error) => {
   console.error('Realtime connection error:', error);
 });
