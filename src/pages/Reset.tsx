@@ -3,7 +3,6 @@ import { useStore } from "@/store/store";
 import { toast } from "sonner";
 import { ResetFilters } from "@/components/reset/ResetFilters";
 import { ResetConfirmDialog } from "@/components/reset/ResetConfirmDialog";
-import Header from "@/components/Header";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
 import { isWithinInterval, startOfDay, endOfDay } from "date-fns";
@@ -69,7 +68,6 @@ const Reset = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main className="container mx-auto py-8 px-4">
         <Card className="max-w-2xl mx-auto glass-effect p-8 rounded-xl shadow-lg border border-border/50 backdrop-blur-sm space-y-8 animate-fade-in">
           <div className="space-y-4">
