@@ -1,5 +1,5 @@
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.settings.jwt_secret" TO 'your-jwt-secret';
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create products table
 CREATE TABLE IF NOT EXISTS public.products (
