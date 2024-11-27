@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import { useStore } from "@/store/store";
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -50,7 +49,6 @@ const Orders = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fefae0] to-[#fefae0]/95">
-      <Header />
       <main className="container py-8 space-y-8">
         <div className="flex items-center justify-between">
           <motion.h1 

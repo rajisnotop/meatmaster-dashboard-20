@@ -7,7 +7,6 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { useSettingsStore } from "@/store/settingsStore";
 import { toast } from "sonner";
-import Header from "@/components/Header";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function Settings() {
@@ -28,7 +27,6 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-cream">
-      <Header />
       <div className="container mx-auto p-6 animate-fade-in">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Settings</h1>
