@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '@/components/Header';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -57,8 +56,6 @@ const Excel = () => {
 
   return (
     <div className="min-h-screen bg-cream">
-      <Header />
-      
       <main className="container py-6">
         <div className="bg-cream rounded-xl border border-moss/10 shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-moss/20 via-earth/10 to-transparent p-6">
