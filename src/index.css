@@ -4,26 +4,34 @@
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    --card: 224 71% 4%;
-    --card-foreground: 210 40% 98%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
-    --primary-rgb: 249, 249, 249;
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 210 40% 98%;
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 216 34% 17%;
+    --background: 52 94% 94%;
+    --foreground: 88 38% 15%;
+    
+    --card: 52 94% 94%;
+    --card-foreground: 88 38% 15%;
+    
+    --popover: 52 94% 94%;
+    --popover-foreground: 88 38% 15%;
+    
+    --primary: 74 32% 32%;
+    --primary-foreground: 52 94% 94%;
+    
+    --secondary: 32 65% 62%;
+    --secondary-foreground: 88 38% 15%;
+    
+    --muted: 88 38% 15%;
+    --muted-foreground: 52 94% 94%;
+    
+    --accent: 32 65% 62%;
+    --accent-foreground: 88 38% 15%;
+    
+    --destructive: 28 67% 44%;
+    --destructive-foreground: 52 94% 94%;
+    
+    --border: 74 32% 32%;
+    --input: 74 32% 32%;
+    --ring: 74 32% 32%;
+    
     --radius: 0.75rem;
   }
 }
@@ -34,89 +42,51 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    background: 
-      linear-gradient(45deg, rgba(26, 27, 30, 0.8), rgba(18, 19, 23, 0.8)),
-      linear-gradient(to right bottom, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05)),
-      radial-gradient(circle at top left, rgba(99, 102, 241, 0.12), transparent 70%),
-      radial-gradient(circle at top right, rgba(168, 85, 247, 0.12), transparent 70%),
-      radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.12), transparent 70%);
-    background-attachment: fixed;
-    background-size: cover, cover, 80% 80%, 80% 80%, 80% 80%;
-    backdrop-filter: blur(100px);
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-    z-index: -1;
+    @apply bg-cream text-forest;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold text-foreground tracking-tight;
-  }
-
-  p, span, div {
-    @apply text-foreground;
+    @apply font-semibold text-tiger tracking-tight;
   }
 }
 
 @layer components {
-  .glass-effect {
-    @apply bg-background/40 backdrop-blur-md border border-white/10;
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-  }
-
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
-  }
-
-  .gradient-border {
-    @apply relative rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 p-[1px];
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  }
-
-  .gradient-border::before {
-    content: "";
-    @apply absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-50 -z-10;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
-  }
-
   .nav-link {
-    @apply px-4 py-2 rounded-lg transition-colors duration-200;
+    @apply px-4 py-2 rounded-lg transition-all duration-200 hover:bg-earth/10;
   }
 
   .nav-link-active {
-    @apply bg-accent/80 text-primary font-medium backdrop-blur-sm;
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    @apply bg-earth text-forest font-medium;
   }
 
   .nav-link-inactive {
-    @apply text-muted-foreground hover:text-primary hover:bg-accent/50;
+    @apply text-forest hover:text-tiger;
+  }
+
+  .card {
+    @apply rounded-lg border border-moss/20 bg-cream/80 backdrop-blur-sm 
+           shadow-lg transition-all duration-300 hover:shadow-xl;
+  }
+
+  .button-primary {
+    @apply bg-tiger text-cream hover:bg-tiger/90 transition-colors duration-200;
+  }
+
+  .button-secondary {
+    @apply bg-earth text-forest hover:bg-earth/90 transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply border-moss/20 bg-cream focus:border-tiger focus:ring-tiger/20;
   }
 }
 
 @layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
+  .animate-hover {
+    @apply transition-all duration-200 hover:scale-105;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .glass-effect {
+    @apply bg-cream/80 backdrop-blur-sm border border-moss/20;
   }
 }

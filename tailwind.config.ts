@@ -19,30 +19,38 @@ export default {
     },
     extend: {
       colors: {
+        // New Nature-inspired Theme Colors
+        "moss": "#606c38",
+        "forest": "#283618",
+        "cream": "#fefae0",
+        "earth": "#dda15e",
+        "tiger": "#bc6c25",
+        
+        // Keep existing system colors for compatibility
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#606c38",
+          foreground: "#fefae0",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#dda15e",
+          foreground: "#283618",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#bc6c25",
+          foreground: "#fefae0",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#283618",
+          foreground: "#fefae0",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#dda15e",
+          foreground: "#283618",
         },
       },
       keyframes: {
@@ -54,19 +62,20 @@ export default {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" }
         },
-        "glow-pulse": {
-          "0%, 100%": {
-            boxShadow: "0 0 20px rgba(var(--primary-rgb), 0.5)"
-          },
-          "50%": {
-            boxShadow: "0 0 30px rgba(var(--primary-rgb), 0.8)"
-          }
+        "slide-in": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" }
+        },
+        "slide-out": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-100%)" }
         }
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
-        "glow-pulse": "glow-pulse 2s ease-in-out infinite"
+        "slide-in": "slide-in 0.3s ease-out",
+        "slide-out": "slide-out 0.3s ease-out"
       }
     },
   },

@@ -2,23 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface SettingsState {
-  isDarkMode: boolean;
   lowStockThreshold: number;
-  notificationsEnabled: boolean;
-  toggleDarkMode: () => void;
+  navStyle: 'top' | 'side';
   setLowStockThreshold: (threshold: number) => void;
-  toggleNotifications: () => void;
+  setNavStyle: (style: 'top' | 'side') => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      isDarkMode: false,
-      lowStockThreshold: 5,
-      notificationsEnabled: true,
-      toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+      lowStockThreshold: 10,
+      navStyle: 'top',
       setLowStockThreshold: (threshold) => set({ lowStockThreshold: threshold }),
-      toggleNotifications: () => set((state) => ({ notificationsEnabled: !state.notificationsEnabled })),
+      setNavStyle: (style) => set({ navStyle: style }),
     }),
     {
       name: 'settings-storage',
