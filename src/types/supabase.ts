@@ -11,7 +11,7 @@ export interface SupabasePayload<T> {
 export interface DatabaseOrder {
   id: string;
   customername: string;
-  product_id: string;
+  productid: string;
   quantity: number;
   total: number;
   date: string;

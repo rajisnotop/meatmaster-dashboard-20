@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.products (
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     customername TEXT,
-    product_id UUID REFERENCES public.products(id),
+    productid UUID REFERENCES public.products(id),
     quantity DECIMAL(10,2) NOT NULL,
     total DECIMAL(10,2) NOT NULL,
     date TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,

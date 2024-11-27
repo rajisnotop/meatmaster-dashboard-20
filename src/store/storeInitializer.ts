@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { transformDatabaseOrder } from '@/utils/dataTransformers';
+import { transformDatabaseOrder, transformDatabaseExpense } from '@/utils/dataTransformers';
 import { DatabaseOrder, DatabaseProduct, DatabaseExpense, SupabasePayload } from '@/types/supabase';
 import { StoreState } from './store';
 
@@ -15,7 +15,7 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
     const ordersRes = await supabase.from('orders').select(`
       id,
       customername,
-      product_id,
+      productid,
       quantity,
       total,
       date,
@@ -33,11 +33,12 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
     }
 
     const transformedOrders = ordersRes.data?.map(transformDatabaseOrder) || [];
+    const transformedExpenses = expensesRes.data?.map(transformDatabaseExpense) || [];
 
     set({
       products: (productsRes.data || []) as DatabaseProduct[],
       orders: transformedOrders,
-      expenses: (expensesRes.data || []) as DatabaseExpense[]
+      expenses: transformedExpenses
     });
 
     // Set up real-time subscriptions
@@ -93,10 +94,12 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
         (payload: SupabasePayload<DatabaseExpense>) => {
           console.log('Expense change received:', payload);
           const currentExpenses = get().expenses;
+          const transformedExpense = payload.new ? transformDatabaseExpense(payload.new) : null;
+
           switch (payload.eventType) {
             case 'INSERT':
-              if (payload.new) {
-                set({ expenses: [...currentExpenses, payload.new] });
+              if (transformedExpense) {
+                set({ expenses: [...currentExpenses, transformedExpense] });
               }
               break;
             case 'DELETE':
@@ -105,8 +108,8 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
               }
               break;
             case 'UPDATE':
-              if (payload.new) {
-                set({ expenses: currentExpenses.map(e => e.id === payload.new?.id ? payload.new : e) });
+              if (transformedExpense) {
+                set({ expenses: currentExpenses.map(e => e.id === transformedExpense.id ? transformedExpense : e) });
               }
               break;
           }
