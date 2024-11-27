@@ -12,15 +12,19 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // Log successful initialization
 console.log('Supabase client initialized successfully');
 
-// Add connection status logging
-supabase.realtime.on('connected', () => {
-  console.log('Realtime connection established');
-});
+// Create a channel for connection status
+const statusChannel = supabase.channel('connection_status');
 
-supabase.realtime.on('disconnected', () => {
-  console.log('Realtime connection closed');
-});
-
-supabase.realtime.on('error', (error) => {
-  console.error('Realtime connection error:', error);
-});
+// Subscribe to connection status events
+statusChannel
+  .subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      console.log('Realtime connection established');
+    }
+    if (status === 'CLOSED') {
+      console.log('Realtime connection closed');
+    }
+    if (status === 'CHANNEL_ERROR') {
+      console.error('Realtime connection error');
+    }
+  });
