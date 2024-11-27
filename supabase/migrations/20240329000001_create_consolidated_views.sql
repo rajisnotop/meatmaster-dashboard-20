@@ -20,8 +20,8 @@ SELECT
     SUM(CASE WHEN o.paidwithqr THEN o.total ELSE 0 END) as qr_payments,
     SUM(CASE WHEN o.wasunpaid AND o.paidwithqr THEN o.total ELSE 0 END) as unpaid_to_qr,
     SUM(CASE WHEN o.paidwithqr OR (o.wasunpaid AND o.paidwithqr) THEN o.total ELSE 0 END) as total_digital_pay,
-    (SELECT SUM(amount) FROM expenses WHERE payment_method = 'cash') as cash_expenses,
-    (SELECT SUM(amount) FROM expenses WHERE payment_method = 'online') as online_expenses,
+    (SELECT SUM(amount) FROM expenses WHERE paymentmethod = 'cash') as cash_expenses,
+    (SELECT SUM(amount) FROM expenses WHERE paymentmethod = 'online') as online_expenses,
     (SELECT SUM(amount) FROM expenses) as total_expenses
 FROM orders o;
 
