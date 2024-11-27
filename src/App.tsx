@@ -12,6 +12,7 @@ import Orders from "./pages/Orders";
 import Billing from "./pages/Billing";
 import Reset from "./pages/Reset";
 import Settings from "./pages/Settings";
+import Excel from "./pages/Excel";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const AppContent = () => {
           <Route path="/billing" element={<Billing />} />
           <Route path="/reset" element={<Reset />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/excel" element={<Excel />} />
         </Routes>
       </TooltipProvider>
     </div>

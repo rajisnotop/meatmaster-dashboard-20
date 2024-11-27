@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Home, FileText, DollarSign, ShoppingBag, Receipt, RotateCcw, Settings as SettingsIcon } from "lucide-react";
+import { Menu, Home, FileText, DollarSign, ShoppingBag, Receipt, RotateCcw, Settings as SettingsIcon, Table } from "lucide-react";
 import { Button } from "./ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
@@ -23,6 +23,7 @@ const Header = () => {
     { path: "/reports", label: "Reports", icon: FileText },
     { path: "/expenditure", label: "Expenditure", icon: Receipt },
     { path: "/billing", label: "Billing", icon: DollarSign },
+    { path: "/excel", label: "Excel", icon: Table },
     { path: "/reset", label: "Reset Data", icon: RotateCcw },
     { path: "/settings", label: "Settings", icon: SettingsIcon },
   ];
