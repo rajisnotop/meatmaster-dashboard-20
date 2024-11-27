@@ -60,13 +60,13 @@
 
 [role="menuitem"],
 [data-radix-select-item] {
-  @apply text-foreground !important;
+  @apply text-forest !important;
   background-color: hsl(var(--background)) !important;
 }
 
 [role="menuitem"]:hover,
 [data-radix-select-item]:hover {
-  @apply bg-accent text-accent-foreground !important;
+  @apply bg-accent text-forest !important;
 }
 
 /* Calendar specific styles */
@@ -76,24 +76,24 @@
 }
 
 .rdp-day {
-  @apply text-foreground !important;
+  @apply text-forest !important;
 }
 
 .rdp-day_selected {
-  @apply bg-primary text-primary-foreground !important;
+  @apply bg-primary text-forest !important;
 }
 
 .rdp-day:hover:not(.rdp-day_selected) {
-  @apply bg-accent text-accent-foreground !important;
+  @apply bg-accent text-forest !important;
 }
 
 .rdp-caption_label,
 .rdp-head_cell {
-  @apply text-foreground font-medium !important;
+  @apply text-forest font-medium !important;
 }
 
 .rdp-nav_button {
-  @apply text-foreground !important;
+  @apply text-forest !important;
 }
 
 .rdp-day_today:not(.rdp-day_outside) {
