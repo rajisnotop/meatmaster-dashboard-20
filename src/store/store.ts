@@ -224,7 +224,6 @@ export const useStore = create<StoreState>()(
           }));
         },
 
-        // Keep existing calculation methods
         getSuppliesExpenses: () => {
           const expenses = get().expenses;
           return expenses

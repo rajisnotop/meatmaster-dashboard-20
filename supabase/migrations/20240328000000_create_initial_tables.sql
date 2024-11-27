@@ -1,36 +1,36 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Enable Row Level Security
+ALTER DATABASE postgres SET "app.settings.jwt_secret" TO 'your-jwt-secret';
 
 -- Create products table
 CREATE TABLE IF NOT EXISTS public.products (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
-    price NUMERIC NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
     stock INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
 -- Create orders table
 CREATE TABLE IF NOT EXISTS public.orders (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    customerName TEXT,
-    productId UUID REFERENCES public.products(id),
-    quantity NUMERIC NOT NULL,
-    total NUMERIC NOT NULL,
-    date TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    isPaid BOOLEAN DEFAULT false,
-    paidWithQR BOOLEAN DEFAULT false,
-    wasUnpaid BOOLEAN DEFAULT false
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_name TEXT,
+    product_id UUID REFERENCES public.products(id),
+    quantity DECIMAL(10,2) NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    date TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    is_paid BOOLEAN DEFAULT false,
+    was_unpaid BOOLEAN DEFAULT true,
+    paid_with_qr BOOLEAN DEFAULT false
 );
 
 -- Create expenses table
 CREATE TABLE IF NOT EXISTS public.expenses (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    description TEXT NOT NULL,
-    amount NUMERIC NOT NULL,
-    date TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     category TEXT NOT NULL,
-    paymentMethod TEXT NOT NULL
+    amount DECIMAL(10,2) NOT NULL,
+    description TEXT,
+    date TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    payment_method TEXT CHECK (payment_method IN ('cash', 'online')) NOT NULL
 );
 
 -- Enable Row Level Security (RLS)
@@ -38,17 +38,42 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
 
--- Create policies that allow all operations (for development)
-CREATE POLICY "Enable all operations for products" ON public.products
-    FOR ALL USING (true);
+-- Create policies
+CREATE POLICY "Enable read access for all users" ON public.products
+    FOR SELECT USING (true);
 
-CREATE POLICY "Enable all operations for orders" ON public.orders
-    FOR ALL USING (true);
+CREATE POLICY "Enable read access for all users" ON public.orders
+    FOR SELECT USING (true);
 
-CREATE POLICY "Enable all operations for expenses" ON public.expenses
-    FOR ALL USING (true);
+CREATE POLICY "Enable read access for all users" ON public.expenses
+    FOR SELECT USING (true);
 
--- Grant access to authenticated and anonymous users
-GRANT ALL ON public.products TO anon, authenticated;
-GRANT ALL ON public.orders TO anon, authenticated;
-GRANT ALL ON public.expenses TO anon, authenticated;
+-- Allow insert, update, delete for authenticated users
+CREATE POLICY "Enable insert for authenticated users only" ON public.products
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable update for authenticated users only" ON public.products
+    FOR UPDATE USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable delete for authenticated users only" ON public.products
+    FOR DELETE USING (auth.role() = 'authenticated');
+
+-- Repeat for orders
+CREATE POLICY "Enable insert for authenticated users only" ON public.orders
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable update for authenticated users only" ON public.orders
+    FOR UPDATE USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable delete for authenticated users only" ON public.orders
+    FOR DELETE USING (auth.role() = 'authenticated');
+
+-- Repeat for expenses
+CREATE POLICY "Enable insert for authenticated users only" ON public.expenses
+    FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable update for authenticated users only" ON public.expenses
+    FOR UPDATE USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable delete for authenticated users only" ON public.expenses
+    FOR DELETE USING (auth.role() = 'authenticated');
