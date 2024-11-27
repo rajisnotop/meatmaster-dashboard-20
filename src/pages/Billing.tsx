@@ -1,24 +1,36 @@
-import { useState } from "react";
-import { useStore } from "@/store/store";
+import { useState, useEffect } from "react";
+import { useExpenseStore } from "@/store/expenseStore";
+import { useBillingStore } from "@/store/billingStore";
 import BillingHeader from "@/components/billing/BillingHeader";
-import BillingCard from "@/components/billing/BillingCard";
 import BillingTable from "@/components/billing/BillingTable";
 import BillingPrintTemplate from "@/components/billing/BillingPrintTemplate";
+import { calculateProductTotals, calculateOverallTotals } from "@/utils/billingCalculations";
 
 const Billing = () => {
-  const { expenses } = useStore();
+  const { expenses } = useExpenseStore();
+  const { orders, products } = useBillingStore();
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [timeFilter, setTimeFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [isPrintTemplateOpen, setIsPrintTemplateOpen] = useState(false);
+  const [openingBalance, setOpeningBalance] = useState(0);
 
-  // Calculate totals
+  const filterDateFn = (date: Date) => {
+    if (timeFilter === "date-range" && startDate && endDate) {
+      return date >= new Date(startDate) && date <= new Date(endDate);
+    }
+    if (dateFilter) {
+      return date.toISOString().split('T')[0] === dateFilter;
+    }
+    return true;
+  };
+
+  const productTotals = calculateProductTotals(products, orders, filterDateFn);
+  const overallTotals = calculateOverallTotals(productTotals);
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const openingBalance = 0; // This should be calculated or fetched from your state
-  const cashInCounter = 0; // This should be calculated based on your business logic
-  const netProfit = 0; // This should be calculated based on your business logic
+  const netProfit = (overallTotals.sales || 0) - totalExpenses;
 
   const handlePrint = (type: "all" | "selected") => {
     if (type === "selected" && selectedProducts.length === 0) {
@@ -29,6 +41,7 @@ const Billing = () => {
   };
 
   const handleExportExcel = () => {
+    // Implementation remains the same
     // Implement Excel export logic
   };
 
@@ -46,38 +59,27 @@ const Billing = () => {
         endDate={endDate}
         setStartDate={setStartDate}
         setEndDate={setEndDate}
-        productTotals={[]} // Add your product totals here
+        productTotals={productTotals}
         totalExpenses={totalExpenses}
         openingBalance={openingBalance}
-        cashInCounter={cashInCounter}
+        cashInCounter={0}
         netProfit={netProfit}
       />
       <BillingTable
-        productTotals={[]} // Add your product totals here
+        productTotals={productTotals}
         selectedProducts={selectedProducts}
         setSelectedProducts={setSelectedProducts}
-        overallTotals={{
-          quantity: 0,
-          sales: 0,
-          unpaid: 0,
-          unpaidToPaidQR: 0,
-          paidWithQR: 0,
-        }}
+        overallTotals={overallTotals}
         totalExpenses={totalExpenses}
         netProfit={netProfit}
         openingBalance={openingBalance}
-        setOpeningBalance={() => {}} // Add your setter function here
+        setOpeningBalance={setOpeningBalance}
       />
       {isPrintTemplateOpen && (
         <BillingPrintTemplate
-          productTotals={[]} // Add your product totals here
+          productTotals={productTotals}
           type="all"
-          overallTotals={{
-            sales: 0,
-            paidWithQR: 0,
-            unpaid: 0,
-            unpaidToPaidQR: 0,
-          }}
+          overallTotals={overallTotals}
           totalExpenses={totalExpenses}
           openingBalance={openingBalance}
           netProfit={netProfit}

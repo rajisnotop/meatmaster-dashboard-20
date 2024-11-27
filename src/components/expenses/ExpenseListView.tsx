@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 import { Card } from "@/components/ui/card";
 import ExpenseTable from "./ExpenseTable";
 import ExpenseFilters from "./ExpenseFilters";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 const ExpenseListView = () => {
-  const { expenses } = useStore();
+  const { expenses } = useExpenseStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     minAmount: "",

@@ -14,7 +14,7 @@ import SalesCard from "./cards/SalesCard";
 import PaymentsCard from "./cards/PaymentsCard";
 import ExpensesCard from "./cards/ExpensesCard";
 import FinancialSummaryCard from "./cards/FinancialSummaryCard";
-import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 
 interface BillingTableProps {
   productTotals: any[];
@@ -43,13 +43,12 @@ const BillingTable = ({
   openingBalance,
   setOpeningBalance,
 }: BillingTableProps) => {
-  const getCashExpenses = useStore((state) => state.getCashExpenses);
-  const getOnlineExpenses = useStore((state) => state.getOnlineExpenses);
+  const getCashExpenses = useExpenseStore((state) => state.getCashExpenses);
+  const getOnlineExpenses = useExpenseStore((state) => state.getOnlineExpenses);
   
   const cashExpenses = getCashExpenses();
   const onlineExpenses = getOnlineExpenses();
   
-  // Updated calculations based on new formulas
   const cashInCounter = (overallTotals.sales || 0) + (overallTotals.unpaid || 0) - cashExpenses;
   const cashInBank = (overallTotals.paidWithQR || 0) + (overallTotals.unpaidToPaidQR || 0) - onlineExpenses;
 
