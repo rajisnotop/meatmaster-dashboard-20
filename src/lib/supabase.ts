@@ -1,22 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = 'https://hfgsxjhujejgfnrcswxy.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZ3N4amh1amVqZ2ZucmNzd3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3MTQzOTcsImV4cCI6MjA0ODI5MDM5N30.ExMiGCWbvJjEDg_ikHSMEpEZue95e3mMmVD6ClG6Pjg';
 
-// Provide meaningful error messages for missing configuration
-if (!supabaseUrl) {
-  console.error('VITE_SUPABASE_URL is not configured in environment variables');
-}
-if (!supabaseKey) {
-  console.error('VITE_SUPABASE_ANON_KEY is not configured in environment variables');
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
 }
 
-// Use fallback values for development to prevent crashes
-const url = supabaseUrl || 'https://your-project-url.supabase.co';
-const key = supabaseKey || 'your-anon-key';
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const supabase = createClient(url, key);
-
-// Log initialization status
-console.log('Supabase Client initialized with URL:', url);
+// Log successful initialization
+console.log('Supabase client initialized successfully');
