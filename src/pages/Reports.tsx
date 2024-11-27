@@ -1,13 +1,13 @@
 import Header from "@/components/Header";
 import { useStore } from "@/store/store";
-import { FileText, Printer, DollarSign, Receipt, TrendingUp, CreditCard } from "lucide-react";
+import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import TopSellingProducts from "@/components/reports/TopSellingProducts";
 import LoyalCustomers from "@/components/reports/LoyalCustomers";
 import RecentCustomers from "@/components/reports/RecentCustomers";
-import MetricCard from "@/components/reports/MetricCard";
+import RevenueMetrics from "@/components/reports/RevenueMetrics";
 import ProfitTrendsChart from "@/components/reports/ProfitTrendsChart";
 import ProductPerformance from "@/components/reports/ProductPerformance";
 import { calculateMonthlyTrends, calculateProductPerformance } from "@/utils/analyticsCalculations";
@@ -21,10 +21,7 @@ const Reports = () => {
   const averageOrderValue = orders.length ? Math.round(totalRevenue / orders.length) : 0;
 
   const monthlyTrends = calculateMonthlyTrends(orders, expenses);
-  const productPerformance = calculateProductPerformance(products, orders).map(product => ({
-    ...product,
-    trend: Math.random() * 100 - 50
-  }));
+  const productPerformance = calculateProductPerformance(products, orders);
 
   const recentCustomers = orders
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -353,14 +350,14 @@ const Reports = () => {
       <main className="container py-8 space-y-8 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Financial Reports</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-3xl font-bold text-forest">Financial Reports</h1>
+            <p className="text-forest/80 mt-1">
               Generated on {format(new Date(), "MMMM dd, yyyy")}
             </p>
           </div>
           <Button 
             variant="outline" 
-            className="hover:bg-primary/20"
+            className="hover:bg-primary/20 text-forest"
             onClick={handlePrintReport}
           >
             <Printer className="w-4 h-4 mr-2" />
@@ -368,28 +365,12 @@ const Reports = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricCard
-            icon={DollarSign}
-            title="Total Revenue"
-            value={`NPR ${totalRevenue.toLocaleString()}`}
-          />
-          <MetricCard
-            icon={Receipt}
-            title="Total Expenses"
-            value={`NPR ${totalExpenses.toLocaleString()}`}
-          />
-          <MetricCard
-            icon={TrendingUp}
-            title="Net Amount"
-            value={`NPR ${netProfit.toLocaleString()}`}
-          />
-          <MetricCard
-            icon={CreditCard}
-            title="Average Order"
-            value={`NPR ${averageOrderValue.toLocaleString()}`}
-          />
-        </div>
+        <RevenueMetrics 
+          totalRevenue={totalRevenue}
+          totalExpenses={totalExpenses}
+          netProfit={netProfit}
+          averageOrderValue={averageOrderValue}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProfitTrendsChart data={monthlyTrends} />
