@@ -34,35 +34,48 @@ export const useStore = create<StoreState>()(
           try {
             console.log('Initializing data from Supabase...');
             
-            // Fetch initial data from Supabase with better error handling
             const productsRes = await supabase.from('products').select('*');
             if (productsRes.error) {
               console.error('Error fetching products:', productsRes.error);
-              if (productsRes.error.message.includes('does not exist')) {
-                console.log('Products table does not exist. Please run the migration script.');
-              }
             }
 
-            const ordersRes = await supabase.from('orders').select('*');
+            // Update the select query to use snake_case column names
+            const ordersRes = await supabase.from('orders').select(`
+              id,
+              customer_name,
+              product_id,
+              quantity,
+              total,
+              date,
+              is_paid,
+              was_unpaid,
+              paid_with_qr
+            `);
             if (ordersRes.error) {
               console.error('Error fetching orders:', ordersRes.error);
-              if (ordersRes.error.message.includes('does not exist')) {
-                console.log('Orders table does not exist. Please run the migration script.');
-              }
             }
 
             const expensesRes = await supabase.from('expenses').select('*');
             if (expensesRes.error) {
               console.error('Error fetching expenses:', expensesRes.error);
-              if (expensesRes.error.message.includes('does not exist')) {
-                console.log('Expenses table does not exist. Please run the migration script.');
-              }
             }
 
-            // Set the data even if some requests failed
+            // Transform the data to match our frontend camelCase format
+            const transformedOrders = ordersRes.data?.map(order => ({
+              id: order.id,
+              customerName: order.customer_name,
+              productId: order.product_id,
+              quantity: order.quantity,
+              total: order.total,
+              date: order.date,
+              isPaid: order.is_paid,
+              wasUnpaid: order.was_unpaid,
+              paidWithQR: order.paid_with_qr
+            })) || [];
+
             set({
               products: productsRes.data || [],
-              orders: ordersRes.data || [],
+              orders: transformedOrders,
               expenses: expensesRes.data || []
             });
 
@@ -91,15 +104,31 @@ export const useStore = create<StoreState>()(
                 payload => {
                   console.log('Order change received:', payload);
                   const currentOrders = get().orders;
+                  const transformedOrder = payload.new ? {
+                    id: payload.new.id,
+                    customerName: payload.new.customer_name,
+                    productId: payload.new.product_id,
+                    quantity: payload.new.quantity,
+                    total: payload.new.total,
+                    date: payload.new.date,
+                    isPaid: payload.new.is_paid,
+                    wasUnpaid: payload.new.was_unpaid,
+                    paidWithQR: payload.new.paid_with_qr
+                  } : null;
+
                   switch (payload.eventType) {
                     case 'INSERT':
-                      set({ orders: [...currentOrders, payload.new as Order] });
+                      if (transformedOrder) {
+                        set({ orders: [...currentOrders, transformedOrder] });
+                      }
                       break;
                     case 'DELETE':
                       set({ orders: currentOrders.filter(o => o.id !== payload.old.id) });
                       break;
                     case 'UPDATE':
-                      set({ orders: currentOrders.map(o => o.id === payload.new.id ? payload.new as Order : o) });
+                      if (transformedOrder) {
+                        set({ orders: currentOrders.map(o => o.id === transformedOrder.id ? transformedOrder : o) });
+                      }
                       break;
                   }
                 })
