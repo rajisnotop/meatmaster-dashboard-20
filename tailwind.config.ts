@@ -19,14 +19,14 @@ export default {
     },
     extend: {
       colors: {
-        // New Nature-inspired Theme Colors
+        // Nature-inspired Theme Colors
         "moss": "#606c38",
         "forest": "#283618",
         "cream": "#fefae0",
         "earth": "#dda15e",
         "tiger": "#bc6c25",
         
-        // Keep existing system colors for compatibility
+        // System colors with updated foreground colors
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -34,7 +34,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "#606c38",
-          foreground: "#fefae0",
+          foreground: "#283618",
         },
         secondary: {
           DEFAULT: "#dda15e",
@@ -42,7 +42,7 @@ export default {
         },
         destructive: {
           DEFAULT: "#bc6c25",
-          foreground: "#fefae0",
+          foreground: "#283618",
         },
         muted: {
           DEFAULT: "#283618",
