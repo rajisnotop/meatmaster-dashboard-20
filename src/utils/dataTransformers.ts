@@ -8,9 +8,9 @@ export const transformDatabaseOrder = (order: DatabaseOrder): Order => ({
   quantity: order.quantity,
   total: order.total,
   date: new Date(order.date),
-  isPaid: order.is_paid,
-  wasUnpaid: order.was_unpaid,
-  paidWithQR: order.paid_with_qr
+  isPaid: order.ispaid,
+  wasUnpaid: order.wasunpaid,
+  paidWithQR: order.paidwithqr
 });
 
 export const transformDatabaseExpense = (expense: DatabaseExpense): Expense => ({

@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS public.orders (
     quantity DECIMAL(10,2) NOT NULL,
     total DECIMAL(10,2) NOT NULL,
     date TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
-    is_paid BOOLEAN DEFAULT false,
-    was_unpaid BOOLEAN DEFAULT true,
-    paid_with_qr BOOLEAN DEFAULT false
+    ispaid BOOLEAN DEFAULT false,
+    wasunpaid BOOLEAN DEFAULT true,
+    paidwithqr BOOLEAN DEFAULT false
 );
 
 -- Create expenses table

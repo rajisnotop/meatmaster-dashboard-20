@@ -15,9 +15,9 @@ export interface DatabaseOrder {
   quantity: number;
   total: number;
   date: string;
-  is_paid: boolean;
-  was_unpaid: boolean;
-  paid_with_qr: boolean;
+  ispaid: boolean;
+  wasunpaid: boolean;
+  paidwithqr: boolean;
 }
 
 export interface DatabaseProduct {

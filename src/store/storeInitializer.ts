@@ -19,9 +19,9 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
       quantity,
       total,
       date,
-      is_paid,
-      was_unpaid,
-      paid_with_qr
+      ispaid,
+      wasunpaid,
+      paidwithqr
     `);
     if (ordersRes.error) {
       console.error('Error fetching orders:', ordersRes.error);
