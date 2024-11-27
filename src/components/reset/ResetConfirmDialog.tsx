@@ -25,8 +25,8 @@ export const ResetConfirmDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="bg-background">
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-forest">Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription className="text-forest">
             This action cannot be undone. All orders, expenses, and related data
             within the selected time period will be permanently deleted.
           </AlertDialogDescription>
