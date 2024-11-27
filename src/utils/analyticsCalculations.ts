@@ -1,5 +1,5 @@
 import { Order, Product, Expense } from "@/types/types";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval, subMonths } from "date-fns";
 
 export const calculateDailyRevenue = (orders: Order[]) => {
   return orders.reduce((acc: { [key: string]: number }, order) => {
@@ -11,16 +11,41 @@ export const calculateDailyRevenue = (orders: Order[]) => {
 };
 
 export const calculateProductPerformance = (products: Product[], orders: Order[]) => {
+  const currentDate = new Date();
+  const lastMonth = subMonths(currentDate, 1);
+
   return products.map(product => {
     const productOrders = orders.filter(order => order.productId === product.id);
     const totalSold = productOrders.reduce((sum, order) => sum + order.quantity, 0);
     const totalRevenue = productOrders.reduce((sum, order) => sum + order.total, 0);
-    
+
+    // Calculate trend by comparing current month vs last month
+    const currentMonthOrders = productOrders.filter(order => 
+      new Date(order.date) >= startOfMonth(currentDate) && 
+      new Date(order.date) <= endOfMonth(currentDate)
+    );
+    const lastMonthOrders = productOrders.filter(order => 
+      new Date(order.date) >= startOfMonth(lastMonth) && 
+      new Date(order.date) <= endOfMonth(lastMonth)
+    );
+
+    const currentMonthRevenue = currentMonthOrders.reduce((sum, order) => sum + order.total, 0);
+    const lastMonthRevenue = lastMonthOrders.reduce((sum, order) => sum + order.total, 0);
+
+    // Calculate percentage change
+    let trend = 0;
+    if (lastMonthRevenue > 0) {
+      trend = ((currentMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
+    } else if (currentMonthRevenue > 0) {
+      trend = 100; // If there was no revenue last month but there is this month
+    }
+
     return {
       name: product.name,
       sold: totalSold,
       revenue: totalRevenue,
-      averagePrice: totalSold > 0 ? totalRevenue / totalSold : 0
+      averagePrice: totalSold > 0 ? totalRevenue / totalSold : 0,
+      trend: Math.round(trend * 10) / 10 // Round to 1 decimal place
     };
   }).sort((a, b) => b.revenue - a.revenue);
 };
