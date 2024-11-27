@@ -41,68 +41,73 @@ const DashboardStats = () => {
       value: `NPR ${todaysSales.toLocaleString()}`,
       change: salesChange,
       icon: DollarSign,
-      gradient: "from-blue-500/20 via-blue-400/20 to-blue-300/20",
-      iconColor: "text-blue-500"
+      gradient: "from-moss/20 via-moss/10 to-transparent",
+      iconColor: "text-moss"
     },
     {
       title: "Orders",
       value: orders.length.toString(),
       change: ordersChange,
       icon: ShoppingCart,
-      gradient: "from-purple-500/20 via-purple-400/20 to-purple-300/20",
-      iconColor: "text-purple-500"
+      gradient: "from-earth/20 via-earth/10 to-transparent",
+      iconColor: "text-earth"
     },
     {
       title: "Products",
       value: products.length.toString(),
       icon: Package,
-      gradient: "from-green-500/20 via-green-400/20 to-green-300/20",
-      iconColor: "text-green-500"
+      gradient: "from-tiger/20 via-tiger/10 to-transparent",
+      iconColor: "text-tiger"
     },
     {
       title: "Total Revenue",
       value: `NPR ${orders.reduce((total, order) => total + order.total, 0).toLocaleString()}`,
       icon: TrendingUp,
-      gradient: "from-orange-500/20 via-orange-400/20 to-orange-300/20",
-      iconColor: "text-orange-500"
+      gradient: "from-forest/20 via-forest/10 to-transparent",
+      iconColor: "text-forest"
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat, index) => (
         <Card
           key={index}
           className={cn(
-            "relative overflow-hidden",
-            "hover:shadow-lg transition-all duration-300",
-            "bg-gradient-to-br backdrop-blur-sm border-border/50",
+            "relative overflow-hidden transition-all duration-300",
+            "hover:shadow-lg hover:-translate-y-1",
+            "bg-gradient-to-r backdrop-blur-sm border-moss/10",
             stat.gradient
           )}
         >
-          <div className="p-6 flex items-center gap-4">
-            <div className={cn(
-              "p-3 rounded-xl",
-              "bg-background/40 backdrop-blur-sm",
-              stat.iconColor
-            )}>
-              <stat.icon className="h-6 w-6" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">{stat.title}</p>
-              <h3 className="text-2xl font-bold tracking-tight">{stat.value}</h3>
-              {typeof stat.change === 'number' && (
-                <div className="flex items-center gap-1">
-                  {stat.change > 0 ? (
-                    <ArrowUp className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <ArrowDown className="h-4 w-4 text-red-500" />
-                  )}
-                  <span className={`text-sm ${stat.change > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {Math.abs(stat.change).toFixed(1)}% from yesterday
-                  </span>
-                </div>
-              )}
+          <div className="p-6">
+            <div className="flex items-center gap-4">
+              <div className={cn(
+                "p-3 rounded-xl",
+                "bg-background/40 backdrop-blur-sm",
+                stat.iconColor
+              )}>
+                <stat.icon className="h-6 w-6" />
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-sm text-forest/70">{stat.title}</p>
+                <h3 className="text-2xl font-bold tracking-tight text-forest">{stat.value}</h3>
+                {typeof stat.change === 'number' && (
+                  <div className="flex items-center gap-1.5">
+                    {stat.change > 0 ? (
+                      <ArrowUp className="h-4 w-4 text-moss" />
+                    ) : (
+                      <ArrowDown className="h-4 w-4 text-tiger" />
+                    )}
+                    <span className={cn(
+                      "text-sm font-medium",
+                      stat.change > 0 ? "text-moss" : "text-tiger"
+                    )}>
+                      {Math.abs(stat.change).toFixed(1)}% from yesterday
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </Card>
