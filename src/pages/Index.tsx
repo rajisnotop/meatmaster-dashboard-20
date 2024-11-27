@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Clock, TrendingUp, Search } from "lucide-react";
 import { format } from "date-fns";
-import Header from "@/components/Header";
 import DashboardStats from "@/components/DashboardStats";
 import ProductsTable from "@/components/ProductsTable";
 import OrderForm from "@/components/OrderForm";
@@ -10,8 +9,6 @@ import { Input } from "@/components/ui/input";
 const Index = () => {
   return (
     <div className="min-h-screen bg-cream">
-      <Header />
-      
       <main className="container py-6 space-y-6">
         {/* Welcome & Search Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-moss/5 p-6 rounded-xl">

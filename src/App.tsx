@@ -26,7 +26,7 @@ function App() {
     <Router>
       <div className={`min-h-screen bg-cream ${navStyle === 'side' ? 'pl-64' : ''}`}>
         <Header />
-        <main className={`${navStyle === 'side' ? 'pt-6' : 'pt-0'}`}>
+        <main className={`${navStyle === 'side' ? 'pt-6' : 'pt-20'}`}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/orders" element={<Orders />} />
