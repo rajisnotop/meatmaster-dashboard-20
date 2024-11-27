@@ -31,75 +31,100 @@ export const useStore = create<StoreState>()(
         expenses: [],
         
         initializeData: async () => {
-          // Fetch initial data from Supabase
-          const [productsRes, ordersRes, expensesRes] = await Promise.all([
-            supabase.from('products').select('*'),
-            supabase.from('orders').select('*'),
-            supabase.from('expenses').select('*')
-          ]);
+          try {
+            console.log('Initializing data from Supabase...');
+            
+            // Fetch initial data from Supabase
+            const [productsRes, ordersRes, expensesRes] = await Promise.all([
+              supabase.from('products').select('*'),
+              supabase.from('orders').select('*'),
+              supabase.from('expenses').select('*')
+            ]);
 
-          if (productsRes.error) console.error('Error fetching products:', productsRes.error);
-          if (ordersRes.error) console.error('Error fetching orders:', ordersRes.error);
-          if (expensesRes.error) console.error('Error fetching expenses:', expensesRes.error);
+            // Log any errors but don't throw them to prevent app from crashing
+            if (productsRes.error) {
+              console.error('Error fetching products:', productsRes.error);
+              return;
+            }
+            if (ordersRes.error) {
+              console.error('Error fetching orders:', ordersRes.error);
+              return;
+            }
+            if (expensesRes.error) {
+              console.error('Error fetching expenses:', expensesRes.error);
+              return;
+            }
 
-          set({
-            products: productsRes.data || [],
-            orders: ordersRes.data || [],
-            expenses: expensesRes.data || []
-          });
+            console.log('Data fetched successfully:', {
+              products: productsRes.data?.length || 0,
+              orders: ordersRes.data?.length || 0,
+              expenses: expensesRes.data?.length || 0
+            });
 
-          // Subscribe to real-time changes
-          supabase
-            .channel('table-changes')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, 
-              payload => {
-                console.log('Product change received:', payload);
-                const currentProducts = get().products;
-                switch (payload.eventType) {
-                  case 'INSERT':
-                    set({ products: [...currentProducts, payload.new as Product] });
-                    break;
-                  case 'DELETE':
-                    set({ products: currentProducts.filter(p => p.id !== payload.old.id) });
-                    break;
-                  case 'UPDATE':
-                    set({ products: currentProducts.map(p => p.id === payload.new.id ? payload.new as Product : p) });
-                    break;
-                }
-              })
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' },
-              payload => {
-                console.log('Order change received:', payload);
-                const currentOrders = get().orders;
-                switch (payload.eventType) {
-                  case 'INSERT':
-                    set({ orders: [...currentOrders, payload.new as Order] });
-                    break;
-                  case 'DELETE':
-                    set({ orders: currentOrders.filter(o => o.id !== payload.old.id) });
-                    break;
-                  case 'UPDATE':
-                    set({ orders: currentOrders.map(o => o.id === payload.new.id ? payload.new as Order : o) });
-                    break;
-                }
-              })
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' },
-              payload => {
-                console.log('Expense change received:', payload);
-                const currentExpenses = get().expenses;
-                switch (payload.eventType) {
-                  case 'INSERT':
-                    set({ expenses: [...currentExpenses, payload.new as Expense] });
-                    break;
-                  case 'DELETE':
-                    set({ expenses: currentExpenses.filter(e => e.id !== payload.old.id) });
-                    break;
-                  case 'UPDATE':
-                    set({ expenses: currentExpenses.map(e => e.id === payload.new.id ? payload.new as Expense : e) });
-                    break;
-                }
-              })
-            .subscribe();
+            set({
+              products: productsRes.data || [],
+              orders: ordersRes.data || [],
+              expenses: expensesRes.data || []
+            });
+
+            // Subscribe to real-time changes
+            const channel = supabase
+              .channel('table-changes')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, 
+                payload => {
+                  console.log('Product change received:', payload);
+                  const currentProducts = get().products;
+                  switch (payload.eventType) {
+                    case 'INSERT':
+                      set({ products: [...currentProducts, payload.new as Product] });
+                      break;
+                    case 'DELETE':
+                      set({ products: currentProducts.filter(p => p.id !== payload.old.id) });
+                      break;
+                    case 'UPDATE':
+                      set({ products: currentProducts.map(p => p.id === payload.new.id ? payload.new as Product : p) });
+                      break;
+                  }
+                })
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' },
+                payload => {
+                  console.log('Order change received:', payload);
+                  const currentOrders = get().orders;
+                  switch (payload.eventType) {
+                    case 'INSERT':
+                      set({ orders: [...currentOrders, payload.new as Order] });
+                      break;
+                    case 'DELETE':
+                      set({ orders: currentOrders.filter(o => o.id !== payload.old.id) });
+                      break;
+                    case 'UPDATE':
+                      set({ orders: currentOrders.map(o => o.id === payload.new.id ? payload.new as Order : o) });
+                      break;
+                  }
+                })
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' },
+                payload => {
+                  console.log('Expense change received:', payload);
+                  const currentExpenses = get().expenses;
+                  switch (payload.eventType) {
+                    case 'INSERT':
+                      set({ expenses: [...currentExpenses, payload.new as Expense] });
+                      break;
+                    case 'DELETE':
+                      set({ expenses: currentExpenses.filter(e => e.id !== payload.old.id) });
+                      break;
+                    case 'UPDATE':
+                      set({ expenses: currentExpenses.map(e => e.id === payload.new.id ? payload.new as Expense : e) });
+                      break;
+                  }
+                });
+
+            channel.subscribe(status => {
+              console.log('Realtime subscription status:', status);
+            });
+          } catch (error) {
+            console.error('Error initializing data:', error);
+          }
         },
 
         addProduct: async (product) => {
