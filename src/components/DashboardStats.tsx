@@ -1,8 +1,7 @@
 import { DollarSign, ShoppingCart, Package, TrendingUp, ArrowUp, ArrowDown } from "lucide-react";
 import { useStore } from "@/store/store";
 import { startOfDay, subDays } from "date-fns";
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const DashboardStats = () => {
   const { orders, products } = useStore();
@@ -41,76 +40,73 @@ const DashboardStats = () => {
       value: `NPR ${todaysSales.toLocaleString()}`,
       change: salesChange,
       icon: DollarSign,
-      gradient: "from-moss/20 via-moss/10 to-transparent",
-      iconColor: "text-moss"
+      color: "moss"
     },
     {
       title: "Orders",
       value: orders.length.toString(),
       change: ordersChange,
       icon: ShoppingCart,
-      gradient: "from-earth/20 via-earth/10 to-transparent",
-      iconColor: "text-earth"
+      color: "earth"
     },
     {
       title: "Products",
       value: products.length.toString(),
       icon: Package,
-      gradient: "from-tiger/20 via-tiger/10 to-transparent",
-      iconColor: "text-tiger"
+      color: "tiger"
     },
     {
       title: "Total Revenue",
       value: `NPR ${orders.reduce((total, order) => total + order.total, 0).toLocaleString()}`,
       icon: TrendingUp,
-      gradient: "from-forest/20 via-forest/10 to-transparent",
-      iconColor: "text-forest"
+      color: "forest"
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat, index) => (
-        <Card
+        <motion.div
           key={index}
-          className={cn(
-            "relative overflow-hidden transition-all duration-300",
-            "hover:shadow-lg hover:-translate-y-1",
-            "bg-gradient-to-r backdrop-blur-sm border-moss/10",
-            stat.gradient
-          )}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          className={`
+            relative p-6 rounded-xl border border-${stat.color}/10
+            bg-gradient-to-br from-${stat.color}/10 via-${stat.color}/5 to-transparent
+            hover:shadow-lg transition-all duration-300 group
+          `}
         >
-          <div className="p-6">
-            <div className="flex items-center gap-4">
-              <div className={cn(
-                "p-3 rounded-xl",
-                "bg-background/40 backdrop-blur-sm",
-                stat.iconColor
-              )}>
-                <stat.icon className="h-6 w-6" />
-              </div>
-              <div className="space-y-1.5">
-                <p className="text-sm text-forest/70">{stat.title}</p>
-                <h3 className="text-2xl font-bold tracking-tight text-forest">{stat.value}</h3>
-                {typeof stat.change === 'number' && (
-                  <div className="flex items-center gap-1.5">
-                    {stat.change > 0 ? (
-                      <ArrowUp className="h-4 w-4 text-moss" />
-                    ) : (
-                      <ArrowDown className="h-4 w-4 text-tiger" />
-                    )}
-                    <span className={cn(
-                      "text-sm font-medium",
-                      stat.change > 0 ? "text-moss" : "text-tiger"
-                    )}>
-                      {Math.abs(stat.change).toFixed(1)}% from yesterday
-                    </span>
-                  </div>
-                )}
-              </div>
+          <div className="flex items-center gap-4">
+            <div className={`
+              p-3 rounded-lg bg-${stat.color}/10 
+              group-hover:bg-${stat.color}/20 transition-colors duration-300
+            `}>
+              <stat.icon className={`h-6 w-6 text-${stat.color}`} />
+            </div>
+            
+            <div className="space-y-1">
+              <p className={`text-sm text-${stat.color}/70`}>{stat.title}</p>
+              <h3 className={`text-2xl font-bold text-${stat.color}`}>
+                {stat.value}
+              </h3>
+              {typeof stat.change === 'number' && (
+                <div className="flex items-center gap-1.5">
+                  {stat.change > 0 ? (
+                    <ArrowUp className="h-4 w-4 text-moss" />
+                  ) : (
+                    <ArrowDown className="h-4 w-4 text-tiger" />
+                  )}
+                  <span className={`text-sm font-medium ${
+                    stat.change > 0 ? 'text-moss' : 'text-tiger'
+                  }`}>
+                    {Math.abs(stat.change).toFixed(1)}% from yesterday
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-        </Card>
+        </motion.div>
       ))}
     </div>
   );

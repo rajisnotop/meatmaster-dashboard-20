@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Button } from "./ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { useStore } from "@/store/store";
 import { useToast } from "./ui/use-toast";
+import { motion } from "framer-motion";
 
 const ProductsTable = () => {
   const { products, addProduct, deleteProduct } = useStore();
@@ -13,6 +14,7 @@ const ProductsTable = () => {
     name: "",
     price: "",
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleAddProduct = () => {
     if (!newProduct.name || !newProduct.price) {
@@ -27,7 +29,7 @@ const ProductsTable = () => {
     addProduct({
       name: newProduct.name,
       price: Number(newProduct.price),
-      stock: 0, // We keep this to maintain compatibility with existing data structure
+      stock: 0,
     });
 
     setNewProduct({ name: "", price: "" });
@@ -45,56 +47,87 @@ const ProductsTable = () => {
     });
   };
 
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="space-y-4 animate-fade-in">
-      <div className="flex gap-4">
-        <Input
-          placeholder="Product Name"
-          value={newProduct.name}
-          onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-        />
-        <Input
-          type="number"
-          placeholder="Price (NPR)"
-          value={newProduct.price}
-          onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-        />
-        <Button onClick={handleAddProduct}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Product
-        </Button>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-4"
+    >
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-moss/50 w-4 h-4" />
+          <Input
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-cream border-moss/20 focus:border-tiger"
+          />
+        </div>
+        <div className="flex gap-4 flex-1">
+          <Input
+            placeholder="Product Name"
+            value={newProduct.name}
+            onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+            className="bg-cream border-moss/20 focus:border-tiger"
+          />
+          <Input
+            type="number"
+            placeholder="Price (NPR)"
+            value={newProduct.price}
+            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+            className="bg-cream border-moss/20 focus:border-tiger"
+          />
+          <Button 
+            onClick={handleAddProduct}
+            className="bg-tiger text-cream hover:bg-tiger/90 transition-colors"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add
+          </Button>
+        </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-lg border border-moss/10 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Product Name</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+            <TableRow className="bg-moss/5 hover:bg-moss/10">
+              <TableHead className="text-forest">Product Name</TableHead>
+              <TableHead className="text-forest">Price</TableHead>
+              <TableHead className="text-right text-forest">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
-              <TableRow key={product.id}>
-                <TableCell className="font-medium">{product.name}</TableCell>
-                <TableCell>NPR {product.price.toLocaleString()}</TableCell>
+            {filteredProducts.map((product, index) => (
+              <motion.tr
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                className="bg-cream hover:bg-moss/5 transition-colors"
+              >
+                <TableCell className="font-medium text-forest">{product.name}</TableCell>
+                <TableCell className="text-moss">NPR {product.price.toLocaleString()}</TableCell>
                 <TableCell className="text-right">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDeleteProduct(product.id)}
-                    className="text-destructive"
+                    className="text-tiger hover:text-tiger/80 hover:bg-tiger/10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
-              </TableRow>
+              </motion.tr>
             ))}
           </TableBody>
         </Table>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
