@@ -12,6 +12,7 @@ import Expenditure from "./pages/Expenditure";
 import Settings from "./pages/Settings";
 import Reset from "./pages/Reset";
 import Excel from "./pages/Excel";
+import ConsolidatedData from "./pages/ConsolidatedData";
 import Header from "./components/Header";
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/reset" element={<Reset />} />
             <Route path="/excel" element={<Excel />} />
+            <Route path="/consolidated" element={<ConsolidatedData />} />
           </Routes>
         </main>
       </div>

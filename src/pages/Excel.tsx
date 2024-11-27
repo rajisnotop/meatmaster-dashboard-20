@@ -3,7 +3,16 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ExcelToolbar } from '@/components/excel/ExcelToolbar';
-import { evaluateFormula } from '@/utils/excelFormulas';
+import {
+  Bold,
+  Italic,
+  Underline,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  PaintBucket,
+  Calculator
+} from 'lucide-react';
 
 interface CellData {
   value: string;
@@ -36,6 +45,55 @@ const Excel = () => {
       setGridData(JSON.parse(savedData));
     }
   }, []);
+
+  const evaluateFormula = (formula: string): number => {
+    try {
+      // Remove the = sign and spaces
+      const expression = formula.substring(1).replace(/\s+/g, '');
+      
+      // Split into parts (numbers and operators)
+      const parts = expression.split(/([+\-*/])/);
+      
+      // Convert cell references to values
+      const values = parts.map(part => {
+        if (['+', '-', '*', '/'].includes(part)) {
+          return part;
+        }
+        // Check if it's a cell reference (e.g., A1, B2)
+        const cellMatch = part.match(/^([A-Z])(\d+)$/);
+        if (cellMatch) {
+          const col = cellMatch[1].charCodeAt(0) - 65;
+          const row = parseInt(cellMatch[2]) - 1;
+          const cellId = getCellId(row, col);
+          const cellValue = parseFloat(gridData[cellId]?.value || '0');
+          return isNaN(cellValue) ? 0 : cellValue;
+        }
+        return parseFloat(part) || 0;
+      });
+
+      // Calculate result
+      let result = values[0] as number;
+      for (let i = 1; i < values.length; i += 2) {
+        const operator = values[i] as string;
+        const nextValue = values[i + 1] as number;
+        
+        switch (operator) {
+          case '+': result += nextValue; break;
+          case '-': result -= nextValue; break;
+          case '*': result *= nextValue; break;
+          case '/': 
+            if (nextValue === 0) throw new Error('Division by zero');
+            result /= nextValue;
+            break;
+        }
+      }
+      
+      return Number(result.toFixed(2));
+    } catch (error) {
+      console.error('Formula evaluation error:', error);
+      return 0;
+    }
+  };
 
   const getCellId = (row: number, col: number) => {
     const colLetter = String.fromCharCode(65 + col);
@@ -113,7 +171,62 @@ const Excel = () => {
           <p className="text-moss/70 text-sm mt-1">Enhanced with formatting and formulas</p>
         </div>
 
-        <ExcelToolbar onStyleChange={handleStyleChange} selectedCell={selectedCell} />
+        <div className="p-4 border-b flex items-center gap-2">
+          <button
+            onClick={() => handleStyleChange('bold', !gridData[selectedCell!]?.style?.bold)}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            <Bold className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => handleStyleChange('italic', !gridData[selectedCell!]?.style?.italic)}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            <Italic className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => handleStyleChange('underline', !gridData[selectedCell!]?.style?.underline)}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            <Underline className="h-4 w-4" />
+          </button>
+          <div className="h-6 w-px bg-gray-300 mx-2" />
+          <button
+            onClick={() => handleStyleChange('align', 'left')}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            <AlignLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => handleStyleChange('align', 'center')}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            <AlignCenter className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => handleStyleChange('align', 'right')}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            <AlignRight className="h-4 w-4" />
+          </button>
+          <div className="h-6 w-px bg-gray-300 mx-2" />
+          <input
+            type="color"
+            onChange={(e) => handleStyleChange('color', e.target.value)}
+            className="w-8 h-8 p-1"
+          />
+          <button
+            onClick={() => handleStyleChange('backgroundColor', '#f0f0f0')}
+            className="p-2 hover:bg-gray-100 rounded"
+          >
+            <PaintBucket className="h-4 w-4" />
+          </button>
+          <div className="h-6 w-px bg-gray-300 mx-2" />
+          <Calculator className="h-4 w-4" />
+          <span className="text-sm text-gray-500">
+            Use =A1+B1 for formulas
+          </span>
+        </div>
           
         <ScrollArea className="h-[800px]">
           <div className="p-6">
