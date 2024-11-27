@@ -8,12 +8,16 @@ import OrdersSummary from "@/components/orders/OrdersSummary";
 import OrdersSearch from "@/components/orders/OrdersSearch";
 import GroupedOrdersList from "@/components/GroupedOrdersList";
 import PaidOrdersList from "@/components/orders/PaidOrdersList";
+import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Orders = () => {
   const { orders } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [editingOrder, setEditingOrder] = useState(null);
+  const [showNewOrderForm, setShowNewOrderForm] = useState(false);
   const [filters, setFilters] = useState({
     paymentStatus: "all",
     minAmount: "",
@@ -45,22 +49,53 @@ const Orders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/95">
+    <div className="min-h-screen bg-gradient-to-b from-[#fefae0] to-[#fefae0]/95">
       <Header />
-      <main className="container py-8 space-y-8 animate-fade-in">
-        <OrdersSummary
-          totalUnpaidAmount={totalUnpaidAmount}
-          totalPaidAmount={totalPaidAmount}
-          totalUnpaidToPaidAmount={totalUnpaidToPaidAmount}
-          totalUnpaidToPaidQRAmount={totalUnpaidToPaidQRAmount}
-          totalOrders={orders.length}
-        />
+      <main className="container py-8 space-y-8">
+        <div className="flex items-center justify-between">
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl font-bold tracking-tight text-[#283618]"
+          >
+            Orders Management
+          </motion.h1>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <Button
+              onClick={() => setShowNewOrderForm(true)}
+              className="bg-[#bc6c25] hover:bg-[#dda15e] text-white flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              New Order
+            </Button>
+          </motion.div>
+        </div>
 
-        <div className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-xl bg-white/50 backdrop-blur-sm border border-[#606c38]/20 p-6 shadow-lg"
+        >
+          <OrdersSummary
+            totalUnpaidAmount={totalUnpaidAmount}
+            totalPaidAmount={totalPaidAmount}
+            totalUnpaidToPaidAmount={totalUnpaidToPaidAmount}
+            totalUnpaidToPaidQRAmount={totalUnpaidToPaidQRAmount}
+            totalOrders={orders.length}
+          />
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-6"
+        >
           <div className="flex flex-col gap-6">
-            <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-              Orders
-            </h2>
             <OrdersSearch
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
@@ -70,25 +105,43 @@ const Orders = () => {
             />
           </div>
 
-          <Tabs defaultValue="unpaid" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="unpaid" className="text-lg">Unpaid Orders</TabsTrigger>
-              <TabsTrigger value="paid" className="text-lg">Paid Orders</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="unpaid" className="mt-0">
-              <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
-            </TabsContent>
-            
-            <TabsContent value="paid" className="mt-0">
-              <PaidOrdersList searchTerm={searchTerm} searchDate={searchDate} />
-            </TabsContent>
-          </Tabs>
-        </div>
+          <div className="rounded-xl bg-white/50 backdrop-blur-sm border border-[#606c38]/20 p-6 shadow-lg">
+            <Tabs defaultValue="unpaid" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger 
+                  value="unpaid" 
+                  className="text-lg data-[state=active]:bg-[#606c38] data-[state=active]:text-white"
+                >
+                  Unpaid Orders
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="paid" 
+                  className="text-lg data-[state=active]:bg-[#606c38] data-[state=active]:text-white"
+                >
+                  Paid Orders
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="unpaid" className="mt-0">
+                <GroupedOrdersList searchTerm={searchTerm} searchDate={searchDate} />
+              </TabsContent>
+              
+              <TabsContent value="paid" className="mt-0">
+                <PaidOrdersList searchTerm={searchTerm} searchDate={searchDate} />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </motion.div>
 
         <Dialog open={!!editingOrder} onOpenChange={() => setEditingOrder(null)}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-[600px]">
             <OrderForm editingOrder={editingOrder} />
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showNewOrderForm} onOpenChange={setShowNewOrderForm}>
+          <DialogContent className="sm:max-w-[600px]">
+            <OrderForm />
           </DialogContent>
         </Dialog>
       </main>
