@@ -2,24 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { 
-  Bold, 
-  Italic, 
-  Underline, 
-  AlignLeft, 
-  AlignCenter, 
-  AlignRight,
-  PaintBucket,
-  Functions
-} from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Separator } from '@/components/ui/separator';
+import { ExcelToolbar } from '@/components/excel/ExcelToolbar';
+import { evaluateFormula } from '@/utils/excelFormulas';
 
 interface CellData {
   value: string;
@@ -58,18 +42,6 @@ const Excel = () => {
     return `${colLetter}${row + 1}`;
   };
 
-  const evaluateFormula = (formula: string, cellId: string): number => {
-    try {
-      // Remove the = sign and evaluate the expression
-      const expression = formula.substring(1);
-      // Basic implementation - you can expand this
-      return eval(expression);
-    } catch (error) {
-      console.error('Formula evaluation error:', error);
-      return 0;
-    }
-  };
-
   const handleCellChange = (row: number, col: number, value: string) => {
     const cellId = getCellId(row, col);
     const newGridData = {
@@ -83,7 +55,7 @@ const Excel = () => {
     };
     
     if (value.startsWith('=')) {
-      const result = evaluateFormula(value, cellId);
+      const result = evaluateFormula(value);
       newGridData[cellId].value = result.toString();
     }
     
@@ -115,7 +87,7 @@ const Excel = () => {
     };
   };
 
-  const applyStyle = (styleType: keyof CellData['style'], value: any) => {
+  const handleStyleChange = (styleType: keyof CellData['style'], value: any) => {
     if (!selectedCell) return;
     
     const newGridData = {
@@ -141,84 +113,7 @@ const Excel = () => {
           <p className="text-moss/70 text-sm mt-1">Enhanced with formatting and formulas</p>
         </div>
 
-        <div className="p-4 border-b border-moss/10">
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => applyStyle('bold', !gridData[selectedCell]?.style?.bold)}
-            >
-              <Bold className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => applyStyle('italic', !gridData[selectedCell]?.style?.italic)}
-            >
-              <Italic className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => applyStyle('underline', !gridData[selectedCell]?.style?.underline)}
-            >
-              <Underline className="h-4 w-4" />
-            </Button>
-            
-            <Separator orientation="vertical" className="h-6" />
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => applyStyle('align', 'left')}
-            >
-              <AlignLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => applyStyle('align', 'center')}
-            >
-              <AlignCenter className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => applyStyle('align', 'right')}
-            >
-              <AlignRight className="h-4 w-4" />
-            </Button>
-            
-            <Separator orientation="vertical" className="h-6" />
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <PaintBucket className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => applyStyle('backgroundColor', '#ffeb3b')}>
-                  Yellow Highlight
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => applyStyle('backgroundColor', '#a5d6a7')}>
-                  Green Highlight
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => applyStyle('backgroundColor', '#ef9a9a')}>
-                  Red Highlight
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              title="Formula Help"
-            >
-              <Functions className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <ExcelToolbar onStyleChange={handleStyleChange} selectedCell={selectedCell} />
           
         <ScrollArea className="h-[800px]">
           <div className="p-6">
