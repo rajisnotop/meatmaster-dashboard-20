@@ -34,40 +34,41 @@ export const useStore = create<StoreState>()(
           try {
             console.log('Initializing data from Supabase...');
             
-            // Fetch initial data from Supabase
-            const [productsRes, ordersRes, expensesRes] = await Promise.all([
-              supabase.from('products').select('*'),
-              supabase.from('orders').select('*'),
-              supabase.from('expenses').select('*')
-            ]);
-
-            // Log any errors but don't throw them to prevent app from crashing
+            // Fetch initial data from Supabase with better error handling
+            const productsRes = await supabase.from('products').select('*');
             if (productsRes.error) {
               console.error('Error fetching products:', productsRes.error);
-              return;
+              if (productsRes.error.message.includes('does not exist')) {
+                console.log('Products table does not exist. Please run the migration script.');
+              }
             }
+
+            const ordersRes = await supabase.from('orders').select('*');
             if (ordersRes.error) {
               console.error('Error fetching orders:', ordersRes.error);
-              return;
+              if (ordersRes.error.message.includes('does not exist')) {
+                console.log('Orders table does not exist. Please run the migration script.');
+              }
             }
+
+            const expensesRes = await supabase.from('expenses').select('*');
             if (expensesRes.error) {
               console.error('Error fetching expenses:', expensesRes.error);
-              return;
+              if (expensesRes.error.message.includes('does not exist')) {
+                console.log('Expenses table does not exist. Please run the migration script.');
+              }
             }
 
-            console.log('Data fetched successfully:', {
-              products: productsRes.data?.length || 0,
-              orders: ordersRes.data?.length || 0,
-              expenses: expensesRes.data?.length || 0
-            });
-
+            // Set the data even if some requests failed
             set({
               products: productsRes.data || [],
               orders: ordersRes.data || [],
               expenses: expensesRes.data || []
             });
 
-            // Subscribe to real-time changes
+            console.log('Data initialization completed');
+
+            // Set up real-time subscriptions
             const channel = supabase
               .channel('table-changes')
               .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, 
@@ -247,6 +248,7 @@ export const useStore = create<StoreState>()(
 
         setOrders: (orders) => set({ orders }),
         setExpenses: (expenses) => set({ expenses }),
+
       }),
       {
         name: 'meat-shop-storage',

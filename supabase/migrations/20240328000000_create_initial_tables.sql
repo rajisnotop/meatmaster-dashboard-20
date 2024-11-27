@@ -1,45 +1,54 @@
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Create products table
-create table public.products (
-    id uuid default gen_random_uuid() primary key,
-    name text not null,
-    price numeric not null,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE IF NOT EXISTS public.products (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL,
+    price NUMERIC NOT NULL,
+    stock INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- Create orders table
-create table public.orders (
-    id uuid default gen_random_uuid() primary key,
-    customerName text,
-    productId uuid references public.products(id),
-    quantity numeric not null,
-    total numeric not null,
-    date timestamp with time zone default timezone('utc'::text, now()) not null,
-    isPaid boolean default false,
-    paidWithQR boolean default false,
-    wasUnpaid boolean default false
+CREATE TABLE IF NOT EXISTS public.orders (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    customerName TEXT,
+    productId UUID REFERENCES public.products(id),
+    quantity NUMERIC NOT NULL,
+    total NUMERIC NOT NULL,
+    date TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    isPaid BOOLEAN DEFAULT false,
+    paidWithQR BOOLEAN DEFAULT false,
+    wasUnpaid BOOLEAN DEFAULT false
 );
 
 -- Create expenses table
-create table public.expenses (
-    id uuid default gen_random_uuid() primary key,
-    description text not null,
-    amount numeric not null,
-    date timestamp with time zone default timezone('utc'::text, now()) not null,
-    category text not null,
-    paymentMethod text not null
+CREATE TABLE IF NOT EXISTS public.expenses (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    description TEXT NOT NULL,
+    amount NUMERIC NOT NULL,
+    date TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    category TEXT NOT NULL,
+    paymentMethod TEXT NOT NULL
 );
 
 -- Enable Row Level Security (RLS)
-alter table public.products enable row level security;
-alter table public.orders enable row level security;
-alter table public.expenses enable row level security;
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
 
 -- Create policies that allow all operations (for development)
-create policy "Enable all operations for products" on public.products
-    for all using (true);
+CREATE POLICY "Enable all operations for products" ON public.products
+    FOR ALL USING (true);
 
-create policy "Enable all operations for orders" on public.orders
-    for all using (true);
+CREATE POLICY "Enable all operations for orders" ON public.orders
+    FOR ALL USING (true);
 
-create policy "Enable all operations for expenses" on public.expenses
-    for all using (true);
+CREATE POLICY "Enable all operations for expenses" ON public.expenses
+    FOR ALL USING (true);
+
+-- Grant access to authenticated and anonymous users
+GRANT ALL ON public.products TO anon, authenticated;
+GRANT ALL ON public.orders TO anon, authenticated;
+GRANT ALL ON public.expenses TO anon, authenticated;
