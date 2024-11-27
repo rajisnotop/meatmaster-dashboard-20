@@ -1,4 +1,8 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -6,27 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Printer, FileSpreadsheet, Database } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import DateRangeSelector from "./DateRangeSelector";
-import { toast } from "sonner";
+import { FileDown, Printer } from "lucide-react";
+import { convertBillingDataToExcelData } from "@/utils/excelDataTransfer";
 
 interface BillingHeaderProps {
   timeFilter: string;
-  setTimeFilter: (value: string) => void;
+  setTimeFilter: (filter: string) => void;
   selectedProducts: string[];
   onPrint: (type: "all" | "selected") => void;
   dateFilter: string;
-  setDateFilter: (value: string) => void;
+  setDateFilter: (date: string) => void;
   onExportExcel: () => void;
   startDate: string | null;
   endDate: string | null;
@@ -51,94 +44,128 @@ const BillingHeader = ({
   endDate,
   setStartDate,
   setEndDate,
+  productTotals,
+  totalExpenses,
+  openingBalance,
+  cashInCounter,
+  netProfit
 }: BillingHeaderProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleExportToExcelPage = () => {
+    const gridData = convertBillingDataToExcelData(productTotals, {
+      totalExpenses,
+      openingBalance,
+      cashInCounter,
+      netProfit
+    });
+    
+    navigate('/excel', { state: { gridData } });
+    
+    toast({
+      title: "Data Exported to Excel Page",
+      description: "You can now edit the data in the Excel page",
+      duration: 2000
+    });
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-4 mb-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Billing Summary</h1>
-        <div className="flex gap-3">
-          <Button onClick={onExportExcel} variant="outline" className="gap-2">
-            <FileSpreadsheet className="h-4 w-4" />
-            Export Excel
+        <h1 className="text-2xl font-semibold text-forest">Billing Overview</h1>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportToExcelPage}
+            className="bg-green-500/20 hover:bg-green-500/30 text-green-700"
+          >
+            <FileDown className="w-4 h-4 mr-2" />
+            Export to Excel Page
           </Button>
-          <Button onClick={() => onPrint("all")} variant="outline" className="gap-2">
-            <Printer className="h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPrint("selected")}
+            disabled={selectedProducts.length === 0}
+            className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-700"
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Print Selected
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPrint("all")}
+            className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-700"
+          >
+            <Printer className="w-4 h-4 mr-2" />
             Print All
           </Button>
           <Button
-            onClick={() => onPrint("selected")}
             variant="outline"
-            disabled={selectedProducts.length === 0}
-            className="gap-2"
+            size="sm"
+            onClick={onExportExcel}
+            className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-700"
           >
-            <Printer className="h-4 w-4" />
-            Print Selected
+            <FileDown className="w-4 h-4 mr-2" />
+            Export Excel
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4">
-        <Select 
-          value={timeFilter} 
-          onValueChange={(value) => {
-            setTimeFilter(value);
-            if (value !== "date-range") {
-              setStartDate(null);
-              setEndDate(null);
-            }
-          }}
-        >
-          <SelectTrigger className="w-[180px] bg-background">
-            <SelectValue placeholder="Select time period" />
-          </SelectTrigger>
-          <SelectContent className="bg-background">
-            <SelectItem value="all">All Time</SelectItem>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-            <SelectItem value="monthly">Monthly</SelectItem>
-            <SelectItem value="yearly">Yearly</SelectItem>
-            <SelectItem value="date-range">Date Range</SelectItem>
-          </SelectContent>
-        </Select>
-        
+      <div className="flex items-end gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="timeFilter">Time Period</Label>
+          <Select value={timeFilter} onValueChange={setTimeFilter}>
+            <SelectTrigger id="timeFilter" className="w-[180px]">
+              <SelectValue placeholder="Select time period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="yearly">Yearly</SelectItem>
+              <SelectItem value="date-range">Date Range</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {timeFilter === "date-range" ? (
-          <DateRangeSelector
-            startDate={startDate}
-            endDate={endDate}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-          />
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Start Date</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={startDate || ""}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-[180px]"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endDate">End Date</Label>
+              <Input
+                id="endDate"
+                type="date"
+                value={endDate || ""}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-[180px]"
+              />
+            </div>
+          </>
         ) : (
-          <div className="flex gap-2">
+          <div className="space-y-2">
+            <Label htmlFor="dateFilter">Select Date</Label>
             <Input
+              id="dateFilter"
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
               className="w-[180px]"
             />
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-[42px] px-2",
-                    !dateFilter && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-background border" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateFilter ? new Date(dateFilter) : undefined}
-                  onSelect={(date) =>
-                    setDateFilter(date ? format(date, "yyyy-MM-dd") : "")
-                  }
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
           </div>
         )}
       </div>

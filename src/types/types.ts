@@ -26,3 +26,19 @@ export interface Expense {
   date: Date;
   paymentMethod: 'cash' | 'online';
 }
+
+export interface GridData {
+  [key: string]: {
+    value: string;
+    id: string;
+    style?: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      backgroundColor?: string;
+      align?: 'left' | 'center' | 'right';
+    };
+    formula?: string;
+  };
+}

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
+import { useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import { ExcelToolbar } from '@/components/excel/ExcelToolbar';
+import ExcelGrid from '@/components/excel/ExcelGrid';
+import { evaluateFormula } from '@/utils/excelFormulas';
+import { exportExcelData } from '@/utils/excelDataTransfer';
 import {
   Bold,
   Italic,
@@ -11,7 +14,8 @@ import {
   AlignCenter,
   AlignRight,
   PaintBucket,
-  Calculator
+  Calculator,
+  FileDown
 } from 'lucide-react';
 
 interface CellData {
@@ -34,66 +38,18 @@ interface GridData {
 
 const Excel = () => {
   const { toast } = useToast();
+  const location = useLocation();
   const [gridData, setGridData] = useState<GridData>({});
   const [selectedCell, setSelectedCell] = useState<string | null>(null);
-  const rows = 100;
-  const cols = 26;
 
   useEffect(() => {
     const savedData = localStorage.getItem('excelData');
     if (savedData) {
       setGridData(JSON.parse(savedData));
+    } else if (location.state?.gridData) {
+      setGridData(location.state.gridData);
     }
-  }, []);
-
-  const evaluateFormula = (formula: string): number => {
-    try {
-      // Remove the = sign and spaces
-      const expression = formula.substring(1).replace(/\s+/g, '');
-      
-      // Split into parts (numbers and operators)
-      const parts = expression.split(/([+\-*/])/);
-      
-      // Convert cell references to values
-      const values = parts.map(part => {
-        if (['+', '-', '*', '/'].includes(part)) {
-          return part;
-        }
-        // Check if it's a cell reference (e.g., A1, B2)
-        const cellMatch = part.match(/^([A-Z])(\d+)$/);
-        if (cellMatch) {
-          const col = cellMatch[1].charCodeAt(0) - 65;
-          const row = parseInt(cellMatch[2]) - 1;
-          const cellId = getCellId(row, col);
-          const cellValue = parseFloat(gridData[cellId]?.value || '0');
-          return isNaN(cellValue) ? 0 : cellValue;
-        }
-        return parseFloat(part) || 0;
-      });
-
-      // Calculate result
-      let result = values[0] as number;
-      for (let i = 1; i < values.length; i += 2) {
-        const operator = values[i] as string;
-        const nextValue = values[i + 1] as number;
-        
-        switch (operator) {
-          case '+': result += nextValue; break;
-          case '-': result -= nextValue; break;
-          case '*': result *= nextValue; break;
-          case '/': 
-            if (nextValue === 0) throw new Error('Division by zero');
-            result /= nextValue;
-            break;
-        }
-      }
-      
-      return Number(result.toFixed(2));
-    } catch (error) {
-      console.error('Formula evaluation error:', error);
-      return 0;
-    }
-  };
+  }, [location.state]);
 
   const getCellId = (row: number, col: number) => {
     const colLetter = String.fromCharCode(65 + col);
@@ -163,12 +119,32 @@ const Excel = () => {
     localStorage.setItem('excelData', JSON.stringify(newGridData));
   };
 
+  const handleExport = () => {
+    exportExcelData(gridData);
+    toast({
+      title: "Export Successful",
+      description: "The Excel file has been downloaded",
+      duration: 2000
+    });
+  };
+
   return (
     <div className="container mx-auto py-6">
       <div className="bg-cream rounded-xl border border-moss/10 shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-moss/20 via-earth/10 to-transparent p-6">
-          <h1 className="text-2xl font-semibold text-forest">Excel Sheet</h1>
-          <p className="text-moss/70 text-sm mt-1">Enhanced with formatting and formulas</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-semibold text-forest">Excel Sheet</h1>
+              <p className="text-moss/70 text-sm mt-1">Enhanced with formatting and formulas</p>
+            </div>
+            <Button
+              onClick={handleExport}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <FileDown className="w-4 h-4 mr-2" />
+              Export to Excel
+            </Button>
+          </div>
         </div>
 
         <div className="p-4 border-b flex items-center gap-2">
@@ -228,47 +204,14 @@ const Excel = () => {
           </span>
         </div>
           
-        <ScrollArea className="h-[800px]">
-          <div className="p-6">
-            <div className="grid">
-              <div className="flex">
-                <div className="w-12 h-8 bg-moss/5 border border-moss/10 flex items-center justify-center text-forest font-semibold">
-                  #
-                </div>
-                {Array.from({ length: cols }).map((_, col) => (
-                  <div
-                    key={`header-${col}`}
-                    className="w-32 h-8 bg-moss/5 border border-moss/10 flex items-center justify-center text-forest font-semibold"
-                  >
-                    {String.fromCharCode(65 + col)}
-                  </div>
-                ))}
-              </div>
-
-              {Array.from({ length: rows }).map((_, row) => (
-                <div key={`row-${row}`} className="flex">
-                  <div className="w-12 h-8 bg-moss/5 border border-moss/10 flex items-center justify-center text-forest font-semibold">
-                    {row + 1}
-                  </div>
-                  {Array.from({ length: cols }).map((_, col) => (
-                    <div
-                      key={`cell-${row}-${col}`}
-                      className="w-32 h-8 border border-moss/10"
-                    >
-                      <Input
-                        value={getCellValue(row, col)}
-                        onChange={(e) => handleCellChange(row, col, e.target.value)}
-                        onFocus={() => setSelectedCell(getCellId(row, col))}
-                        className="w-full h-full border-0 focus:ring-0 bg-transparent text-forest"
-                        style={getCellStyle(row, col)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </ScrollArea>
+        <ExcelGrid
+          gridData={gridData}
+          selectedCell={selectedCell}
+          setSelectedCell={setSelectedCell}
+          handleCellChange={handleCellChange}
+          getCellValue={getCellValue}
+          getCellStyle={getCellStyle}
+        />
       </div>
     </div>
   );
