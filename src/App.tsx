@@ -1,54 +1,40 @@
-import React from "react";
+import { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useSettingsStore } from "@/store/settingsStore";
+import { useStore } from "./store/store";
 import Index from "./pages/Index";
+import Orders from "./pages/Orders";
+import Credit from "./pages/Credit";
+import Billing from "./pages/Billing";
 import Reports from "./pages/Reports";
 import Expenditure from "./pages/Expenditure";
-import Orders from "./pages/Orders";
-import Billing from "./pages/Billing";
-import Reset from "./pages/Reset";
 import Settings from "./pages/Settings";
+import Reset from "./pages/Reset";
 import Excel from "./pages/Excel";
 
-const queryClient = new QueryClient();
+function App() {
+  const initializeData = useStore(state => state.initializeData);
 
-const AppContent = () => {
-  const { navStyle } = useSettingsStore();
-  
-  return (
-    <div className={`${navStyle === 'side' ? 'pl-64' : ''}`}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/expenditure" element={<Expenditure />} />
-          <Route path="/billing" element={<Billing />} />
-          <Route path="/reset" element={<Reset />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/excel" element={<Excel />} />
-        </Routes>
-      </TooltipProvider>
-    </div>
-  );
-};
+  useEffect(() => {
+    initializeData().catch(console.error);
+  }, [initializeData]);
 
-const App = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/credit" element={<Credit />} />
+        <Route path="/billing" element={<Billing />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/expenditure" element={<Expenditure />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/reset" element={<Reset />} />
+        <Route path="/excel" element={<Excel />} />
+      </Routes>
+      <Toaster />
+    </Router>
   );
-};
+}
 
 export default App;
