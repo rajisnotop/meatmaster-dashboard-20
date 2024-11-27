@@ -57,20 +57,44 @@ export const useStore = create<StoreState>()(
         },
 
         addOrder: async (order) => {
+          // Format the order data to match Supabase column names
+          const supabaseOrder = {
+            customername: order.customerName,
+            productid: order.productId,
+            quantity: order.quantity,
+            total: order.total,
+            date: order.date.toISOString(),
+            ispaid: order.isPaid,
+            wasunpaid: order.wasUnpaid,
+            paidwithqr: order.paidWithQR
+          };
+
           const { data, error } = await supabase
             .from('orders')
-            .insert([{ ...order }])
+            .insert([supabaseOrder])
             .select()
             .single();
 
           if (error) throw error;
-          set(state => ({ orders: [...state.orders, data] }));
+          set(state => ({ orders: [...state.orders, { ...order, id: data.id }] }));
         },
 
         updateOrder: async (updatedOrder) => {
+          // Format the order data to match Supabase column names
+          const supabaseOrder = {
+            customername: updatedOrder.customerName,
+            productid: updatedOrder.productId,
+            quantity: updatedOrder.quantity,
+            total: updatedOrder.total,
+            date: updatedOrder.date.toISOString(),
+            ispaid: updatedOrder.isPaid,
+            wasunpaid: updatedOrder.wasUnpaid,
+            paidwithqr: updatedOrder.paidWithQR
+          };
+
           const { error } = await supabase
             .from('orders')
-            .update(updatedOrder)
+            .update(supabaseOrder)
             .eq('id', updatedOrder.id);
 
           if (error) throw error;
@@ -85,9 +109,9 @@ export const useStore = create<StoreState>()(
           const { error } = await supabase
             .from('orders')
             .update({ 
-              isPaid, 
-              paidWithQR,
-              wasUnpaid: true 
+              ispaid: isPaid, 
+              paidwithqr: paidWithQR,
+              wasunpaid: true 
             })
             .eq('id', id);
 
@@ -107,14 +131,23 @@ export const useStore = create<StoreState>()(
         },
 
         addExpense: async (expense) => {
+          // Format the expense data to match Supabase column names
+          const supabaseExpense = {
+            category: expense.category,
+            amount: expense.amount,
+            description: expense.description,
+            date: expense.date.toISOString(),
+            payment_method: expense.paymentMethod
+          };
+
           const { data, error } = await supabase
             .from('expenses')
-            .insert([{ ...expense }])
+            .insert([supabaseExpense])
             .select()
             .single();
 
           if (error) throw error;
-          set(state => ({ expenses: [...state.expenses, data] }));
+          set(state => ({ expenses: [...state.expenses, { ...expense, id: data.id }] }));
         },
 
         deleteExpense: async (id) => {
