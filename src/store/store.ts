@@ -8,6 +8,10 @@ export interface StoreState {
   products: Product[];
   orders: Order[];
   expenses: Expense[];
+  totalExpenses: number;
+  openingBalance: number;
+  cashInCounter: number;
+  netProfit: number;
   addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   addOrder: (order: Order) => Promise<void>;
@@ -30,6 +34,10 @@ export const useStore = create<StoreState>()(
         products: [],
         orders: [],
         expenses: [],
+        totalExpenses: 0,
+        openingBalance: 0,
+        cashInCounter: 0,
+        netProfit: 0,
         
         initializeData: () => initializeStore(set, get),
 
