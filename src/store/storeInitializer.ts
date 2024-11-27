@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { transformDatabaseOrder } from '@/utils/dataTransformers';
-import { DatabaseOrder, SupabasePayload } from '@/types/supabase';
+import { DatabaseOrder, DatabaseProduct, DatabaseExpense, SupabasePayload } from '@/types/supabase';
 import { StoreState } from './store';
 
 export const initializeStore = async (set: (state: Partial<StoreState>) => void, get: () => StoreState) => {
@@ -14,7 +14,7 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
 
     const ordersRes = await supabase.from('orders').select(`
       id,
-      customer_name,
+      customername,
       product_id,
       quantity,
       total,
@@ -35,27 +35,33 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
     const transformedOrders = ordersRes.data?.map(transformDatabaseOrder) || [];
 
     set({
-      products: productsRes.data || [],
+      products: (productsRes.data || []) as DatabaseProduct[],
       orders: transformedOrders,
-      expenses: expensesRes.data || []
+      expenses: (expensesRes.data || []) as DatabaseExpense[]
     });
 
     // Set up real-time subscriptions
     const channel = supabase
       .channel('table-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, 
-        payload => {
+        (payload: SupabasePayload<DatabaseProduct>) => {
           console.log('Product change received:', payload);
           const currentProducts = get().products;
           switch (payload.eventType) {
             case 'INSERT':
-              set({ products: [...currentProducts, payload.new] });
+              if (payload.new) {
+                set({ products: [...currentProducts, payload.new] });
+              }
               break;
             case 'DELETE':
-              set({ products: currentProducts.filter(p => p.id !== payload.old?.id) });
+              if (payload.old) {
+                set({ products: currentProducts.filter(p => p.id !== payload.old?.id) });
+              }
               break;
             case 'UPDATE':
-              set({ products: currentProducts.map(p => p.id === payload.new?.id ? payload.new : p) });
+              if (payload.new) {
+                set({ products: currentProducts.map(p => p.id === payload.new?.id ? payload.new : p) });
+              }
               break;
           }
         })
@@ -72,7 +78,9 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
               }
               break;
             case 'DELETE':
-              set({ orders: currentOrders.filter(o => o.id !== payload.old?.id) });
+              if (payload.old) {
+                set({ orders: currentOrders.filter(o => o.id !== payload.old?.id) });
+              }
               break;
             case 'UPDATE':
               if (transformedOrder) {
@@ -82,18 +90,24 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
           }
         })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' },
-        payload => {
+        (payload: SupabasePayload<DatabaseExpense>) => {
           console.log('Expense change received:', payload);
           const currentExpenses = get().expenses;
           switch (payload.eventType) {
             case 'INSERT':
-              set({ expenses: [...currentExpenses, payload.new] });
+              if (payload.new) {
+                set({ expenses: [...currentExpenses, payload.new] });
+              }
               break;
             case 'DELETE':
-              set({ expenses: currentExpenses.filter(e => e.id !== payload.old?.id) });
+              if (payload.old) {
+                set({ expenses: currentExpenses.filter(e => e.id !== payload.old?.id) });
+              }
               break;
             case 'UPDATE':
-              set({ expenses: currentExpenses.map(e => e.id === payload.new?.id ? payload.new : e) });
+              if (payload.new) {
+                set({ expenses: currentExpenses.map(e => e.id === payload.new?.id ? payload.new : e) });
+              }
               break;
           }
         });

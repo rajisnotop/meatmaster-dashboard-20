@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.products (
 -- Create orders table
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    customer_name TEXT,
+    customername TEXT,
     product_id UUID REFERENCES public.products(id),
     quantity DECIMAL(10,2) NOT NULL,
     total DECIMAL(10,2) NOT NULL,

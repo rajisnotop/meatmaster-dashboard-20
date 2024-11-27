@@ -10,7 +10,7 @@ export interface SupabasePayload<T> {
 
 export interface DatabaseOrder {
   id: string;
-  customer_name: string;
+  customername: string;
   product_id: string;
   quantity: number;
   total: number;
@@ -18,4 +18,20 @@ export interface DatabaseOrder {
   is_paid: boolean;
   was_unpaid: boolean;
   paid_with_qr: boolean;
+}
+
+export interface DatabaseProduct {
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+}
+
+export interface DatabaseExpense {
+  id: string;
+  category: string;
+  amount: number;
+  description: string;
+  date: string;
+  payment_method: 'cash' | 'online';
 }
