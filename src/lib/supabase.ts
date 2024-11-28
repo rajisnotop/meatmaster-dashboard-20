@@ -7,9 +7,36 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true
+  },
+  db: {
+    schema: 'public'
+  }
+});
 
-// Add error handling for connection issues
+export const fetchExpenses = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('*')
+      .order('date', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching expenses:', error);
+      throw error;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchExpenses:', error);
+    throw error;
+  }
+};
+
+// Initialize auth state listener
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_OUT') {
     console.log('User signed out');
@@ -17,17 +44,3 @@ supabase.auth.onAuthStateChange((event, session) => {
     console.log('User signed in');
   }
 });
-
-export const fetchExpenses = async () => {
-  const { data, error } = await supabase
-    .from('expenses')
-    .select('id, category, amount, description, date, paymentmethod')
-    .order('date', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching expenses:', error);
-    throw error;
-  }
-
-  return data;
-};
