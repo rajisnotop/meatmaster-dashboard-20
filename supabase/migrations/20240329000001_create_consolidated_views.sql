@@ -27,7 +27,8 @@ LEFT JOIN orders o ON p.id = o.productid
 GROUP BY p.name;
 
 -- Create a materialized view for overall metrics
-CREATE MATERIALIZED VIEW IF NOT EXISTS overall_metrics AS
+DROP MATERIALIZED VIEW IF EXISTS overall_metrics;
+CREATE MATERIALIZED VIEW overall_metrics AS
 SELECT
     COUNT(DISTINCT o.id) as total_orders,
     SUM(o.total) as total_sales,
@@ -61,10 +62,11 @@ AFTER INSERT OR UPDATE OR DELETE ON expenses
 FOR EACH STATEMENT
 EXECUTE FUNCTION refresh_metrics();
 
--- Grant permissions
-ALTER MATERIALIZED VIEW overall_metrics OWNER TO authenticated;
-GRANT SELECT ON overall_metrics TO authenticated;
+-- Set ownership and grant permissions
+ALTER MATERIALIZED VIEW overall_metrics OWNER TO postgres;
+GRANT ALL ON overall_metrics TO postgres;
+GRANT ALL ON overall_metrics TO authenticated;
 GRANT SELECT ON financial_metrics TO authenticated;
 GRANT SELECT ON consolidated_data TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON expenses TO authenticated;
+GRANT ALL ON expenses TO authenticated;
 GRANT EXECUTE ON FUNCTION refresh_metrics() TO authenticated;

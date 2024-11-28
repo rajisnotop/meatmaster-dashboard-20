@@ -1,4 +1,4 @@
--- Drop existing permissions to clean up
+-- Drop existing policies
 DROP POLICY IF EXISTS "Enable read access for authenticated users" ON expenses;
 DROP POLICY IF EXISTS "Enable insert access for authenticated users" ON expenses;
 DROP POLICY IF EXISTS "Enable update access for authenticated users" ON expenses;
@@ -29,13 +29,12 @@ ON expenses FOR DELETE
 TO authenticated
 USING (true);
 
--- Grant ALL permissions on the expenses table
+-- Grant ALL permissions
 GRANT ALL ON expenses TO authenticated;
-
--- Grant permissions on materialized views
 GRANT ALL ON overall_metrics TO authenticated;
+GRANT ALL ON overall_metrics TO postgres;
 
--- Grant permissions on views
+-- Grant SELECT permissions on views
 GRANT SELECT ON financial_metrics TO authenticated;
 GRANT SELECT ON consolidated_data TO authenticated;
 
@@ -44,3 +43,6 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
 -- Grant execute permissions on functions
 GRANT EXECUTE ON FUNCTION refresh_metrics() TO authenticated;
+
+-- Ensure postgres user has all necessary permissions
+ALTER MATERIALIZED VIEW overall_metrics OWNER TO postgres;
