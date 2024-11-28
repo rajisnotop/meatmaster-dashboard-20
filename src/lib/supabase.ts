@@ -14,10 +14,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
   db: {
     schema: 'public'
-  },
-  headers: {
-    apikey: supabaseAnonKey,
-    Authorization: `Bearer ${supabaseAnonKey}`
   }
 });
 
@@ -26,8 +22,7 @@ export const fetchExpenses = async () => {
     console.log('Fetching expenses...');
     const { data, error } = await supabase
       .from('expenses')
-      .select('category, amount, description, date, paymentmethod')
-      .order('date', { ascending: false });
+      .select('category, amount, description, date, paymentmethod');
 
     if (error) {
       console.error('Error fetching expenses:', error);
