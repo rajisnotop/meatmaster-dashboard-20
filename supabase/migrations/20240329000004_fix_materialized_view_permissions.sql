@@ -34,7 +34,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON expenses TO authenticated;
 
 -- Grant permissions on materialized views
 GRANT SELECT ON overall_metrics TO authenticated;
-GRANT SELECT ON consolidated_metrics TO authenticated;
 
 -- Grant permissions on views
 GRANT SELECT ON financial_metrics TO authenticated;
@@ -45,4 +44,3 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
 -- Grant execute permissions on functions
 GRANT EXECUTE ON FUNCTION refresh_metrics() TO authenticated;
-GRANT EXECUTE ON FUNCTION refresh_consolidated_metrics() TO authenticated;

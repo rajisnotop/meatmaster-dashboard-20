@@ -12,8 +12,22 @@ FROM products p
 LEFT JOIN orders o ON p.id = o.productid
 GROUP BY p.name;
 
+-- Create a view for consolidated data
+CREATE OR REPLACE VIEW consolidated_data AS
+SELECT 
+    p.name as product_name,
+    COUNT(o.id) as total_orders,
+    SUM(o.total) as total_sales,
+    SUM(CASE WHEN o.paidwithqr THEN o.total ELSE 0 END) as qr_payments,
+    SUM(CASE WHEN o.wasunpaid THEN o.total ELSE 0 END) as unpaid_to_paid,
+    SUM(CASE WHEN o.wasunpaid AND o.paidwithqr THEN o.total ELSE 0 END) as unpaid_to_paid_qr,
+    SUM(o.quantity) as quantity_sold
+FROM products p
+LEFT JOIN orders o ON p.id = o.productid
+GROUP BY p.name;
+
 -- Create a materialized view for overall metrics
-CREATE MATERIALIZED VIEW overall_metrics AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS overall_metrics AS
 SELECT
     COUNT(DISTINCT o.id) as total_orders,
     SUM(o.total) as total_sales,
@@ -35,11 +49,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create triggers to refresh the materialized view
+DROP TRIGGER IF EXISTS refresh_metrics_orders ON orders;
 CREATE TRIGGER refresh_metrics_orders
 AFTER INSERT OR UPDATE OR DELETE ON orders
 FOR EACH STATEMENT
 EXECUTE FUNCTION refresh_metrics();
 
+DROP TRIGGER IF EXISTS refresh_metrics_expenses ON expenses;
 CREATE TRIGGER refresh_metrics_expenses
 AFTER INSERT OR UPDATE OR DELETE ON expenses
 FOR EACH STATEMENT
