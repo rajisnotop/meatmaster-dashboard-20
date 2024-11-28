@@ -110,5 +110,3 @@ export const useExpenseStore = create<ExpenseStore>()(
     )
   )
 );
-
-useExpenseStore.getState().initializeExpenses();

@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
@@ -41,9 +41,9 @@ const categories = [
   "Other"
 ];
 
-const ExpenseForm = () => {
+export function ExpenseForm() {
   const { toast } = useToast();
-  const addExpense = useStore((state) => state.addExpense);
+  const addExpense = useExpenseStore((state) => state.addExpense);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,27 +56,35 @@ const ExpenseForm = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    addExpense({
-      amount: Number(values.amount),
-      description: values.description,
-      date: new Date(values.date),
-      category: values.category,
-      paymentMethod: values.paymentMethod,
-    });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await addExpense({
+        amount: Number(values.amount),
+        description: values.description,
+        date: new Date(values.date),
+        category: values.category,
+        paymentMethod: values.paymentMethod,
+      });
 
-    toast({
-      title: "Expense Added",
-      description: "Your expense has been successfully recorded.",
-    });
+      toast({
+        title: "Success",
+        description: "Expense added successfully",
+      });
 
-    form.reset({
-      amount: "",
-      description: "",
-      date: new Date().toISOString().split("T")[0],
-      category: "",
-      paymentMethod: "cash",
-    });
+      form.reset({
+        amount: "",
+        description: "",
+        date: new Date().toISOString().split("T")[0],
+        category: "",
+        paymentMethod: "cash",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add expense",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -104,11 +112,11 @@ const ExpenseForm = () => {
               <FormLabel>Category</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="bg-background">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="bg-background">
+                <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -157,11 +165,11 @@ const ExpenseForm = () => {
               <FormLabel>Payment Method</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="bg-background">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select payment method" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent className="bg-background">
+                <SelectContent>
                   <SelectItem value="cash">Cash</SelectItem>
                   <SelectItem value="online">Online Pay</SelectItem>
                 </SelectContent>
@@ -175,6 +183,6 @@ const ExpenseForm = () => {
       </form>
     </Form>
   );
-};
+}
 
 export default ExpenseForm;
