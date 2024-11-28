@@ -29,7 +29,7 @@ export const useExpenseStore = create<ExpenseStore>()(
           try {
             const { data: expensesData, error } = await supabase
               .from('expenses')
-              .select('id, category, amount, description, date, payment_method')
+              .select('id, category, amount, description, date, paymentmethod')
               .order('date', { ascending: false });
 
             if (error) throw error;
@@ -53,7 +53,7 @@ export const useExpenseStore = create<ExpenseStore>()(
                 amount: expense.amount,
                 description: expense.description,
                 date: expense.date.toISOString(),
-                payment_method: expense.paymentMethod
+                paymentmethod: expense.paymentMethod
               }])
               .select()
               .single();

@@ -19,5 +19,5 @@ export const transformDatabaseExpense = (expense: DatabaseExpense): Expense => (
   amount: expense.amount,
   description: expense.description,
   date: new Date(expense.date),
-  paymentMethod: expense.payment_method as 'cash' | 'online'
+  paymentMethod: expense.paymentmethod as 'cash' | 'online'
 });

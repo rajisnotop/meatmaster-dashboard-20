@@ -33,5 +33,5 @@ export interface DatabaseExpense {
   amount: number;
   description: string;
   date: string;
-  payment_method: string;
+  paymentmethod: string;
 }
