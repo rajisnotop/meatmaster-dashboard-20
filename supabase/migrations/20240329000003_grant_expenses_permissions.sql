@@ -1,8 +1,8 @@
 -- Grant access to the expenses table for authenticated users
-GRANT SELECT, INSERT, UPDATE, DELETE ON expenses TO authenticated;
+GRANT ALL ON expenses TO authenticated;
 
 -- Grant access to the materialized views and related functions
-GRANT SELECT ON materialized view overall_metrics TO authenticated;
+GRANT ALL ON overall_metrics TO authenticated;
 GRANT SELECT ON financial_metrics TO authenticated;
 GRANT SELECT ON consolidated_data TO authenticated;
 

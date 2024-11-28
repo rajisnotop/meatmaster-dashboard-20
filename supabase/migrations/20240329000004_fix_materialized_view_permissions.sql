@@ -29,11 +29,11 @@ ON expenses FOR DELETE
 TO authenticated
 USING (true);
 
--- Grant necessary permissions on the expenses table
-GRANT SELECT, INSERT, UPDATE, DELETE ON expenses TO authenticated;
+-- Grant ALL permissions on the expenses table
+GRANT ALL ON expenses TO authenticated;
 
 -- Grant permissions on materialized views
-GRANT SELECT ON overall_metrics TO authenticated;
+GRANT ALL ON overall_metrics TO authenticated;
 
 -- Grant permissions on views
 GRANT SELECT ON financial_metrics TO authenticated;

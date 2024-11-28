@@ -60,3 +60,11 @@ CREATE TRIGGER refresh_metrics_expenses
 AFTER INSERT OR UPDATE OR DELETE ON expenses
 FOR EACH STATEMENT
 EXECUTE FUNCTION refresh_metrics();
+
+-- Grant permissions
+ALTER MATERIALIZED VIEW overall_metrics OWNER TO authenticated;
+GRANT SELECT ON overall_metrics TO authenticated;
+GRANT SELECT ON financial_metrics TO authenticated;
+GRANT SELECT ON consolidated_data TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON expenses TO authenticated;
+GRANT EXECUTE ON FUNCTION refresh_metrics() TO authenticated;
