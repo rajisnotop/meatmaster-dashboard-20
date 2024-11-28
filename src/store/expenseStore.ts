@@ -29,7 +29,7 @@ export const useExpenseStore = create<ExpenseStore>()(
           try {
             const { data: expensesData, error } = await supabase
               .from('expenses')
-              .select('*')
+              .select('id, category, amount, description, date, paymentmethod')
               .order('date', { ascending: false });
 
             if (error) throw error;
@@ -111,5 +111,4 @@ export const useExpenseStore = create<ExpenseStore>()(
   )
 );
 
-// Initialize expenses when the store is created
 useExpenseStore.getState().initializeExpenses();
