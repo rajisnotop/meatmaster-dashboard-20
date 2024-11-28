@@ -14,14 +14,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
   db: {
     schema: 'public'
+  },
+  global: {
+    headers: {
+      'apikey': supabaseAnonKey,
+      'Authorization': `Bearer ${supabaseAnonKey}`
+    }
   }
 });
 
 export const fetchExpenses = async () => {
   try {
+    console.log('Fetching expenses...');
     const { data, error } = await supabase
       .from('expenses')
-      .select('*')
+      .select('category, amount, description, date, paymentmethod')
       .order('date', { ascending: false });
 
     if (error) {
@@ -29,10 +36,11 @@ export const fetchExpenses = async () => {
       throw new Error(`Failed to fetch expenses: ${error.message}`);
     }
 
+    console.log('Fetched expenses:', data);
     return data || [];
   } catch (error) {
     console.error('Error in fetchExpenses:', error);
-    throw new Error(`Failed to fetch expenses: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw error instanceof Error ? error : new Error('Unknown error in fetchExpenses');
   }
 };
 
