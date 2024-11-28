@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.expenses (
     amount DECIMAL(10,2) NOT NULL,
     description TEXT,
     date TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
-    payment_method TEXT CHECK (payment_method IN ('cash', 'online')) NOT NULL
+    paymentmethod TEXT CHECK (paymentmethod IN ('cash', 'online')) NOT NULL
 );
 
 -- Enable Row Level Security (RLS)

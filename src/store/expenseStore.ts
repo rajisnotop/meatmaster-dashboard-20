@@ -53,7 +53,7 @@ export const useExpenseStore = create<ExpenseStore>()(
                 amount: expense.amount,
                 description: expense.description,
                 date: expense.date.toISOString(),
-                payment_method: expense.paymentMethod
+                paymentmethod: expense.paymentMethod
               }])
               .select()
               .single();
