@@ -27,7 +27,14 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
       console.error('Error fetching orders:', ordersRes.error);
     }
 
-    const expensesRes = await supabase.from('expenses').select('*');
+    const expensesRes = await supabase.from('expenses').select(`
+      id,
+      category,
+      amount,
+      description,
+      date,
+      paymentmethod
+    `);
     if (expensesRes.error) {
       console.error('Error fetching expenses:', expensesRes.error);
     }
