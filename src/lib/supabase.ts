@@ -26,13 +26,13 @@ export const fetchExpenses = async () => {
 
     if (error) {
       console.error('Error fetching expenses:', error);
-      throw error;
+      throw new Error(`Failed to fetch expenses: ${error.message}`);
     }
 
     return data || [];
   } catch (error) {
     console.error('Error in fetchExpenses:', error);
-    throw error;
+    throw new Error(`Failed to fetch expenses: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { Expense } from '@/types/types';
-import { supabase, fetchExpenses } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { transformDatabaseExpense } from '@/utils/dataTransformers';
 
 interface ExpenseStore {
@@ -27,16 +27,27 @@ export const useExpenseStore = create<ExpenseStore>()(
         initializeExpenses: async () => {
           set({ isLoading: true, error: null });
           try {
-            const expensesData = await fetchExpenses();
-            const transformedExpenses = expensesData.map(transformDatabaseExpense);
+            const { data, error } = await supabase
+              .from('expenses')
+              .select('*')
+              .order('date', { ascending: false });
+
+            if (error) {
+              console.error('Error initializing expenses:', error);
+              throw new Error(`Failed to initialize expenses: ${error.message}`);
+            }
+
+            const transformedExpenses = data.map(transformDatabaseExpense);
             set({ expenses: transformedExpenses });
           } catch (error) {
-            console.error('Error initializing expenses:', error);
-            set({ error: 'Failed to load expenses. Please try again.' });
+            console.error('Error in initializeExpenses:', error);
+            set({ error: error instanceof Error ? error.message : 'Failed to initialize expenses' });
           } finally {
             set({ isLoading: false });
           }
         },
+        
+        setExpenses: (expenses) => set({ expenses }),
 
         addExpense: async (expense) => {
           try {
@@ -52,15 +63,18 @@ export const useExpenseStore = create<ExpenseStore>()(
               .select()
               .single();
 
-            if (error) throw error;
-            
+            if (error) {
+              console.error('Error adding expense:', error);
+              throw new Error(`Failed to add expense: ${error.message}`);
+            }
+
             const newExpense = transformDatabaseExpense(data);
             set(state => ({
               expenses: [newExpense, ...state.expenses]
             }));
           } catch (error) {
-            console.error('Error adding expense:', error);
-            throw error;
+            console.error('Error in addExpense:', error);
+            throw new Error(`Failed to add expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
         },
 
@@ -71,18 +85,19 @@ export const useExpenseStore = create<ExpenseStore>()(
               .delete()
               .eq('id', id);
 
-            if (error) throw error;
+            if (error) {
+              console.error('Error deleting expense:', error);
+              throw new Error(`Failed to delete expense: ${error.message}`);
+            }
             
             set(state => ({
               expenses: state.expenses.filter(expense => expense.id !== id)
             }));
           } catch (error) {
-            console.error('Error deleting expense:', error);
-            throw error;
+            console.error('Error in deleteExpense:', error);
+            throw new Error(`Failed to delete expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
         },
-
-        setExpenses: (expenses) => set({ expenses }),
 
         getCashExpenses: () => {
           const expenses = get().expenses;
