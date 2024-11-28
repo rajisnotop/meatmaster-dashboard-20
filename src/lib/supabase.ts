@@ -7,32 +7,27 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true
-  },
-  db: {
-    schema: 'public'
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Add error handling for connection issues
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    console.log('User signed out');
+  } else if (event === 'SIGNED_IN') {
+    console.log('User signed in');
   }
 });
 
-// Log successful initialization
-console.log('Supabase client initialized successfully');
+export const fetchExpenses = async () => {
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('id, category, amount, description, date, paymentmethod')
+    .order('date', { ascending: false });
 
-// Create a channel for connection status
-const statusChannel = supabase.channel('connection_status');
+  if (error) {
+    console.error('Error fetching expenses:', error);
+    throw error;
+  }
 
-// Subscribe to connection status events
-statusChannel
-  .subscribe((status) => {
-    if (status === 'SUBSCRIBED') {
-      console.log('Realtime connection established');
-    }
-    if (status === 'CLOSED') {
-      console.log('Realtime connection closed');
-    }
-    if (status === 'CHANNEL_ERROR') {
-      console.error('Realtime connection error');
-    }
-  });
+  return data;
+};

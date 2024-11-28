@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { Expense } from '@/types/types';
-import { supabase } from '@/lib/supabase';
+import { supabase, fetchExpenses } from '@/lib/supabase';
 import { transformDatabaseExpense } from '@/utils/dataTransformers';
 
 interface ExpenseStore {
@@ -27,18 +27,12 @@ export const useExpenseStore = create<ExpenseStore>()(
         initializeExpenses: async () => {
           set({ isLoading: true, error: null });
           try {
-            const { data: expensesData, error } = await supabase
-              .from('expenses')
-              .select('id, category, amount, description, date, paymentmethod')
-              .order('date', { ascending: false });
-
-            if (error) throw error;
-
+            const expensesData = await fetchExpenses();
             const transformedExpenses = expensesData.map(transformDatabaseExpense);
             set({ expenses: transformedExpenses });
           } catch (error) {
             console.error('Error initializing expenses:', error);
-            set({ error: 'Failed to load expenses' });
+            set({ error: 'Failed to load expenses. Please try again.' });
           } finally {
             set({ isLoading: false });
           }
