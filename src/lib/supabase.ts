@@ -1,20 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://hfgsxjhujejgfnrcswxy.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZ3N4amh1amVqZ2ZucmNzd3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3MTQzOTcsImV4cCI6MjA0ODI5MDM5N30.ExMiGCWbvJjEDg_ikHSMEpEZue95e3mMmVD6ClG6Pjg';
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZ3N4amh1amVqZ2ZucmNzd3h5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMjcxNDM5NywiZXhwIjoyMDQ4MjkwMzk3fQ.R_5YV8Rv8xhmloOEkg2xJQ9WMetTZkgL8-kRYzkdbnU';
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true
   },
   global: {
     headers: {
-      'apikey': supabaseAnonKey
+      'apikey': supabaseServiceKey,
+      'Authorization': `Bearer ${supabaseServiceKey}`
     }
   }
 });
