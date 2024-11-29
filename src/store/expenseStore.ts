@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { Expense } from '@/types/types';
 import { supabase } from '@/lib/supabase';
-import { transformDatabaseExpense } from '@/utils/dataTransformers';
 
 interface ExpenseStore {
   expenses: Expense[];
@@ -11,22 +10,21 @@ interface ExpenseStore {
   addExpense: (expense: Omit<Expense, 'id'>) => Promise<void>;
   deleteExpense: (id: string) => Promise<void>;
   setExpenses: (expenses: Expense[]) => void;
-  getCashExpenses: () => number;
-  getOnlineExpenses: () => number;
   initializeExpenses: () => Promise<void>;
 }
 
 export const useExpenseStore = create<ExpenseStore>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         expenses: [],
         isLoading: false,
         error: null,
-        
+
         initializeExpenses: async () => {
           set({ isLoading: true, error: null });
           try {
+            console.log('Fetching expenses...');
             const { data, error } = await supabase
               .from('expenses')
               .select('*')
@@ -34,40 +32,55 @@ export const useExpenseStore = create<ExpenseStore>()(
 
             if (error) throw error;
 
-            const transformedExpenses = data.map(transformDatabaseExpense);
+            const transformedExpenses = data.map((expense): Expense => ({
+              id: expense.id,
+              description: expense.description,
+              amount: expense.amount,
+              category: expense.category,
+              date: new Date(expense.date),
+              paymentMethod: expense.payment_method
+            }));
+
             set({ expenses: transformedExpenses });
           } catch (error) {
-            console.error('Error in initializeExpenses:', error);
-            set({ error: error instanceof Error ? error.message : 'Failed to initialize expenses' });
+            console.error('Error fetching expenses:', error);
+            set({ error: error instanceof Error ? error.message : 'Failed to fetch expenses' });
           } finally {
             set({ isLoading: false });
           }
         },
-        
-        setExpenses: (expenses) => set({ expenses }),
 
         addExpense: async (expense) => {
           try {
             const { data, error } = await supabase
               .from('expenses')
               .insert([{
-                category: expense.category,
-                amount: expense.amount,
                 description: expense.description,
+                amount: expense.amount,
+                category: expense.category,
                 date: expense.date.toISOString(),
-                paymentmethod: expense.paymentMethod
+                payment_method: expense.paymentMethod
               }])
               .select()
               .single();
 
             if (error) throw error;
 
-            const newExpense = transformDatabaseExpense(data);
+            const newExpense: Expense = {
+              id: data.id,
+              description: data.description,
+              amount: data.amount,
+              category: data.category,
+              date: new Date(data.date),
+              paymentMethod: data.payment_method
+            };
+
             set(state => ({
               expenses: [newExpense, ...state.expenses]
             }));
           } catch (error) {
-            throw new Error(`Failed to add expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            console.error('Error adding expense:', error);
+            throw error;
           }
         },
 
@@ -84,21 +97,12 @@ export const useExpenseStore = create<ExpenseStore>()(
               expenses: state.expenses.filter(expense => expense.id !== id)
             }));
           } catch (error) {
-            throw new Error(`Failed to delete expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            console.error('Error deleting expense:', error);
+            throw error;
           }
         },
 
-        getCashExpenses: () => {
-          return get().expenses
-            .filter(expense => expense.paymentMethod === "cash")
-            .reduce((sum, expense) => sum + expense.amount, 0);
-        },
-
-        getOnlineExpenses: () => {
-          return get().expenses
-            .filter(expense => expense.paymentMethod === "online")
-            .reduce((sum, expense) => sum + expense.amount, 0);
-        },
+        setExpenses: (expenses) => set({ expenses }),
       }),
       {
         name: 'expense-storage',

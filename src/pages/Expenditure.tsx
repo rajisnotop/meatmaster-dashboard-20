@@ -12,6 +12,7 @@ const Expenditure = () => {
   const { isLoading, error, initializeExpenses } = useExpenseStore();
 
   useEffect(() => {
+    console.log('Initializing expenses...');
     initializeExpenses();
   }, [initializeExpenses]);
 
