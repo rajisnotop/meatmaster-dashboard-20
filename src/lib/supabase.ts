@@ -25,7 +25,8 @@ export const fetchExpenses = async () => {
     console.log('Fetching expenses...');
     const { data, error } = await supabase
       .from('expenses')
-      .select('category, amount, description, date, paymentmethod');
+      .select('*')
+      .order('date', { ascending: false });
 
     if (error) {
       console.error('Error fetching expenses:', error);
