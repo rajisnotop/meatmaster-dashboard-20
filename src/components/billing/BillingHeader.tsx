@@ -78,47 +78,15 @@ const BillingHeader = ({
     try {
       const workbook = XLSX.utils.book_new();
       
-      // Sales Overview Section
-      const salesOverviewData = [
-        ['Sales Overview', ''],
-        ['Total Sales', `NPR ${productTotals.reduce((sum, p) => sum + (p.amount || 0), 0).toLocaleString()}`],
-        ['Opening Balance', `NPR ${openingBalance.toLocaleString()}`],
-        ['Quantity Sold', `${productTotals.reduce((sum, p) => sum + (p.quantity || 0), 0)} kg`],
-        ['', ''],
+      // Company Header
+      const headerData = [
+        ['Neelkantha Meat Shop'],
+        ['Sales Report'],
+        [`Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`],
+        [''], // Empty row for spacing
       ];
 
-      // Digital Payments Section
-      const totalQRPayments = productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0);
-      const totalUnpaidToQR = productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0);
-      const digitalPaymentsData = [
-        ['Digital Payments', ''],
-        ['QR Payments', `NPR ${totalQRPayments.toLocaleString()}`],
-        ['Unpaid to QR', `NPR ${totalUnpaidToQR.toLocaleString()}`],
-        ['Total Digital Pay', `NPR ${(totalQRPayments + totalUnpaidToQR).toLocaleString()}`],
-        ['', ''],
-      ];
-
-      // Expenses Section
-      const cashExpenses = expenseStore.getCashExpenses();
-      const onlineExpenses = expenseStore.getOnlineExpenses();
-      const expensesData = [
-        ['Expenses', ''],
-        ['Total Expenses', `NPR ${totalExpenses.toLocaleString()}`],
-        ['Cash Expenses', `NPR ${cashExpenses.toLocaleString()}`],
-        ['Online Expenses', `NPR ${onlineExpenses.toLocaleString()}`],
-        ['', ''],
-      ];
-
-      // Financial Summary Section
-      const financialSummaryData = [
-        ['Financial Summary', ''],
-        ['Cash in Counter', `NPR ${cashInCounter.toLocaleString()}`],
-        ['Cash in Bank', `NPR ${(totalQRPayments + totalUnpaidToQR - onlineExpenses).toLocaleString()}`],
-        ['Net Amount', `NPR ${netProfit.toLocaleString()}`],
-        ['', ''],
-      ];
-
-      // Product Details Section
+      // Product Details Section (Now at the top)
       const productDetailsData = [
         ['Product Details', '', '', '', ''],
         ['Product', 'Total Sales (NPR)', 'Paid with QR (NPR)', 'Unpaid Amount (NPR)', 'Unpaid to Paid QR (NPR)'],
@@ -135,40 +103,104 @@ const BillingHeader = ({
           productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0).toLocaleString(),
           productTotals.reduce((sum, p) => sum + (p.unpaid || 0), 0).toLocaleString(),
           productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0).toLocaleString()
-        ]
+        ],
+        [''], // Spacing
       ];
 
-      // Combine all sections
+      // Sales Overview Section
+      const salesOverviewData = [
+        ['Sales Overview', ''],
+        ['Total Sales', `NPR ${productTotals.reduce((sum, p) => sum + (p.amount || 0), 0).toLocaleString()}`],
+        ['Opening Balance', `NPR ${openingBalance.toLocaleString()}`],
+        ['Quantity Sold', `${productTotals.reduce((sum, p) => sum + (p.quantity || 0), 0)} kg`],
+        [''], // Spacing
+      ];
+
+      // Digital Payments Section
+      const totalQRPayments = productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0);
+      const totalUnpaidToQR = productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0);
+      const digitalPaymentsData = [
+        ['Digital Payments', ''],
+        ['QR Payments', `NPR ${totalQRPayments.toLocaleString()}`],
+        ['Unpaid to QR', `NPR ${totalUnpaidToQR.toLocaleString()}`],
+        ['Total Digital Pay', `NPR ${(totalQRPayments + totalUnpaidToQR).toLocaleString()}`],
+        [''], // Spacing
+      ];
+
+      // Expenses Section
+      const cashExpenses = expenseStore.getCashExpenses();
+      const onlineExpenses = expenseStore.getOnlineExpenses();
+      const expensesData = [
+        ['Expenses', ''],
+        ['Total Expenses', `NPR ${totalExpenses.toLocaleString()}`],
+        ['Cash Expenses', `NPR ${cashExpenses.toLocaleString()}`],
+        ['Online Expenses', `NPR ${onlineExpenses.toLocaleString()}`],
+        [''], // Spacing
+      ];
+
+      // Financial Summary Section
+      const financialSummaryData = [
+        ['Financial Summary', ''],
+        ['Cash in Counter', `NPR ${cashInCounter.toLocaleString()}`],
+        ['Cash in Bank', `NPR ${(totalQRPayments + totalUnpaidToQR - onlineExpenses).toLocaleString()}`],
+        ['Net Amount', `NPR ${netProfit.toLocaleString()}`],
+        [''], // Spacing
+      ];
+
+      // Combine all sections in the desired order
       const wsData = [
+        ...headerData,
+        ...productDetailsData,
         ...salesOverviewData,
         ...digitalPaymentsData,
         ...expensesData,
-        ...financialSummaryData,
-        ['', ''],  // Add spacing
-        ...productDetailsData
+        ...financialSummaryData
       ];
 
       const worksheet = XLSX.utils.aoa_to_sheet(wsData);
       
-      // Add styling
-      const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-      for (let R = range.s.r; R <= range.e.r; R++) {
-        for (let C = range.s.c; C <= range.e.c; C++) {
-          const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
-          if (!worksheet[cell_address]) continue;
-          
-          // Style section headers
-          if (worksheet[cell_address].v && typeof worksheet[cell_address].v === 'string' && 
-              ['Sales Overview', 'Digital Payments', 'Expenses', 'Financial Summary', 'Product Details'].includes(worksheet[cell_address].v)) {
-            worksheet[cell_address].s = {
-              font: { bold: true, color: { rgb: "2F5233" } },
-              fill: { fgColor: { rgb: "E8F5E9" } }
-            };
-          }
-        }
-      }
+      // Set column widths
+      const cols = [
+        { wch: 25 }, // Column A
+        { wch: 20 }, // Column B
+        { wch: 20 }, // Column C
+        { wch: 20 }, // Column D
+        { wch: 20 }, // Column E
+      ];
+      worksheet['!cols'] = cols;
 
-      // Add the worksheet to the workbook
+      // Merge cells for the header
+      worksheet['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }, // Company name
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }, // Report title
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } }, // Generated date
+      ];
+
+      // Style the header
+      ['A1', 'A2', 'A3'].forEach(cellRef => {
+        worksheet[cellRef].s = {
+          font: { 
+            bold: true,
+            sz: cellRef === 'A1' ? 16 : 12, // Bigger font for company name
+            color: { rgb: "2F5233" }
+          },
+          alignment: { horizontal: "center" }
+        };
+      });
+
+      // Style section headers
+      const sectionHeaders = ['Product Details', 'Sales Overview', 'Digital Payments', 'Expenses', 'Financial Summary'];
+      Object.keys(worksheet).forEach(cellRef => {
+        if (typeof worksheet[cellRef].v === 'string' && 
+            sectionHeaders.includes(worksheet[cellRef].v)) {
+          worksheet[cellRef].s = {
+            font: { bold: true, color: { rgb: "2F5233" } },
+            fill: { fgColor: { rgb: "E8F5E9" } }
+          };
+        }
+      });
+
+      // Add the worksheet to workbook
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
       
       // Generate Excel file
