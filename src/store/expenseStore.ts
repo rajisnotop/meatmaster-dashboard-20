@@ -32,10 +32,7 @@ export const useExpenseStore = create<ExpenseStore>()(
               .select('*')
               .order('date', { ascending: false });
 
-            if (error) {
-              console.error('Error initializing expenses:', error);
-              throw new Error(`Failed to initialize expenses: ${error.message}`);
-            }
+            if (error) throw error;
 
             const transformedExpenses = data.map(transformDatabaseExpense);
             set({ expenses: transformedExpenses });
@@ -63,17 +60,13 @@ export const useExpenseStore = create<ExpenseStore>()(
               .select()
               .single();
 
-            if (error) {
-              console.error('Error adding expense:', error);
-              throw new Error(`Failed to add expense: ${error.message}`);
-            }
+            if (error) throw error;
 
             const newExpense = transformDatabaseExpense(data);
             set(state => ({
               expenses: [newExpense, ...state.expenses]
             }));
           } catch (error) {
-            console.error('Error in addExpense:', error);
             throw new Error(`Failed to add expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
         },
@@ -85,30 +78,24 @@ export const useExpenseStore = create<ExpenseStore>()(
               .delete()
               .eq('id', id);
 
-            if (error) {
-              console.error('Error deleting expense:', error);
-              throw new Error(`Failed to delete expense: ${error.message}`);
-            }
+            if (error) throw error;
             
             set(state => ({
               expenses: state.expenses.filter(expense => expense.id !== id)
             }));
           } catch (error) {
-            console.error('Error in deleteExpense:', error);
             throw new Error(`Failed to delete expense: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
         },
 
         getCashExpenses: () => {
-          const expenses = get().expenses;
-          return expenses
+          return get().expenses
             .filter(expense => expense.paymentMethod === "cash")
             .reduce((sum, expense) => sum + expense.amount, 0);
         },
 
         getOnlineExpenses: () => {
-          const expenses = get().expenses;
-          return expenses
+          return get().expenses
             .filter(expense => expense.paymentMethod === "online")
             .reduce((sum, expense) => sum + expense.amount, 0);
         },

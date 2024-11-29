@@ -1,14 +1,12 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { Product, Order, Expense } from '@/types/types';
+import { Product, Order } from '@/types/types';
 import { supabase } from '@/lib/supabase';
 import { initializeStore } from './storeInitializer';
 
 export interface StoreState {
   products: Product[];
   orders: Order[];
-  expenses: Expense[];
-  totalExpenses: number;
   openingBalance: number;
   cashInCounter: number;
   netProfit: number;
@@ -17,13 +15,7 @@ export interface StoreState {
   addOrder: (order: Order) => Promise<void>;
   updateOrder: (order: Order) => Promise<void>;
   updateOrderStatus: (id: string, isPaid: boolean, paidWithQR?: boolean) => Promise<void>;
-  addExpense: (expense: Omit<Expense, 'id'>) => Promise<void>;
-  deleteExpense: (id: string) => Promise<void>;
-  getSuppliesExpenses: () => number;
-  getCashExpenses: () => number;
-  getOnlineExpenses: () => number;
   setOrders: (orders: Order[]) => void;
-  setExpenses: (expenses: Expense[]) => void;
   initializeData: () => Promise<void>;
 }
 
@@ -33,8 +25,6 @@ export const useStore = create<StoreState>()(
       (set, get) => ({
         products: [],
         orders: [],
-        expenses: [],
-        totalExpenses: 0,
         openingBalance: 0,
         cashInCounter: 0,
         netProfit: 0,
@@ -65,7 +55,6 @@ export const useStore = create<StoreState>()(
         },
 
         addOrder: async (order) => {
-          // Format the order data to match Supabase column names
           const supabaseOrder = {
             customername: order.customerName,
             productid: order.productId,
@@ -88,7 +77,6 @@ export const useStore = create<StoreState>()(
         },
 
         updateOrder: async (updatedOrder) => {
-          // Format the order data to match Supabase column names
           const supabaseOrder = {
             customername: updatedOrder.customerName,
             productid: updatedOrder.productId,
@@ -137,62 +125,6 @@ export const useStore = create<StoreState>()(
             )
           }));
         },
-
-        addExpense: async (expense) => {
-          // Format the expense data to match Supabase column names
-          const supabaseExpense = {
-            category: expense.category,
-            amount: expense.amount,
-            description: expense.description,
-            date: expense.date.toISOString(),
-            payment_method: expense.paymentMethod
-          };
-
-          const { data, error } = await supabase
-            .from('expenses')
-            .insert([supabaseExpense])
-            .select()
-            .single();
-
-          if (error) throw error;
-          set(state => ({ expenses: [...state.expenses, { ...expense, id: data.id }] }));
-        },
-
-        deleteExpense: async (id) => {
-          const { error } = await supabase
-            .from('expenses')
-            .delete()
-            .eq('id', id);
-
-          if (error) throw error;
-          set(state => ({
-            expenses: state.expenses.filter(expense => expense.id !== id)
-          }));
-        },
-
-        getSuppliesExpenses: () => {
-          const expenses = get().expenses;
-          return expenses
-            .filter(expense => expense.category === "Supplies")
-            .reduce((sum, expense) => sum + expense.amount, 0);
-        },
-
-        getCashExpenses: () => {
-          const expenses = get().expenses;
-          return expenses
-            .filter(expense => expense.paymentMethod === "cash")
-            .reduce((sum, expense) => sum + expense.amount, 0);
-        },
-
-        getOnlineExpenses: () => {
-          const expenses = get().expenses;
-          return expenses
-            .filter(expense => expense.paymentMethod === "online")
-            .reduce((sum, expense) => sum + expense.amount, 0);
-        },
-
-        setOrders: (orders) => set({ orders }),
-        setExpenses: (expenses) => set({ expenses }),
 
       }),
       {
