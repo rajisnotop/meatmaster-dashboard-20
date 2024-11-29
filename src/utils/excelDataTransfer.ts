@@ -1,4 +1,5 @@
 import { GridData } from "@/types/types";
+import * as XLSX from 'xlsx';
 
 export const convertBillingDataToExcelData = (productTotals: any[], overallTotals: any) => {
   const gridData: GridData = {};
@@ -109,7 +110,7 @@ export const convertBillingDataToExcelData = (productTotals: any[], overallTotal
 };
 
 export const exportExcelData = (gridData: GridData) => {
-  const workbook = window.XLSX.utils.book_new();
+  const workbook = XLSX.utils.book_new();
   
   // Convert grid data to array format
   const data: any[][] = [];
@@ -141,7 +142,7 @@ export const exportExcelData = (gridData: GridData) => {
     }
   });
 
-  const worksheet = window.XLSX.utils.aoa_to_sheet(data);
+  const worksheet = XLSX.utils.aoa_to_sheet(data);
 
   // Apply styles
   Object.entries(gridData).forEach(([cellId, cellData]) => {
@@ -166,6 +167,6 @@ export const exportExcelData = (gridData: GridData) => {
     }
   });
 
-  window.XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-  window.XLSX.writeFile(workbook, 'excel_export.xlsx');
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  XLSX.writeFile(workbook, 'excel_export.xlsx');
 };
