@@ -1,42 +1,48 @@
-interface GridData {
-  [key: string]: {
-    value: string;
-    id: string;
-    formula?: string;
-  };
-}
-
-const memoizedValues = new Map<string, string | number>();
-
-export const evaluateFormula = (formula: string, gridData: GridData): string | number => {
-  if (!formula.startsWith('=')) {
-    return formula;
-  }
-
-  const cacheKey = `${formula}-${JSON.stringify(gridData)}`;
-  if (memoizedValues.has(cacheKey)) {
-    return memoizedValues.get(cacheKey)!;
-  }
-
+export const evaluateFormula = (formula: string): number => {
   try {
+    // Remove the = sign
     const expression = formula.substring(1);
-    const evaluatedExpression = expression.replace(/[A-Z]+[0-9]+/g, (match) => {
-      const cellValue = gridData[match]?.value || '0';
-      return isNaN(Number(cellValue)) ? '0' : cellValue;
-    });
-
-    const result = Function(`"use strict"; return (${evaluatedExpression})`)();
-    memoizedValues.set(cacheKey, result);
     
-    // Prevent memory leaks by limiting cache size
-    if (memoizedValues.size > 1000) {
-      const firstKey = memoizedValues.keys().next().value;
-      memoizedValues.delete(firstKey);
+    // Split the expression into parts
+    const parts = expression.split(/([+\-*/])/);
+    
+    // Convert parts to numbers and operators
+    const numbers = parts.map(part => {
+      const trimmed = part.trim();
+      if (['+', '-', '*', '/'].includes(trimmed)) {
+        return trimmed;
+      }
+      return isNaN(Number(trimmed)) ? 0 : Number(trimmed);
+    });
+    
+    // Calculate result
+    let result = numbers[0] as number;
+    for (let i = 1; i < numbers.length; i += 2) {
+      const operator = numbers[i] as string;
+      const nextNumber = numbers[i + 1] as number;
+      
+      switch (operator) {
+        case '+':
+          result += nextNumber;
+          break;
+        case '-':
+          result -= nextNumber;
+          break;
+        case '*':
+          result *= nextNumber;
+          break;
+        case '/':
+          if (nextNumber === 0) {
+            throw new Error('Division by zero');
+          }
+          result /= nextNumber;
+          break;
+      }
     }
-
+    
     return result;
   } catch (error) {
     console.error('Formula evaluation error:', error);
-    return 'ERROR';
+    return 0;
   }
 };
