@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
-import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 import { Receipt, TrendingUp, TrendingDown, Calendar, ArrowUp, ArrowDown } from "lucide-react";
 import { startOfDay, subDays } from "date-fns";
 
 const ExpenseOverview = () => {
-  const expenses = useStore((state) => state.expenses);
+  const { expenses } = useExpenseStore();
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   
   const today = startOfDay(new Date());

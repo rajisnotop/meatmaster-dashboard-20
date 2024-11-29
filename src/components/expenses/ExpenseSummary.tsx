@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 
 const ExpenseSummary = () => {
-  const expenses = useStore((state) => state.expenses);
+  const { expenses } = useExpenseStore();
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
   return (

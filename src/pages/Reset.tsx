@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 import { toast } from "sonner";
 import { ResetFilters } from "@/components/reset/ResetFilters";
 import { ResetConfirmDialog } from "@/components/reset/ResetConfirmDialog";
@@ -16,7 +17,8 @@ const Reset = () => {
     specificDate: "",
   });
   
-  const { orders, expenses, setOrders, setExpenses } = useStore();
+  const { orders, setOrders } = useStore();
+  const { expenses, setExpenses } = useExpenseStore();
 
   const handleReset = () => {
     const { timeFilter, startDate, endDate, specificDate } = filters;

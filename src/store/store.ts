@@ -126,6 +126,7 @@ export const useStore = create<StoreState>()(
           }));
         },
 
+        setOrders: (orders) => set({ orders }),
       }),
       {
         name: 'meat-shop-storage',

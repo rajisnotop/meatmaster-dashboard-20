@@ -1,14 +1,25 @@
 import { Card } from "@/components/ui/card";
 import { Receipt } from "lucide-react";
-import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 
 interface ExpensesCardProps {
   totalExpenses: number;
 }
 
 const ExpensesCard = ({ totalExpenses }: ExpensesCardProps) => {
-  const getCashExpenses = useStore((state) => state.getCashExpenses);
-  const getOnlineExpenses = useStore((state) => state.getOnlineExpenses);
+  const expenses = useExpenseStore((state) => state.expenses);
+  
+  const getCashExpenses = () => {
+    return expenses
+      .filter(expense => expense.paymentMethod === 'cash')
+      .reduce((sum, expense) => sum + expense.amount, 0);
+  };
+
+  const getOnlineExpenses = () => {
+    return expenses
+      .filter(expense => expense.paymentMethod === 'online')
+      .reduce((sum, expense) => sum + expense.amount, 0);
+  };
 
   return (
     <Card className="p-6 bg-gradient-to-br from-red-900/30 to-red-800/30 border-red-700/50">

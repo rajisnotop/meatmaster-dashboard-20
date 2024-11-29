@@ -8,9 +8,11 @@ import ProfitTrendsChart from "@/components/reports/ProfitTrendsChart";
 import RecentCustomers from "@/components/reports/RecentCustomers";
 import TopProducts from "@/components/reports/TopProducts";
 import { useStore } from "@/store/store";
+import { useExpenseStore } from "@/store/expenseStore";
 
 const Reports = () => {
-  const { orders, expenses } = useStore();
+  const { orders } = useStore();
+  const { expenses } = useExpenseStore();
 
   // Calculate metrics
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);

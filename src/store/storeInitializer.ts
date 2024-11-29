@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
-import { transformDatabaseOrder, transformDatabaseExpense } from '@/utils/dataTransformers';
-import { DatabaseOrder, DatabaseProduct, DatabaseExpense, SupabasePayload } from '@/types/supabase';
+import { transformDatabaseOrder } from '@/utils/dataTransformers';
+import { DatabaseOrder, DatabaseProduct, SupabasePayload } from '@/types/supabase';
 import { StoreState } from './store';
 
 export const initializeStore = async (set: (state: Partial<StoreState>) => void, get: () => StoreState) => {
@@ -27,25 +27,11 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
       console.error('Error fetching orders:', ordersRes.error);
     }
 
-    const expensesRes = await supabase.from('expenses').select(`
-      id,
-      category,
-      amount,
-      description,
-      date,
-      paymentmethod
-    `);
-    if (expensesRes.error) {
-      console.error('Error fetching expenses:', expensesRes.error);
-    }
-
     const transformedOrders = ordersRes.data?.map(transformDatabaseOrder) || [];
-    const transformedExpenses = expensesRes.data?.map(transformDatabaseExpense) || [];
 
     set({
       products: (productsRes.data || []) as DatabaseProduct[],
       orders: transformedOrders,
-      expenses: transformedExpenses
     });
 
     // Set up real-time subscriptions
@@ -93,30 +79,6 @@ export const initializeStore = async (set: (state: Partial<StoreState>) => void,
             case 'UPDATE':
               if (transformedOrder) {
                 set({ orders: currentOrders.map(o => o.id === transformedOrder.id ? transformedOrder : o) });
-              }
-              break;
-          }
-        })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' },
-        (payload: SupabasePayload<DatabaseExpense>) => {
-          console.log('Expense change received:', payload);
-          const currentExpenses = get().expenses;
-          const transformedExpense = payload.new ? transformDatabaseExpense(payload.new) : null;
-
-          switch (payload.eventType) {
-            case 'INSERT':
-              if (transformedExpense) {
-                set({ expenses: [...currentExpenses, transformedExpense] });
-              }
-              break;
-            case 'DELETE':
-              if (payload.old) {
-                set({ expenses: currentExpenses.filter(e => e.id !== payload.old?.id) });
-              }
-              break;
-            case 'UPDATE':
-              if (transformedExpense) {
-                set({ expenses: currentExpenses.map(e => e.id === transformedExpense.id ? transformedExpense : e) });
               }
               break;
           }
