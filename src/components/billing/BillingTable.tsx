@@ -43,11 +43,10 @@ const BillingTable = ({
   openingBalance,
   setOpeningBalance,
 }: BillingTableProps) => {
-  const getCashExpenses = useExpenseStore((state) => state.getCashExpenses);
-  const getOnlineExpenses = useExpenseStore((state) => state.getOnlineExpenses);
+  const expenseStore = useExpenseStore();
   
-  const cashExpenses = getCashExpenses();
-  const onlineExpenses = getOnlineExpenses();
+  const cashExpenses = expenseStore.getCashExpenses();
+  const onlineExpenses = expenseStore.getOnlineExpenses();
   
   const cashInCounter = (overallTotals.sales || 0) + (overallTotals.unpaid || 0) - cashExpenses;
   const cashInBank = (overallTotals.paidWithQR || 0) + (overallTotals.unpaidToPaidQR || 0) - onlineExpenses;

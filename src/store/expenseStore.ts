@@ -11,12 +11,14 @@ interface ExpenseStore {
   deleteExpense: (id: string) => Promise<void>;
   setExpenses: (expenses: Expense[]) => void;
   initializeExpenses: () => Promise<void>;
+  getCashExpenses: () => number;
+  getOnlineExpenses: () => number;
 }
 
 export const useExpenseStore = create<ExpenseStore>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
         expenses: [],
         isLoading: false,
         error: null,
@@ -103,6 +105,20 @@ export const useExpenseStore = create<ExpenseStore>()(
         },
 
         setExpenses: (expenses) => set({ expenses }),
+
+        getCashExpenses: () => {
+          const state = get();
+          return state.expenses
+            .filter(expense => expense.paymentMethod === 'cash')
+            .reduce((sum, expense) => sum + expense.amount, 0);
+        },
+
+        getOnlineExpenses: () => {
+          const state = get();
+          return state.expenses
+            .filter(expense => expense.paymentMethod === 'online')
+            .reduce((sum, expense) => sum + expense.amount, 0);
+        }
       }),
       {
         name: 'expense-storage',
