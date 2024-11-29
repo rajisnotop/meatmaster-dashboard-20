@@ -6,17 +6,7 @@ import { ExcelToolbar } from '@/components/excel/ExcelToolbar';
 import ExcelGrid from '@/components/excel/ExcelGrid';
 import { evaluateFormula } from '@/utils/excelFormulas';
 import { exportExcelData } from '@/utils/excelDataTransfer';
-import {
-  Bold,
-  Italic,
-  Underline,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  PaintBucket,
-  Calculator,
-  FileDown
-} from 'lucide-react';
+import { FileDown } from 'lucide-react';
 
 interface CellData {
   value: string;
@@ -28,6 +18,7 @@ interface CellData {
     color?: string;
     backgroundColor?: string;
     align?: 'left' | 'center' | 'right';
+    fontSize?: string;
   };
   formula?: string;
 }
@@ -41,6 +32,7 @@ const Excel = () => {
   const location = useLocation();
   const [gridData, setGridData] = useState<GridData>({});
   const [selectedCell, setSelectedCell] = useState<string | null>(null);
+  const [clipboard, setClipboard] = useState<{ value: string; style?: any } | null>(null);
 
   useEffect(() => {
     const savedData = localStorage.getItem('excelData');
@@ -69,18 +61,21 @@ const Excel = () => {
     };
     
     if (value.startsWith('=')) {
-      const result = evaluateFormula(value);
-      newGridData[cellId].value = result.toString();
+      try {
+        const result = evaluateFormula(value, gridData);
+        newGridData[cellId].value = result.toString();
+      } catch (error) {
+        console.error('Formula evaluation error:', error);
+        toast({
+          title: "Formula Error",
+          description: error instanceof Error ? error.message : "Invalid formula",
+          variant: "destructive"
+        });
+      }
     }
     
     setGridData(newGridData);
     localStorage.setItem('excelData', JSON.stringify(newGridData));
-    
-    toast({
-      title: "Cell Updated",
-      description: `${cellId}: ${value}`,
-      duration: 1000
-    });
   };
 
   const getCellValue = (row: number, col: number) => {
@@ -97,11 +92,12 @@ const Excel = () => {
       textDecoration: cell?.style?.underline ? 'underline' : 'none',
       color: cell?.style?.color || 'inherit',
       backgroundColor: cell?.style?.backgroundColor || 'transparent',
-      textAlign: cell?.style?.align || 'left'
+      textAlign: cell?.style?.align || 'left',
+      fontSize: cell?.style?.fontSize || 'inherit'
     };
   };
 
-  const handleStyleChange = (styleType: keyof CellData['style'], value: any) => {
+  const handleStyleChange = (styleType: string, value: any) => {
     if (!selectedCell) return;
     
     const newGridData = {
@@ -117,6 +113,51 @@ const Excel = () => {
     
     setGridData(newGridData);
     localStorage.setItem('excelData', JSON.stringify(newGridData));
+  };
+
+  const handleCopy = () => {
+    if (!selectedCell || !gridData[selectedCell]) return;
+    setClipboard({
+      value: gridData[selectedCell].value,
+      style: gridData[selectedCell].style
+    });
+    toast({
+      title: "Copied",
+      description: "Cell content copied to clipboard",
+      duration: 2000
+    });
+  };
+
+  const handleCut = () => {
+    if (!selectedCell || !gridData[selectedCell]) return;
+    handleCopy();
+    const newGridData = { ...gridData };
+    newGridData[selectedCell] = {
+      ...newGridData[selectedCell],
+      value: '',
+      style: {}
+    };
+    setGridData(newGridData);
+    localStorage.setItem('excelData', JSON.stringify(newGridData));
+  };
+
+  const handlePaste = () => {
+    if (!selectedCell || !clipboard) return;
+    const newGridData = {
+      ...gridData,
+      [selectedCell]: {
+        ...gridData[selectedCell],
+        value: clipboard.value,
+        style: clipboard.style
+      }
+    };
+    setGridData(newGridData);
+    localStorage.setItem('excelData', JSON.stringify(newGridData));
+    toast({
+      title: "Pasted",
+      description: "Content pasted successfully",
+      duration: 2000
+    });
   };
 
   const handleExport = () => {
@@ -147,62 +188,13 @@ const Excel = () => {
           </div>
         </div>
 
-        <div className="p-4 border-b flex items-center gap-2">
-          <button
-            onClick={() => handleStyleChange('bold', !gridData[selectedCell!]?.style?.bold)}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <Bold className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => handleStyleChange('italic', !gridData[selectedCell!]?.style?.italic)}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <Italic className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => handleStyleChange('underline', !gridData[selectedCell!]?.style?.underline)}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <Underline className="h-4 w-4" />
-          </button>
-          <div className="h-6 w-px bg-gray-300 mx-2" />
-          <button
-            onClick={() => handleStyleChange('align', 'left')}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <AlignLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => handleStyleChange('align', 'center')}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <AlignCenter className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => handleStyleChange('align', 'right')}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <AlignRight className="h-4 w-4" />
-          </button>
-          <div className="h-6 w-px bg-gray-300 mx-2" />
-          <input
-            type="color"
-            onChange={(e) => handleStyleChange('color', e.target.value)}
-            className="w-8 h-8 p-1"
-          />
-          <button
-            onClick={() => handleStyleChange('backgroundColor', '#f0f0f0')}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <PaintBucket className="h-4 w-4" />
-          </button>
-          <div className="h-6 w-px bg-gray-300 mx-2" />
-          <Calculator className="h-4 w-4" />
-          <span className="text-sm text-gray-500">
-            Use =A1+B1 for formulas
-          </span>
-        </div>
+        <ExcelToolbar
+          onStyleChange={handleStyleChange}
+          selectedCell={selectedCell}
+          onCopy={handleCopy}
+          onCut={handleCut}
+          onPaste={handlePaste}
+        />
           
         <ExcelGrid
           gridData={gridData}
