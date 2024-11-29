@@ -115,7 +115,7 @@ export const convertBillingDataToExcelData = (productTotals: any[], overallTotal
     bold: true,
     backgroundColor: '#2F5233',
     color: '#FFFFFF',
-    align: 'center'
+    align: 'center' as const // Fixed: Using "as const" to ensure correct type
   };
 
   // Headers with styling
@@ -137,42 +137,42 @@ export const convertBillingDataToExcelData = (productTotals: any[], overallTotal
     gridData[`A${row}`] = {
       value: product.name,
       id: `A${row}`,
-      style: { align: 'left' }
+      style: { align: 'left' as const }
     };
     
     // Quantity
     gridData[`B${row}`] = {
       value: product.quantity.toString(),
       id: `B${row}`,
-      style: { align: 'right' }
+      style: { align: 'right' as const }
     };
     
     // Sales
     gridData[`C${row}`] = {
       value: product.amount.toString(),
       id: `C${row}`,
-      style: { align: 'right', color: '#2F5233' }
+      style: { align: 'right' as const, color: '#2F5233' }
     };
     
     // Paid with QR
     gridData[`D${row}`] = {
       value: (product.paidWithQR || 0).toString(),
       id: `D${row}`,
-      style: { align: 'right', color: '#2F5233' }
+      style: { align: 'right' as const, color: '#2F5233' }
     };
     
     // Unpaid to Paid
     gridData[`E${row}`] = {
       value: (product.unpaid || 0).toString(),
       id: `E${row}`,
-      style: { align: 'right', color: '#2F5233' }
+      style: { align: 'right' as const, color: '#2F5233' }
     };
     
     // Unpaid to Paid QR
     gridData[`F${row}`] = {
       value: (product.unpaidToPaidQR || 0).toString(),
       id: `F${row}`,
-      style: { align: 'right', color: '#2F5233' }
+      style: { align: 'right' as const, color: '#2F5233' }
     };
   });
 
@@ -182,13 +182,13 @@ export const convertBillingDataToExcelData = (productTotals: any[], overallTotal
     bold: true,
     backgroundColor: '#E8F5E9',
     color: '#2F5233',
-    align: 'right'
+    align: 'right' as const
   };
 
   gridData[`A${totalRow}`] = {
     value: 'Total',
     id: `A${totalRow}`,
-    style: { ...totalStyle, align: 'left' }
+    style: { ...totalStyle, align: 'left' as const }
   };
 
   // Add formulas for totals with styling
