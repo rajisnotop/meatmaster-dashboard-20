@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { FileDown, Printer } from "lucide-react";
 import { convertBillingDataToExcelData } from "@/utils/excelDataTransfer";
+import * as XLSX from 'xlsx';
 
 interface BillingHeaderProps {
   timeFilter: string;
@@ -70,6 +71,54 @@ const BillingHeader = ({
     });
   };
 
+  const handleDirectExcelExport = () => {
+    console.log('Starting direct Excel export...');
+    try {
+      const workbook = XLSX.utils.book_new();
+      
+      // Convert data to worksheet format
+      const wsData = productTotals.map(product => ({
+        Product: product.name,
+        'Total Sales (NPR)': product.amount || 0,
+        'Paid with QR (NPR)': product.paidWithQR || 0,
+        'Unpaid Amount (NPR)': product.unpaid || 0,
+        'Unpaid to Paid QR (NPR)': product.unpaidToPaidQR || 0
+      }));
+
+      // Add summary row
+      wsData.push({
+        Product: 'Total',
+        'Total Sales (NPR)': productTotals.reduce((sum, p) => sum + (p.amount || 0), 0),
+        'Paid with QR (NPR)': productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0),
+        'Unpaid Amount (NPR)': productTotals.reduce((sum, p) => sum + (p.unpaid || 0), 0),
+        'Unpaid to Paid QR (NPR)': productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0)
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(wsData);
+      
+      // Add the worksheet to the workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
+      
+      // Generate Excel file
+      XLSX.writeFile(workbook, 'sales_report.xlsx');
+      
+      console.log('Excel export completed successfully');
+      toast({
+        title: "Export Successful",
+        description: "The Excel file has been downloaded",
+        duration: 2000
+      });
+    } catch (error) {
+      console.error('Excel export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the Excel file",
+        variant: "destructive",
+        duration: 2000
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 mb-8">
       <div className="flex items-center justify-between">
@@ -106,7 +155,7 @@ const BillingHeader = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={onExportExcel}
+            onClick={handleDirectExcelExport}
             className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-700"
           >
             <FileDown className="w-4 h-4 mr-2" />
