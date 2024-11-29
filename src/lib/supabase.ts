@@ -15,11 +15,18 @@ export const fetchExpenses = async () => {
 
     if (error) {
       console.error('Error fetching expenses:', error);
+      if (error.code === '42P01') {
+        throw new Error('Expenses table does not exist. Please run the migrations first.');
+      }
       throw new Error(`Failed to fetch expenses: ${error.message}`);
     }
 
     console.log('Fetched expenses:', data);
-    return data || [];
+    return data?.map(expense => ({
+      ...expense,
+      date: new Date(expense.date),
+      paymentMethod: expense.payment_method
+    })) || [];
   } catch (error) {
     console.error('Error in fetchExpenses:', error);
     throw error instanceof Error ? error : new Error('Unknown error in fetchExpenses');
