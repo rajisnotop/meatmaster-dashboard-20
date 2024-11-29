@@ -62,7 +62,7 @@ const Excel = () => {
     
     if (value.startsWith('=')) {
       try {
-        const result = evaluateFormula(value, gridData);
+        const result = evaluateFormula(value, newGridData);
         newGridData[cellId].value = result.toString();
       } catch (error) {
         console.error('Formula evaluation error:', error);
