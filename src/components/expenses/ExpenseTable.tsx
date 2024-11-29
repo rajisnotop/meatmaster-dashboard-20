@@ -20,20 +20,26 @@ const ExpenseTable = ({ expenses, onDelete }: ExpenseTableProps) => {
     <div className="rounded-md border bg-card">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead className="text-right">Amount (NPR)</TableHead>
+          <TableRow className="bg-moss/20">
+            <TableHead className="text-forest font-semibold">Date</TableHead>
+            <TableHead className="text-forest font-semibold">Description</TableHead>
+            <TableHead className="text-forest font-semibold">Category</TableHead>
+            <TableHead className="text-forest font-semibold text-right">Amount (NPR)</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {expenses.map((expense) => (
-            <TableRow key={expense.id}>
-              <TableCell>{format(new Date(expense.date), "PPP")}</TableCell>
-              <TableCell>{expense.description}</TableCell>
-              <TableCell>{expense.category}</TableCell>
-              <TableCell className="text-right">
+            <TableRow key={expense.id} className="hover:bg-moss/10">
+              <TableCell className="text-forest">
+                {format(new Date(expense.date), "PPP")}
+              </TableCell>
+              <TableCell className="text-forest">
+                {expense.description}
+              </TableCell>
+              <TableCell className="text-forest">
+                {expense.category}
+              </TableCell>
+              <TableCell className="text-forest text-right">
                 {expense.amount.toLocaleString()}
               </TableCell>
             </TableRow>
