@@ -13,6 +13,7 @@ import {
 import { FileDown, Printer } from "lucide-react";
 import { convertBillingDataToExcelData } from "@/utils/excelDataTransfer";
 import * as XLSX from 'xlsx';
+import { useExpenseStore } from "@/store/expenseStore";
 
 interface BillingHeaderProps {
   timeFilter: string;
@@ -53,6 +54,7 @@ const BillingHeader = ({
 }: BillingHeaderProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const expenseStore = useExpenseStore();
 
   const handleExportToExcelPage = () => {
     const gridData = convertBillingDataToExcelData(productTotals, {
@@ -76,26 +78,96 @@ const BillingHeader = ({
     try {
       const workbook = XLSX.utils.book_new();
       
-      // Convert data to worksheet format
-      const wsData = productTotals.map(product => ({
-        Product: product.name,
-        'Total Sales (NPR)': product.amount || 0,
-        'Paid with QR (NPR)': product.paidWithQR || 0,
-        'Unpaid Amount (NPR)': product.unpaid || 0,
-        'Unpaid to Paid QR (NPR)': product.unpaidToPaidQR || 0
-      }));
+      // Sales Overview Section
+      const salesOverviewData = [
+        ['Sales Overview', ''],
+        ['Total Sales', `NPR ${productTotals.reduce((sum, p) => sum + (p.amount || 0), 0).toLocaleString()}`],
+        ['Opening Balance', `NPR ${openingBalance.toLocaleString()}`],
+        ['Quantity Sold', `${productTotals.reduce((sum, p) => sum + (p.quantity || 0), 0)} kg`],
+        ['', ''],
+      ];
 
-      // Add summary row
-      wsData.push({
-        Product: 'Total',
-        'Total Sales (NPR)': productTotals.reduce((sum, p) => sum + (p.amount || 0), 0),
-        'Paid with QR (NPR)': productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0),
-        'Unpaid Amount (NPR)': productTotals.reduce((sum, p) => sum + (p.unpaid || 0), 0),
-        'Unpaid to Paid QR (NPR)': productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0)
-      });
+      // Digital Payments Section
+      const totalQRPayments = productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0);
+      const totalUnpaidToQR = productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0);
+      const digitalPaymentsData = [
+        ['Digital Payments', ''],
+        ['QR Payments', `NPR ${totalQRPayments.toLocaleString()}`],
+        ['Unpaid to QR', `NPR ${totalUnpaidToQR.toLocaleString()}`],
+        ['Total Digital Pay', `NPR ${(totalQRPayments + totalUnpaidToQR).toLocaleString()}`],
+        ['', ''],
+      ];
 
-      const worksheet = XLSX.utils.json_to_sheet(wsData);
+      // Expenses Section
+      const cashExpenses = expenseStore.getCashExpenses();
+      const onlineExpenses = expenseStore.getOnlineExpenses();
+      const expensesData = [
+        ['Expenses', ''],
+        ['Total Expenses', `NPR ${totalExpenses.toLocaleString()}`],
+        ['Cash Expenses', `NPR ${cashExpenses.toLocaleString()}`],
+        ['Online Expenses', `NPR ${onlineExpenses.toLocaleString()}`],
+        ['', ''],
+      ];
+
+      // Financial Summary Section
+      const financialSummaryData = [
+        ['Financial Summary', ''],
+        ['Cash in Counter', `NPR ${cashInCounter.toLocaleString()}`],
+        ['Cash in Bank', `NPR ${(totalQRPayments + totalUnpaidToQR - onlineExpenses).toLocaleString()}`],
+        ['Net Amount', `NPR ${netProfit.toLocaleString()}`],
+        ['', ''],
+      ];
+
+      // Product Details Section
+      const productDetailsData = [
+        ['Product Details', '', '', '', ''],
+        ['Product', 'Total Sales (NPR)', 'Paid with QR (NPR)', 'Unpaid Amount (NPR)', 'Unpaid to Paid QR (NPR)'],
+        ...productTotals.map(product => [
+          product.name,
+          (product.amount || 0).toLocaleString(),
+          (product.paidWithQR || 0).toLocaleString(),
+          (product.unpaid || 0).toLocaleString(),
+          (product.unpaidToPaidQR || 0).toLocaleString()
+        ]),
+        [
+          'Total',
+          productTotals.reduce((sum, p) => sum + (p.amount || 0), 0).toLocaleString(),
+          productTotals.reduce((sum, p) => sum + (p.paidWithQR || 0), 0).toLocaleString(),
+          productTotals.reduce((sum, p) => sum + (p.unpaid || 0), 0).toLocaleString(),
+          productTotals.reduce((sum, p) => sum + (p.unpaidToPaidQR || 0), 0).toLocaleString()
+        ]
+      ];
+
+      // Combine all sections
+      const wsData = [
+        ...salesOverviewData,
+        ...digitalPaymentsData,
+        ...expensesData,
+        ...financialSummaryData,
+        ['', ''],  // Add spacing
+        ...productDetailsData
+      ];
+
+      const worksheet = XLSX.utils.aoa_to_sheet(wsData);
       
+      // Add styling
+      const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+      for (let R = range.s.r; R <= range.e.r; R++) {
+        for (let C = range.s.c; C <= range.e.c; C++) {
+          const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+          if (!worksheet[cell_address]) continue;
+          
+          // Style section headers
+          if (worksheet[cell_address].v && typeof worksheet[cell_address].v === 'string' && 
+              ['Sales Overview', 'Digital Payments', 'Expenses', 'Financial Summary', 'Product Details'].includes(worksheet[cell_address].v)) {
+            worksheet[cell_address].s = {
+              font: { bold: true, color: { rgb: "2F5233" } },
+              fill: { fgColor: { rgb: "E8F5E9" } }
+            };
+          }
+        }
+      }
+
       // Add the worksheet to the workbook
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
       
