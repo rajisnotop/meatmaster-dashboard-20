@@ -71,6 +71,45 @@ export const useStore = create<StoreState>()(
           }
         },
 
+        addProduct: async (product) => {
+          try {
+            console.log('Adding product:', product);
+            const { data, error } = await supabase
+              .from('products')
+              .insert([product])
+              .select()
+              .single();
+
+            if (error) throw error;
+            
+            set(state => ({
+              products: [...state.products, data]
+            }));
+          } catch (error) {
+            console.error('Error adding product:', error);
+            throw error;
+          }
+        },
+
+        deleteProduct: async (id) => {
+          try {
+            console.log('Deleting product:', id);
+            const { error } = await supabase
+              .from('products')
+              .delete()
+              .eq('id', id);
+
+            if (error) throw error;
+            
+            set(state => ({
+              products: state.products.filter(product => product.id !== id)
+            }));
+          } catch (error) {
+            console.error('Error deleting product:', error);
+            throw error;
+          }
+        },
+
         addOrder: async (order) => {
           try {
             console.log('Adding order:', order);
