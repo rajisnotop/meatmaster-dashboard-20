@@ -37,49 +37,76 @@ const OrderForm = ({ editingOrder = null }) => {
     }
   }, [order.quantity, selectedProduct]);
 
-  const handleSubmit = (isPaid: boolean, paidWithQR: boolean = false) => {
-    if (!order.productId || (!order.quantity && !order.price)) {
+  const handleSubmit = async (isPaid: boolean, paidWithQR: boolean = false) => {
+    try {
+      console.log('Submitting order...', { order, isPaid, paidWithQR });
+      
+      if (!order.productId || (!order.quantity && !order.price)) {
+        toast({
+          title: "Error",
+          description: "Please fill in required fields",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const product = products.find((p) => p.id === order.productId);
+      if (!product) {
+        console.error('Product not found');
+        return;
+      }
+
+      const total = product.price * Number(order.quantity);
+
+      const newOrder = {
+        id: editingOrder?.id || crypto.randomUUID(),
+        customerName: order.customerName || undefined,
+        productId: order.productId,
+        quantity: Number(order.quantity),
+        total,
+        isPaid,
+        paidWithQR,
+        wasUnpaid: editingOrder ? editingOrder.wasUnpaid : !isPaid,
+        date: new Date(),
+      };
+
+      console.log('Creating new order:', newOrder);
+
+      if (editingOrder) {
+        await updateOrder(newOrder);
+        toast({
+          title: "Success",
+          description: "Order updated successfully",
+        });
+      } else {
+        await addOrder(newOrder);
+        toast({
+          title: "Success",
+          description: `Order ${isPaid ? (paidWithQR ? 'created and marked as paid with QR' : 'created and marked as paid') : 'created as unpaid'} successfully`,
+        });
+      }
+
+      setOrder({
+        customerName: "",
+        productId: "",
+        quantity: "",
+        price: "",
+        date: new Date().toLocaleDateString()
+      });
+
+      // Force a small delay before navigation to ensure state updates
+      setTimeout(() => {
+        navigate("/orders");
+      }, 100);
+
+    } catch (error) {
+      console.error('Error submitting order:', error);
       toast({
         title: "Error",
-        description: "Please fill in required fields",
+        description: "Failed to create order. Please try again.",
         variant: "destructive",
       });
-      return;
     }
-
-    const product = products.find((p) => p.id === order.productId);
-    if (!product) return;
-
-    const total = product.price * Number(order.quantity);
-
-    const newOrder = {
-      id: editingOrder?.id || crypto.randomUUID(),
-      customerName: order.customerName || undefined,
-      productId: order.productId,
-      quantity: Number(order.quantity),
-      total,
-      isPaid,
-      paidWithQR,
-      wasUnpaid: editingOrder ? editingOrder.wasUnpaid : !isPaid,
-      date: new Date(),
-    };
-
-    if (editingOrder) {
-      updateOrder(newOrder);
-      toast({
-        title: "Success",
-        description: "Order updated successfully",
-      });
-    } else {
-      addOrder(newOrder);
-      toast({
-        title: "Success",
-        description: `Order ${isPaid ? (paidWithQR ? 'created and marked as paid with QR' : 'created and marked as paid') : 'created as unpaid'} successfully`,
-      });
-    }
-
-    setOrder({ customerName: "", productId: "", quantity: "", price: "", date: new Date().toLocaleDateString() });
-    navigate("/orders");
   };
 
   return (

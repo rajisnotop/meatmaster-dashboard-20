@@ -32,98 +32,133 @@ export const useStore = create<StoreState>()(
         initializeData: () => initializeStore(set, get),
 
         addProduct: async (product) => {
-          const { data, error } = await supabase
-            .from('products')
-            .insert([{ ...product }])
-            .select()
-            .single();
+          try {
+            console.log('Adding product:', product);
+            const { data, error } = await supabase
+              .from('products')
+              .insert([product])
+              .select()
+              .single();
 
-          if (error) throw error;
-          set(state => ({ products: [...state.products, data] }));
+            if (error) throw error;
+            
+            set(state => ({
+              products: [...state.products, data]
+            }));
+          } catch (error) {
+            console.error('Error adding product:', error);
+            throw error;
+          }
         },
 
         deleteProduct: async (id) => {
-          const { error } = await supabase
-            .from('products')
-            .delete()
-            .eq('id', id);
+          try {
+            console.log('Deleting product:', id);
+            const { error } = await supabase
+              .from('products')
+              .delete()
+              .eq('id', id);
 
-          if (error) throw error;
-          set(state => ({
-            products: state.products.filter(product => product.id !== id)
-          }));
+            if (error) throw error;
+            
+            set(state => ({
+              products: state.products.filter(product => product.id !== id)
+            }));
+          } catch (error) {
+            console.error('Error deleting product:', error);
+            throw error;
+          }
         },
 
         addOrder: async (order) => {
-          const supabaseOrder = {
-            customername: order.customerName,
-            productid: order.productId,
-            quantity: order.quantity,
-            total: order.total,
-            date: order.date.toISOString(),
-            ispaid: order.isPaid,
-            wasunpaid: order.wasUnpaid,
-            paidwithqr: order.paidWithQR
-          };
+          try {
+            console.log('Adding order to Supabase:', order);
+            const { data, error } = await supabase
+              .from('orders')
+              .insert([{
+                id: order.id,
+                customername: order.customerName,
+                productid: order.productId,
+                quantity: order.quantity,
+                total: order.total,
+                date: order.date.toISOString(),
+                ispaid: order.isPaid,
+                wasunpaid: order.wasUnpaid,
+                paidwithqr: order.paidWithQR
+              }])
+              .select()
+              .single();
 
-          const { data, error } = await supabase
-            .from('orders')
-            .insert([supabaseOrder])
-            .select()
-            .single();
-
-          if (error) throw error;
-          set(state => ({ orders: [...state.orders, { ...order, id: data.id }] }));
+            if (error) throw error;
+            
+            console.log('Order added successfully:', data);
+            set(state => ({
+              orders: [order, ...state.orders]
+            }));
+          } catch (error) {
+            console.error('Error adding order:', error);
+            throw error;
+          }
         },
 
-        updateOrder: async (updatedOrder) => {
-          const supabaseOrder = {
-            customername: updatedOrder.customerName,
-            productid: updatedOrder.productId,
-            quantity: updatedOrder.quantity,
-            total: updatedOrder.total,
-            date: updatedOrder.date.toISOString(),
-            ispaid: updatedOrder.isPaid,
-            wasunpaid: updatedOrder.wasUnpaid,
-            paidwithqr: updatedOrder.paidWithQR
-          };
+        updateOrder: async (order) => {
+          try {
+            console.log('Updating order:', order);
+            const { error } = await supabase
+              .from('orders')
+              .update({
+                customername: order.customerName,
+                productid: order.productId,
+                quantity: order.quantity,
+                total: order.total,
+                date: order.date.toISOString(),
+                ispaid: order.isPaid,
+                wasunpaid: order.wasUnpaid,
+                paidwithqr: order.paidWithQR
+              })
+              .eq('id', order.id);
 
-          const { error } = await supabase
-            .from('orders')
-            .update(supabaseOrder)
-            .eq('id', updatedOrder.id);
-
-          if (error) throw error;
-          set(state => ({
-            orders: state.orders.map(order =>
-              order.id === updatedOrder.id ? updatedOrder : order
-            )
-          }));
+            if (error) throw error;
+            
+            set(state => ({
+              orders: state.orders.map(o => o.id === order.id ? order : o)
+            }));
+          } catch (error) {
+            console.error('Error updating order:', error);
+            throw error;
+          }
         },
 
         updateOrderStatus: async (id, isPaid, paidWithQR = false) => {
-          const { error } = await supabase
-            .from('orders')
-            .update({ 
-              ispaid: isPaid, 
-              paidwithqr: paidWithQR,
-              wasunpaid: true 
-            })
-            .eq('id', id);
+          try {
+            console.log('Updating order status:', { id, isPaid, paidWithQR });
+            const { error } = await supabase
+              .from('orders')
+              .update({
+                ispaid: isPaid,
+                paidwithqr: paidWithQR,
+                wasunpaid: true
+              })
+              .eq('id', id);
 
-          if (error) throw error;
-          set(state => ({
-            orders: state.orders.map(order =>
-              order.id === id 
-                ? { 
-                    ...order, 
-                    isPaid, 
-                    wasUnpaid: true,
-                    paidWithQR 
-                  } 
-                : order
-            )
-          }));
+            if (error) throw error;
+            
+            set(state => ({
+              orders: state.orders.map(order =>
+                order.id === id
+                  ? {
+                      ...order,
+                      isPaid,
+                      wasUnpaid: true,
+                      paidWithQR
+                    }
+                  : order
+              )
+            }));
+          } catch (error) {
+            console.error('Error updating order status:', error);
+            throw error;
+          }
         },
 
         setOrders: (orders) => set({ orders }),
@@ -135,5 +170,5 @@ export const useStore = create<StoreState>()(
   )
 );
 
-// Initialize data when the app starts
+// Initialize data when the store is created
 useStore.getState().initializeData();
