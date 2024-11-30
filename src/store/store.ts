@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { Product, Order } from '@/types/types';
 import { supabase } from '@/lib/supabase';
-import { initializeStore } from './storeInitializer';
 
 export interface StoreState {
   products: Product[];
@@ -29,54 +28,55 @@ export const useStore = create<StoreState>()(
         cashInCounter: 0,
         netProfit: 0,
         
-        initializeData: () => initializeStore(set, get),
-
-        addProduct: async (product) => {
+        initializeData: async () => {
           try {
-            console.log('Adding product:', product);
-            const { data, error } = await supabase
+            console.log('Initializing data...');
+            const { data: ordersData, error: ordersError } = await supabase
+              .from('orders')
+              .select('*')
+              .order('date', { ascending: false });
+
+            if (ordersError) {
+              console.error('Error fetching orders:', ordersError);
+              throw ordersError;
+            }
+
+            const { data: productsData, error: productsError } = await supabase
               .from('products')
-              .insert([product])
-              .select()
-              .single();
+              .select('*');
 
-            if (error) throw error;
-            
-            set(state => ({
-              products: [...state.products, data]
+            if (productsError) {
+              console.error('Error fetching products:', productsError);
+              throw productsError;
+            }
+
+            const transformedOrders = ordersData.map(order => ({
+              id: order.id,
+              customerName: order.customername,
+              productId: order.productid,
+              quantity: order.quantity,
+              total: order.total,
+              date: new Date(order.date),
+              isPaid: order.ispaid,
+              wasUnpaid: order.wasunpaid,
+              paidWithQR: order.paidwithqr
             }));
-          } catch (error) {
-            console.error('Error adding product:', error);
-            throw error;
-          }
-        },
 
-        deleteProduct: async (id) => {
-          try {
-            console.log('Deleting product:', id);
-            const { error } = await supabase
-              .from('products')
-              .delete()
-              .eq('id', id);
-
-            if (error) throw error;
-            
-            set(state => ({
-              products: state.products.filter(product => product.id !== id)
-            }));
+            set({ 
+              orders: transformedOrders,
+              products: productsData
+            });
           } catch (error) {
-            console.error('Error deleting product:', error);
-            throw error;
+            console.error('Error initializing data:', error);
           }
         },
 
         addOrder: async (order) => {
           try {
-            console.log('Adding order to Supabase:', order);
+            console.log('Adding order:', order);
             const { data, error } = await supabase
               .from('orders')
               .insert([{
-                id: order.id,
                 customername: order.customerName,
                 productid: order.productId,
                 quantity: order.quantity,
