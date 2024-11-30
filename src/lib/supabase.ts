@@ -1,9 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://hfgsxjhujejgfnrcswxy.supabase.co';
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZ3N4amh1amVqZ2ZucmNzd3h5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMjcxNDM5NywiZXhwIjoyMDQ4MjkwMzk3fQ.R_5YV8Rv8xhmloOEkg2xJQ9WMetTZkgL8-kRYzkdbnU';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZ3N4amh1amVqZ2ZucmNzd3h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI3MTQzOTcsImV4cCI6MjA0ODI5MDM5N30.RNKnV5qwEl9iJqBqTqfyqaQwU7HNcYpPQDHqBnQM4Oc';
 
-export const supabase = createClient(supabaseUrl, supabaseServiceKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
 
 export const fetchExpenses = async () => {
   try {
